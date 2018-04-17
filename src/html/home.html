@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>中经汇金-主页</title>
+    <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
+    <script src="../../lib/jquery.min.js"></script>
+    <script src="../../lib/vue.js"></script>
+    <script src="../../lib/element-ui/lib/index.js"></script>
+    <style>
+        #home {
+            width: 100%;
+            height: 100%;
+        }
+        .info {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            height: 120px;
+            margin-bottom: 20px;
+        }
+        .info_detail {
+            width: calc(50% - 10px);
+            background: white;
+            height: 100%;
+            border-radius: 4px;
+            align-items: center;
+            display: flex;
+        }
+        .company {
+            width: 20%;
+            margin-left: 5%;
+        }
+        .num {
+            width: 20%;
+        }
+        .prices {
+            width: 13%;
+        }
+        .tip {
+            font-family: PingFangSC-Semibold;
+            font-size: 22px;
+            color: #6B778C;
+        }
+        .tip_detail {
+            font-family: PingFangSC-Regular;
+            font-size: 14px;
+            color: #999999;
+        }
+        .handle {
+            margin-left: 10%;
+        }
+        .handle button {
+            width: 64px;
+            height: 26px;
+            border-radius: 100px;
+            outline: 0;
+            border: none;
+            cursor: pointer;
+            font-family: PingFangSC-Medium;
+            font-size: 14px;
+            color: #FFFFFF;
+        }
+        .buy {
+            background: #FB7979;
+            margin-right: 20px;
+        }
+        .sell {
+            background: #3BCDB1;
+        }
+        .table_wrapper {
+            width: calc(100% - 20px);
+            height: calc(100% - 140px);
+            background: white;
+            padding-left: 20px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .table_content {
+            width: 100%;
+            height: 100%;
+        }
+        #tab-published, #tab-transaction {
+            width: 72px;
+            text-align: center;
+            padding: 0;
+            outline: none;
+        }
+        .el-tabs__nav .el-tabs__active-bar {
+            width: 72px!important;
+        }
+        .el-tabs__nav-wrap::after {
+            background-color: #E4E3E3;
+            height: 1px;
+        }
+        .el-tabs__active-bar {
+            background-color: #4B92E0;
+        }
+        .el-tabs__item {
+            height: 59px;
+            line-height: 59px;
+        }
+        .el-table th.is-leaf {
+            border: none;
+            background: #F9F9F9;
+            font-family: PingFangSC-Medium;
+            font-size: 14px;
+            color: #1F2D3D;
+            padding: 6px 0;
+        }
+        .el-table td {
+            color: #666666;
+            padding: 4px 0 3px;
+            font-family: PingFangSC-Regular;
+        }
+        .el-table tr {
+            height: 40px;
+        }
+        .el-button+.el-button {
+            margin-left: 0px;
+        }
+        .el-button--mini, .el-button--small {
+            font-size: 14px;
+        }
+        .el-button--text {
+            font-family: PingFangSC-Regular;
+            color: #2678D2;
+        }
+    </style>
+</head>
+<body>
+<div id="home">
+    <div class="info">
+        <div class="info_detail">
+            <div class="company">
+                <p class="tip">梦古堂</p>
+                <p class="tip_detail">股票名称</p>
+            </div>
+            <div class="num">
+                <p class="tip">100202</p>
+                <p class="tip_detail">股数</p>
+            </div>
+            <div class="prices">
+                <p class="tip">11.67</p>
+                <p class="tip_detail">参考单价(元)</p>
+            </div>
+            <div class="handle">
+                <button class="buy">买入</button>
+                <button class="sell">买入</button>
+            </div>
+        </div>
+        <div class="info_detail">
+            <div class="company">
+                <p class="tip">中经汇金</p>
+                <p class="tip_detail">股票名称</p>
+            </div>
+            <div class="num">
+                <p class="tip">698336</p>
+                <p class="tip_detail">股数</p>
+            </div>
+            <div class="prices">
+                <p class="tip">30.67</p>
+                <p class="tip_detail">参考单价(元)</p>
+            </div>
+            <div class="handle">
+                <button class="buy">买入</button>
+                <button class="sell">买入</button>
+            </div>
+        </div>
+    </div>
+    <div class="table_wrapper">
+        <div class="table_content">
+            <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tab-pane label="发布中" name="published">
+                    <div style="width: calc(100% - 20px);">
+                        <el-table :data="published">
+                            <el-table-column prop="name" label="交易股票">
+                            </el-table-column>
+                            <el-table-column prop="announcer" label="发布者">
+                            </el-table-column>
+                            <el-table-column prop="total_num" min-width="100px" label="发布数量(股)">
+                            </el-table-column>
+                            <el-table-column prop="tradable_num" min-width="110px" label="可交易数量(股)">
+                            </el-table-column>
+                            <el-table-column prop="price" label="发布单价(元)">
+                            </el-table-column>
+                            <el-table-column prop="publish_date" min-width="150px" label="发布时间" header-align="center"
+                                             align="center">
+                            </el-table-column>
+                            <el-table-column prop="note" min-width="150px" label="备注信息">
+                            </el-table-column>
+                            <el-table-column label="操作" header-align="center"
+                                             align="center">
+                                <template slot-scope="scope">
+                                    <el-button type="text" size="small">咨询</el-button>
+                                    <span style="font-size: 14px; color: #2678D2;">|</span>
+                                    <el-button  @click="buyClick(scope, scope.row)" type="text" size="small">购买</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </el-tab-pane>
+                <el-tab-pane label="交易记录" name="transaction">
+                    <div style="width: calc(100% - 20px);">
+                        <el-table :data="transaction">
+                            <el-table-column prop="name" label="交易股票">
+                            </el-table-column>
+                            <el-table-column prop="announcer" label="发布者">
+                            </el-table-column>
+                            <el-table-column prop="buyers" label="购买者">
+                            </el-table-column>
+                            <el-table-column prop="trading_num" label="交易数量(股)">
+                            </el-table-column>
+                            <el-table-column prop="price" label="交易单价(元)">
+                            </el-table-column>
+                            <el-table-column prop="publish_date" header-align="center"
+                                             align="center" min-width="150px" label="交易时间">
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </el-tab-pane>
+            </el-tabs>
+        </div>
+    </div>
+</div>
+    <script type="text/javascript">
+        $(function () {
+            var home = new Vue({
+                el: '#home',
+                data: {
+                    activeName: 'published',
+                    published: [{
+                        name: '梦古堂',
+                        announcer: '方阳春 女士',
+                        total_num: 1000,
+                        tradable_num: 1000,
+                        price: '10.77',
+                        publish_date: '2017/02/12 16:27:56',
+                        note: '线下交易只接受杭州同城交易'
+                    },
+                        {
+                            name: '梦古堂',
+                            announcer: '方阳春 女士',
+                            total_num: 1000,
+                            tradable_num: 1000,
+                            price: '10.77',
+                            publish_date: '2017/02/12 16:27:56',
+                            note: '线下交易只接受杭州同城交易'
+                        }],
+                    transaction: [{
+                        name: '中经汇金',
+                        announcer: '方阳春 女士',
+                        buyers: '周雅琼 女士',
+                        trading_num: 1000,
+                        price: 10.77,
+                        publish_date: '2017/02/12 16:27:56'
+                    },
+                        {
+                            name: '中经汇金',
+                            announcer: '方阳春 女士',
+                            buyers: '周雅琼 女士',
+                            trading_num: 1000,
+                            price: 10.77,
+                            publish_date: '2017/02/12 16:27:56'
+                        }]
+                },
+                methods: {
+                    handleClick (tab, event) {
+                        // console.log(tab.name);
+                        if (this.activeName === 'transaction') {
+                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
+                        } else {
+                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '0px');
+                        }
+                    },
+                    buyClick (scope, row) {
+                        // console.log(scope, row);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

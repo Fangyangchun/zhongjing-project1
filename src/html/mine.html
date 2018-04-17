@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>中经汇金-我的</title>
+    <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
+    <script src="../../lib/jquery.min.js"></script>
+    <script src="../../lib/vue.js"></script>
+    <script src="../../lib/element-ui/lib/index.js"></script>
+</head>
+<body>
+<div id="mine">
+    <el-table
+            ref="singleTable"
+            :data="tableData"
+            border
+            highlight-current-row
+            @current-change="handleCurrentChange"
+            style="width: 100%">
+        <el-table-column
+                type="index"
+                width="50">
+        </el-table-column>
+        <el-table-column
+                prop="date"
+                label="日期"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="name"
+                label="姓名"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="address"
+                label="地址">
+        </el-table-column>
+        <el-table-column
+                label="操作"
+                width="100">
+            <template slot-scope="scope">
+                <el-button @click="handleClick(scope.row.date)" type="text" size="small">查看</el-button>
+                <el-button type="text" size="small">编辑</el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    <div style="margin-top: 20px">
+        <el-button @click="setCurrent(tableData[1])">选中第二行</el-button>
+        <el-button @click="setCurrent()">取消选择</el-button>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var mine = new Vue({
+            el: '#mine',
+            data: {
+                tableData: [{
+                    date: '2016-05-02',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }, {
+                    date: '2016-05-04',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1517 弄'
+                }, {
+                    date: '2016-05-01',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1519 弄'
+                }, {
+                    date: '2016-05-03',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1516 弄'
+                }],
+                currentRow: null
+            },
+            methods: {
+                setCurrent(row) {
+                    this.$refs.singleTable.setCurrentRow(row);
+                },
+                handleClick (data) {
+                    console.log(data);
+                },
+                handleCurrentChange (val) {
+                    console.log(val);
+                    this.currentRow = val;
+
+                }
+            }
+        });
+    })
+</script>
+</body>
+</html>

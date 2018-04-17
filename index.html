@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>会员登录</title>
+    <link rel="stylesheet" href="lib/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="src/css/styles.css">
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/vue.js"></script>
+    <!--<script src="lib/vue-router.js"></script>-->
+    <script src="lib/element-ui/lib/index.js"></script>
+    <style>
+        .forms {
+            width: 290px;
+        }
+        .el-input {
+            margin-top: 30px;
+        }
+        .el-input__inner {
+            font-family: PingFangSC-Regular;
+            border-radius: 0px;
+            border: none;
+            border-bottom: 1px solid #DAE4EA;
+            color: #333333;
+            font-size: 14px;
+            height: 30px;
+            line-height: 30px;
+        }
+        .el-input--prefix .el-input__inner {
+            padding-left: 35px;
+        }
+        .el-input__icon {
+            line-height: 30px;
+        }
+        .el-input__inner::-webkit-input-placeholder {
+            font-family: PingFangSC-Regular;
+            font-size: 14px;
+            color: #BBBBBB;
+            letter-spacing: 0;
+        }
+        .el-input__inner::-moz-placeholder {
+            font-family: PingFangSC-Regular;
+            font-size: 14px;
+            color: #BBBBBB;
+            letter-spacing: 0;
+        }
+        .forms .el-button {
+            position: absolute;
+            line-height: 17px;
+            padding: 3px 0px;
+            width: 76px;
+            border: 1px solid #4993E5;
+            right: 10px;
+            bottom: 5px;
+        }
+        .forms .el-button--text {
+            font-size: 12px;
+            color: #4993E5;
+            letter-spacing: 0;
+        }
+        .forms .el-button:hover {
+            border: 1px solid #4993E5;
+        }
+        .forms .el-button:focus {
+            color: #BBBBBB;
+            border: 1px solid #BBBBBB;
+        }
+        .submit_info {
+            position: absolute;
+            bottom: 60px;
+        }
+        .submit_info .el-button.is-round {
+            width: 141px;
+            height: 42px;
+            padding: 0;
+            box-shadow: 0 6px 4px 0 #B5D8FF;
+            border-radius: 75px;
+            font-family: PingFangSC-Regular;
+            font-size: 18px;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="content_box">
+            <div class="login_img"></div>
+            <div class="form_box">
+                <p>内部股权交易系统</p>
+                <div class="forms">
+                    <el-input
+                            placeholder="请输入身份证号"
+                            prefix-icon="el-icon-date"
+                            v-model="ID_number">
+                    </el-input>
+                    <div style="position: relative;">
+                        <el-input
+                                placeholder="请输入手机号"
+                                prefix-icon="el-icon-date"
+                                v-model="TEL_number">
+                        </el-input>
+                        <el-button type="text">发送验证码</el-button>
+                    </div>
+                    <el-input
+                            placeholder="请输入验证码"
+                            prefix-icon="el-icon-date"
+                            v-model="Verifi_code">
+                    </el-input>
+                </div>
+                <div class="submit_info">
+                    <el-button type="primary" round @click="loginCheck">登录</el-button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    ID_number: '',
+                    TEL_number: '',
+                    Verifi_code: ''
+
+                },
+                methods: {
+                    loginCheck () {
+                        window.location.href = `src/html/backend.html`
+                        + `?role=3&&account=fangyc&&resource=home`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
