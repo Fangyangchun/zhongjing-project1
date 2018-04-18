@@ -74,11 +74,12 @@
             background: white;
             padding-left: 20px;
             border-radius: 4px;
-            overflow: hidden;
+            overflow-y: auto;
         }
         .table_content {
             width: 100%;
             height: 100%;
+            position: relative;
         }
         #tab-published, #tab-transaction {
             width: 72px;
@@ -126,6 +127,79 @@
             font-family: PingFangSC-Regular;
             color: #2678D2;
         }
+        .pagination_box {
+            display: flex;
+            justify-content: flex-end;
+            margin: 20px 0 10px;
+        }
+        .pagination_box i {
+            padding-left: 0;
+        }
+        .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li {
+            margin: 0;
+            background: #FFFFFF;
+            border: 1px solid #D3DCE6;
+            font-family: HelveticaNeue;
+            color: #475669;
+            min-width: 28px;
+            border-radius: 0;
+        }
+        .el-pagination.is-background .btn-next, .el-pagination.is-background .el-pager li {
+            border-left: none;
+        }
+        .el-pagination.is-background .btn-prev i, .el-pagination.is-background .btn-next i {
+            color: #99A9BF;
+        }
+        .el-pagination.is-background .btn-prev.disabled i, .el-pagination.is-background .btn-next.disabled i {
+            color: #D3DCE6;
+        }
+        .el-pagination.is-background .el-pager li:not(.disabled).active {
+            background: #2678D2;
+            font-family: HelveticaNeue;
+        }
+        .el-pagination span:not([class*=suffix]) {
+            margin: 0 10px;
+            color: #475669;
+        }
+        .block {
+            position: absolute;
+            right: 30px;
+            top: 12px;
+            z-index: 1;
+        }
+        .el-input__inner {
+            border-radius: 37px;
+            height: 35px;
+            line-height: 35px;
+            border: 1px solid #E4E4E4;
+        }
+        .el-date-editor .el-range-input {
+            font-family: PingFangSC-Medium;
+            font-size: 12px;
+            color: #333333;
+        }
+        .el-date-editor .el-range__icon {
+            font-size: 12px;
+            line-height: 1;
+        }
+        .el-date-editor .el-range__close-icon {
+            line-height: 1;
+        }
+        .el-date-editor .el-range-separator {
+            line-height: 27px;
+            color: #333333;
+        }
+        .el-date-editor .el-range-input::-webkit-input-placeholder {
+            font-size: 12px;
+            color: #AAAAAA;
+        }
+        .el-date-editor .el-range-inpu::-moz-placeholder {
+            font-size: 12px;
+            color: #AAAAAA;
+        }
+        .el-date-editor--daterange.el-input, .el-date-editor--daterange.el-input__inner, .el-date-editor--timerange.el-input, .el-date-editor--timerange.el-input__inner {
+            width: 300px;
+        }
     </style>
 </head>
 <body>
@@ -170,6 +244,19 @@
     </div>
     <div class="table_wrapper">
         <div class="table_content">
+            <div class="block">
+                <el-date-picker v-model="value" type="daterange"
+                                align="right"
+                                unlink-panels
+                                range-separator="-"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                :picker-options="pickerOptions"
+                                :default-value="new Date(`${nowYear}-${nowMonth}-1`)"
+                                @change="dateChangeHandle"
+                                value-format="yyyy-MM-dd">
+                </el-date-picker>
+            </div>
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="发布中" name="published">
                     <div style="width: calc(100% - 20px);">
@@ -178,11 +265,11 @@
                             </el-table-column>
                             <el-table-column prop="announcer" label="发布者">
                             </el-table-column>
-                            <el-table-column prop="total_num" min-width="100px" label="发布数量(股)">
+                            <el-table-column prop=total_num min-width="100px" label="发布数量(股)">
                             </el-table-column>
-                            <el-table-column prop="tradable_num" min-width="110px" label="可交易数量(股)">
+                            <el-table-column prop=tradable_num min-width="110px" label="可交易数量(股)">
                             </el-table-column>
-                            <el-table-column prop="price" label="发布单价(元)">
+                            <el-table-column prop=price label="发布单价(元)">
                             </el-table-column>
                             <el-table-column prop="publish_date" min-width="150px" label="发布时间" header-align="center"
                                              align="center">
@@ -194,10 +281,17 @@
                                 <template slot-scope="scope">
                                     <el-button type="text" size="small">咨询</el-button>
                                     <span style="font-size: 14px; color: #2678D2;">|</span>
-                                    <el-button  @click="buyClick(scope, scope.row)" type="text" size="small">购买</el-button>
+                                    <el-button  @click="buyClick(scope, scope.row)"
+                                                type="text" size="small">购买</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
+                        <div class="pagination_box">
+                            <el-pagination background layout="prev, pager, next, jumper"
+                                           :page-size=pagesize :total=publish_total
+                                           @current-change="handleCurrentChange1">
+                            </el-pagination>
+                        </div>
                     </div>
                 </el-tab-pane>
                 <el-tab-pane label="交易记录" name="transaction">
@@ -209,14 +303,20 @@
                             </el-table-column>
                             <el-table-column prop="buyers" label="购买者">
                             </el-table-column>
-                            <el-table-column prop="trading_num" label="交易数量(股)">
+                            <el-table-column prop=trading_num label="交易数量(股)">
                             </el-table-column>
-                            <el-table-column prop="price" label="交易单价(元)">
+                            <el-table-column prop=price label="交易单价(元)">
                             </el-table-column>
                             <el-table-column prop="publish_date" header-align="center"
                                              align="center" min-width="150px" label="交易时间">
                             </el-table-column>
                         </el-table>
+                        <div class="pagination_box">
+                            <el-pagination background layout="prev, pager, next, jumper"
+                                           :page-size=pagesize :total=transaction_total
+                                           @current-change="handleCurrentChange2">
+                            </el-pagination>
+                        </div>
                     </div>
                 </el-tab-pane>
             </el-tabs>
@@ -228,41 +328,60 @@
             var home = new Vue({
                 el: '#home',
                 data: {
+                    nowYear: new Date().getFullYear(),
+                    nowMonth: new Date().getMonth(),
                     activeName: 'published',
+                    pagesize: 8,
+                    publish_total: 12,
+                    transaction_total: 12,
+                    value: '',
+                    pickerOptions: {
+                        shortcuts: [{
+                            text: '最近一周',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近一个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近三个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }],
+                        disabledDate (time) {
+                            return time.getTime() > Date.now() - 8.64e6;
+                        }
+                    },
                     published: [{
                         name: '梦古堂',
                         announcer: '方阳春 女士',
                         total_num: 1000,
                         tradable_num: 1000,
-                        price: '10.77',
-                        publish_date: '2017/02/12 16:27:56',
+                        price: 10.77,
+                        publish_date: '2017-02-12 16:27:56',
                         note: '线下交易只接受杭州同城交易'
-                    },
-                        {
-                            name: '梦古堂',
-                            announcer: '方阳春 女士',
-                            total_num: 1000,
-                            tradable_num: 1000,
-                            price: '10.77',
-                            publish_date: '2017/02/12 16:27:56',
-                            note: '线下交易只接受杭州同城交易'
-                        }],
+                    }],
                     transaction: [{
                         name: '中经汇金',
                         announcer: '方阳春 女士',
                         buyers: '周雅琼 女士',
                         trading_num: 1000,
                         price: 10.77,
-                        publish_date: '2017/02/12 16:27:56'
-                    },
-                        {
-                            name: '中经汇金',
-                            announcer: '方阳春 女士',
-                            buyers: '周雅琼 女士',
-                            trading_num: 1000,
-                            price: 10.77,
-                            publish_date: '2017/02/12 16:27:56'
-                        }]
+                        publish_date: '2017-02-12 16:27:56'
+                    }]
                 },
                 methods: {
                     handleClick (tab, event) {
@@ -275,6 +394,19 @@
                     },
                     buyClick (scope, row) {
                         // console.log(scope, row);
+                    },
+                    dateChangeHandle (val) {
+                        if (val) {
+                          console.log(val);
+                        } else {
+                            console.log('读取无日期筛选的数据');
+                        }
+                    },
+                    handleCurrentChange1 (val) {
+                        console.log(val);
+                    },
+                    handleCurrentChange2 (val) {
+                        console.log(val);
                     }
                 }
             });
