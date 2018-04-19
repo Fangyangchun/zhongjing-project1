@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="484033e5-fe6c-402d-9235-9291abfc5e49" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/src/html/home.html" afterPath="$PROJECT_DIR$/src/html/home.html" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/src/html/header.html" afterPath="$PROJECT_DIR$/src/html/header.html" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -16,16 +17,22 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="home.html" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/html/home.html">
+      <file leaf-file-name="header.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/html/header.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="325">
-              <caret line="358" column="67" lean-forward="true" selection-start-line="358" selection-start-column="67" selection-end-line="358" selection-end-column="67" />
-              <folding>
-                <element signature="n#style#0;n#div#0;n#el-tab-pane#0;n#el-tabs#0;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#span#0;n#template#0;n#el-table-column#7;n#el-table#0;n#div#0;n#el-tab-pane#0;n#el-tabs#0;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#el-tab-pane#1;n#el-tabs#0;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-              </folding>
+            <state relative-caret-position="497">
+              <caret line="288" column="36" lean-forward="false" selection-start-line="288" selection-start-column="36" selection-end-line="288" selection-end-column="36" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="324">
+              <caret line="45" column="9" lean-forward="true" selection-start-line="34" selection-start-column="8" selection-end-line="45" selection-end-column="9" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -47,6 +54,10 @@
       <find>onclick</find>
       <find>::</find>
       <find>table_content</find>
+      <find>rules</find>
+      <find>rules1</find>
+      <find>ruleForm</find>
+      <find>.el-dialog__footer</find>
     </findStrings>
     <replaceStrings>
       <replace>width: 100%; text-align: center;</replace>
@@ -68,14 +79,14 @@
         <option value="$PROJECT_DIR$/src/html/reporter.html" />
         <option value="$PROJECT_DIR$/src/js/server.js" />
         <option value="$PROJECT_DIR$/src/html/mine.html" />
-        <option value="$PROJECT_DIR$/src/html/header.html" />
-        <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/src/html/backend.html" />
         <option value="$PROJECT_DIR$/src/html/params.html" />
         <option value="$PROJECT_DIR$/src/html/orders.html" />
         <option value="$PROJECT_DIR$/src/html/aside.html" />
         <option value="$PROJECT_DIR$/src/css/styles.css" />
         <option value="$PROJECT_DIR$/src/html/home.html" />
+        <option value="$PROJECT_DIR$/index.html" />
+        <option value="$PROJECT_DIR$/src/html/header.html" />
       </list>
     </option>
   </component>
@@ -92,7 +103,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="23" />
+    <option name="x" value="-1440" />
+    <option name="y" value="56" />
     <option name="width" value="1440" />
     <option name="height" value="797" />
   </component>
@@ -231,15 +243,15 @@
       <workItem from="1523857510675" duration="3421000" />
       <workItem from="1523928817358" duration="22514000" />
       <workItem from="1523972921264" duration="8220000" />
-      <workItem from="1524013879451" duration="19462000" />
+      <workItem from="1524013879451" duration="35399000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="96371000" />
+    <option name="totallyTimeSpent" value="112308000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="797" extended-state="0" />
+    <frame x="-1440" y="56" width="1440" height="797" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20789288" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -394,13 +406,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/html/header.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="513">
-          <caret line="45" column="38" lean-forward="false" selection-start-line="45" selection-start-column="17" selection-end-line="45" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/html/mine.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="353">
@@ -501,23 +506,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1337">
-          <caret line="128" column="38" lean-forward="true" selection-start-line="128" selection-start-column="38" selection-end-line="128" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/html/home.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="325">
-          <caret line="358" column="67" lean-forward="true" selection-start-line="358" selection-start-column="67" selection-end-line="358" selection-end-column="67" />
+        <state relative-caret-position="1105">
+          <caret line="364" column="35" lean-forward="false" selection-start-line="364" selection-start-column="35" selection-end-line="364" selection-end-column="35" />
           <folding>
             <element signature="n#style#0;n#div#0;n#el-tab-pane#0;n#el-tabs#0;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#span#0;n#template#0;n#el-table-column#7;n#el-table#0;n#div#0;n#el-tab-pane#0;n#el-tabs#0;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#el-tab-pane#1;n#el-tabs#0;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="45" column="9" lean-forward="true" selection-start-line="34" selection-start-column="8" selection-end-line="45" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/html/header.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="497">
+          <caret line="288" column="36" lean-forward="false" selection-start-line="288" selection-start-column="36" selection-end-line="288" selection-end-column="36" />
+          <folding />
         </state>
       </provider>
     </entry>

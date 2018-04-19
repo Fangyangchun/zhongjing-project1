@@ -8,44 +8,327 @@
     <script src="../../lib/vue.js"></script>
     <script src="../../lib/element-ui/lib/index.js"></script>
     <style>
-        .detail {
+        #header {
             width: 100%;
             height: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .logo {
             margin-left: 15px;
         }
+
         .setting {
             display: flex;
             margin-right: 30px;
         }
+
         .setting p {
             height: 22px;
             line-height: 22px;
             font-size: 16px;
             color: #FFFFFF;
         }
-        i {
+
+        .icon_settings {
             padding-left: 20px;
             color: white;
             font-size: 16px;
             cursor: pointer;
         }
+        .el-dropdown-menu__item--divided:before {
+            height: 0!important;
+        }
+        .el-dropdown-menu__item--divided {
+            margin-top: 0!important;
+            border-top: 1px solid #ECECEC!important;
+        }
+        .el-dropdown-menu {
+            padding: 0!important;
+            border: 1px solid #E6E6E6!important;
+        }
+        .el-dropdown-menu__item {
+            line-height: 44px!important;
+            padding: 0 25px!important;
+            ont-family: PingFangSC-Regular!important;
+            color: #666666!important;
+        }
+        .el-dialog__header {
+            padding: 0 30px!important;
+            line-height: 35px!important;
+            font-size: 16px!important;
+            color: #FFFFFF!important;
+            background: #4993E5!important;
+        }
+        .el-dialog__body {
+            padding: 20px 30px 0px!important;
+        }
+        .el-dialog__title {
+            line-height: 35px!important;
+            font-size: 16px!important;
+            color: #FFFFFF!important;
+        }
+        .el-dialog__headerbtn {
+            height: 35px!important;
+            top: 0!important;
+        }
+        .el-dialog__headerbtn i {
+            padding-left: 0!important;
+            color: white!important;
+            font-size: 18px!important;
+        }
+        [class*=" el-icon-"], [class^=el-icon-] {
+            font-weight: bold!important;
+        }
+        .el-dialog__body .el-button {
+            padding: 12px 16px!important;
+            color: #475669!important;
+            margin-bottom: 22px;
+            margin-top: 18px;
+        }
+        .el-dialog__body .el-button.el-button--primary {
+            color: #fff!important;
+            background-color: #4993E5!important;
+            border-color: #4993E5!important;
+            margin-left: 5px;
+        }
+        .el-dialog__body .el-input--prefix .el-input__inner {
+            border-radius: 0;
+            border: none;
+            border-bottom: 1px solid #DAE4EA;
+            padding-left: 43px;
+            color: #333333;
+            height: 24px;
+            line-height: 24px;
+        }
+        .el-dialog__body .el-input--prefix .el-input__inner::-webkit-input-placeholder {
+            font-family: PingFangSC-Regular;
+            font-size: 14px;
+            color: #BBBBBB;
+            letter-spacing: 0;
+        }
+        .el-dialog__body .el-input--prefix .el-input__inner::-moz-placeholder {
+            font-family: PingFangSC-Regular;
+            font-size: 14px;
+            color: #BBBBBB;
+            letter-spacing: 0;
+        }
+        .el-dialog__body .el-form-item__content {
+            text-align: right;
+            line-height: 35px;
+        }
+        .el-dialog__body .el-input__prefix, .el-input__suffix {
+            color: #B9C3CD;
+        }
+        .el-form-item__error {
+            padding-left: 43px;
+        }
+        .el-dialog__body .el-input__icon {
+            line-height: 32px;
+        }
     </style>
 </head>
 <body>
-    <div class="detail">
-        <div class="logo">
-            <p style="color: white;">这里是logo</p>
-        </div>
-        <div class="setting">
-            <p style="margin-right: 10px;">欢迎您，151****5248!</p>
-            <p><i class="el-icon-edit"></i></p>
-            <p><i class="el-icon-edit"></i></p>
-        </div>
+<div id="header">
+    <div class="logo">
+        <p style="color: white;">这里是logo</p>
     </div>
+    <div class="setting">
+        <p style="margin-right: 10px;">欢迎您，151****5248!</p>
+        <p>
+            <el-dropdown trigger="click" @command="handleCommand">
+                <span>
+                    <i class="icon_settings el-icon-edit"></i>
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item command="persional">个人信息</el-dropdown-item>
+                    <el-dropdown-item command="account" divided>账户信息</el-dropdown-item>
+                    <el-dropdown-item command="password" divided>登录密码</el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
+        </p>
+        <p><i class="icon_settings  el-icon-edit"></i></p>
+    </div>
+
+    <el-dialog width="382px" title="个人信息" :visible.sync="dialogPersionVisible"
+               :close-on-click-modal=false>
+        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2">
+            <el-form-item prop="account">
+                <el-input v-model="ruleForm2.account" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入用户名"></el-input>
+            </el-form-item>
+            <el-form-item prop="ID">
+                <el-input v-model="ruleForm2.ID" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入身份证号"></el-input>
+            </el-form-item>
+            <el-form-item prop="tel">
+                <el-input v-model="ruleForm2.tel" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入手机号"></el-input>
+            </el-form-item>
+            <el-form-item prop="code">
+                <el-input v-model.number="ruleForm2.code"
+                          prefix-icon="el-icon-edit" placeholder="请输入验证码"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button @click="dialogAccountVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitForm('ruleForm2')">确定</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+    <el-dialog width="382px" title="账户信息" :visible.sync="dialogAccountVisible"
+               :close-on-click-modal=false>
+        <el-form :model="ruleForm1" status-icon :rules="rules1" ref="ruleForm1">
+            <el-form-item prop="old_pass">
+                <el-input v-model="ruleForm1.old_pass" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入原密码"></el-input>
+            </el-form-item>
+            <el-form-item prop="new_pass">
+                <el-input v-model="ruleForm1.new_pass" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入新密码"></el-input>
+            </el-form-item><el-form-item prop="old_pass">
+            <el-input v-model="ruleForm1.check_pass" prefix-icon="el-icon-edit"
+                      auto-complete="off" placeholder="请确认新密码"></el-input>
+        </el-form-item>
+
+        </el-form>
+    </el-dialog>
+    <el-dialog width="382px" title="登录密码" :visible.sync="dialogPasswordVisible"
+               :close-on-click-modal=false>
+        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2">
+            <el-form-item prop="account">
+                <el-input v-model="ruleForm2.account" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入用户名"></el-input>
+            </el-form-item>
+            <el-form-item prop="ID">
+                <el-input v-model="ruleForm2.ID" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入身份证号"></el-input>
+            </el-form-item>
+            <el-form-item prop="tel">
+                <el-input v-model="ruleForm2.tel" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入手机号"></el-input>
+            </el-form-item>
+            <el-form-item prop="code">
+                <el-input v-model.number="ruleForm2.code"
+                          prefix-icon="el-icon-edit" placeholder="请输入验证码"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button @click="dialogAccountVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitForm('ruleForm2')">确定</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var header = new Vue({
+            el: '#header',
+            data () {
+                var validateAccount = (rule, value, callback) => {
+                    if (!value) {
+                        return callback(new Error('用户名不能为空'));
+                    } else {
+                        callback();
+                    }
+                };
+                var validateID = (rule, value, callback) => {
+                    var IDreg = /^(([1][1-5])|([2][1-3])|([3][1-7])|([4][1-6])|([5][0-4])|([6][1-5])|([7][1])|([8][1-2]))\d{4}(([1][9]\d{2})|([2]\d{3}))(([0][1-9])|([1][0-2]))(([0][1-9])|([1-2][0-9])|([3][0-1]))\d{3}[0-9xX]$/;
+                    if (!value) {
+                        return callback(new Error('身份证号不能为空'));
+                    } else {
+                        if (!IDreg.test(value)) {
+                            callback(new Error('请输入正确格式的身份证号'));
+                        } else {
+                            callback();
+                        }
+                    }
+                };
+                var validateTel = (rule, value, callback) => {
+                    var telreg = /^1[3|4|5|7|8][0-9]{9}$/;
+                    if (value === '') {
+                        callback(new Error('请输入手机号码'));
+                    } else {
+                        if (!telreg.test(value)) {
+                            callback(new Error('请输入正确格式的手机号码'));
+                        } else {
+                            callback();
+                        }
+                    }
+                };
+                var validateCode = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请输入验证码'));
+                    } else if (!Number.isInteger(value)) {
+                        callback(new Error('请输入数值型验证码!'));
+                    } else {
+                        if (value.toString().length !== 6) {
+                            callback(new Error('请输入6位验证'));
+                        } else {
+                            callback();
+                        }
+                    }
+                };
+                return {
+                    dialogPersionVisible: false,
+                    dialogAccountVisible: false,
+                    dialogPasswordVisible: false,
+                    ruleForm1: {
+                        old_pass: '',
+                        new_pass: '',
+                        check_pass: ''
+                    },
+                    ruleForm2: {
+                        account: '',
+                        ID: '',
+                        tel: '',
+                        code: ''
+                    },
+                    ruleForm3: {
+                        card: '',
+                        confirm_card: '',
+                        check_pass: ''
+                    },
+                    rules1: {},
+                    rules2: {
+                        account: [
+                            { validator: validateAccount, trigger: 'blur' }
+                        ],
+                        ID: [
+                            { validator: validateID, trigger: 'blur' }
+                        ],
+                        tel: [
+                            { validator: validateTel, trigger: 'blur' }
+                        ],
+                        code: [
+                            { validator: validateCode, trigger: 'blur' }
+                        ]
+                    }
+                };
+            },
+            methods: {
+                handleCommand(command) {
+                    if (command === 'persional') {
+                        this.dialogPersionVisible = true;
+                    } else if (command === 'account') {
+                        this.dialogAccountVisible = true;
+                    } else {
+                        this.dialogPasswordVisible = true;
+                    }
+                },
+                submitForm(formName) {
+                    this.$refs[formName].validate((valid) => {
+                        if (valid) {
+                            this.dialogAccountVisible = false;
+                        } else {
+                            console.log('error submit!!');
+                            return false;
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
