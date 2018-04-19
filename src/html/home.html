@@ -200,6 +200,14 @@
         .el-date-editor--daterange.el-input, .el-date-editor--daterange.el-input__inner, .el-date-editor--timerange.el-input, .el-date-editor--timerange.el-input__inner {
             width: 300px;
         }
+        .el-popper[x-placement^=top] {
+            font-size: 16px!important;
+            color: #666666!important;
+            font-weight: bold!important;
+        }
+        .el-popover--plain {
+            padding: 10px 0 10px 10px!important;
+        }
     </style>
 </head>
 <body>
@@ -279,7 +287,14 @@
                             <el-table-column label="操作" header-align="center"
                                              align="center">
                                 <template slot-scope="scope">
-                                    <el-button type="text" size="small">咨询</el-button>
+                                    <el-popover
+                                            width="60"
+                                            placement="top"
+                                            trigger="click"
+                                            :content=scope.row.tel.slice(0,3)+'-'+scope.row.tel.slice(3,7)+'-'+scope.row.tel.slice(7)>
+                                        <el-button type="text" size="small"
+                                                   slot="reference">咨询</el-button>
+                                    </el-popover>
                                     <span style="font-size: 14px; color: #2678D2;">|</span>
                                     <el-button  @click="buyClick(scope, scope.row)"
                                                 type="text" size="small">购买</el-button>
@@ -372,7 +387,17 @@
                         tradable_num: 1000,
                         price: 10.77,
                         publish_date: '2017-02-12 16:27:56',
-                        note: '线下交易只接受杭州同城交易'
+                        note: '线下交易只接受杭州同城交易',
+                        tel: '15116925248'
+                    }, {
+                        name: '梦古堂',
+                        announcer: '方阳春 女士',
+                        total_num: 1000,
+                        tradable_num: 1000,
+                        price: 10.77,
+                        publish_date: '2017-02-12 16:27:56',
+                        note: '线下交易只接受杭州同城交易',
+                        tel: '18858936291'
                     }],
                     transaction: [{
                         name: '中经汇金',
