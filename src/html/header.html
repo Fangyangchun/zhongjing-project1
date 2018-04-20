@@ -134,6 +134,26 @@
         .el-dialog__body .el-select {
             width: 100%;
         }
+        .el-dialog__body .el-button.el-button--text.timerBtn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 0 8px!important;
+            line-height: 22px!important;
+            font-size: 12px!important;
+            margin: 0!important;
+        }
+        .el-dialog__body .el-button.el-button--text.timerBtn.active {
+            border: 1px solid #4993E5!important;
+            color: #4993E5!important;
+        }
+        .el-dialog__body .el-button.el-button--text.is-disabled.timerBtn.active, .el-button.el-button--text.is-disabled.timerBtn {
+            border: 1px solid #CCCCCC!important;
+            color: #AAAAAA!important;
+        }
+        .el-dialog__body .el-input.is-disabled .el-input__inner {
+            background-color: white;
+        }
     </style>
 </head>
 <body>
@@ -171,7 +191,11 @@
             </el-form-item>
             <el-form-item prop="tel">
                 <el-input v-model="ruleForm2.tel" prefix-icon="el-icon-edit"
-                          auto-complete="off" placeholder="请输入手机号"></el-input>
+                          auto-complete="off" :disabled=modifyTel
+                          placeholder="请输入手机号"></el-input>
+                <el-button class="timerBtn" v-bind:class="{ active: isActive }"
+                           @click="modifyTel=true"
+                           :disabled=btnActive type="text">{{ btnText }}</el-button>
             </el-form-item>
             <el-form-item prop="code">
                 <el-input v-model.number="ruleForm2.code"
@@ -342,6 +366,11 @@
                     }
                 };
                 return {
+                    btnText: '发送验证码',
+                    count: 60,
+                    timer: null,
+                    modifyTel: false,
+                    btnActive: true,
                     dialogPersionVisible: false,
                     dialogAccountVisible: false,
                     dialogPasswordVisible: false,
@@ -403,6 +432,11 @@
                     }
                 };
             },
+            computed: {
+                isActive: function () {
+                    return /^1[3|4|5|7|8][0-9]{9}$/.test(this.ruleForm2.tel);
+                }
+            },
             methods: {
                 handleCommand(command) {
                     if (command === 'persional') {
@@ -428,6 +462,30 @@
                             return false;
                         }
                     });
+                }
+            },
+            watch: {
+                isActive: function (newVal, oldVal) {
+                    this.btnActive = oldVal;
+                },
+                modifyTel: function (newActive, oldActive) {
+                    if (this.modifyTel) {
+                        this.btnActive = true;
+                        this.btnText = `${this.count}后重发`;
+                        var that = this;
+                        this.timer = setInterval(function () {
+                            if (that.count === 1) {
+                                clearInterval(that.timer);
+                                that.btnText = '发送验证码';
+                                that.count = 60;
+                                that.modifyTel = false;
+                                that.btnActive = false;
+                            } else {
+                                that.count--;
+                                that.btnText = `${that.count}后重发`;
+                            }
+                        }, 1000)
+                    }
                 }
             }
         });
