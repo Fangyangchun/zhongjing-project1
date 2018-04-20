@@ -94,7 +94,7 @@
             border-color: #4993E5!important;
             margin-left: 5px;
         }
-        .el-dialog__body .el-input--prefix .el-input__inner {
+        .el-dialog__body .el-input--prefix .el-input__inner, .el-dialog__body .el-select .el-input__inner {
             border-radius: 0;
             border: none;
             border-bottom: 1px solid #DAE4EA;
@@ -122,11 +122,17 @@
         .el-dialog__body .el-input__prefix, .el-input__suffix {
             color: #B9C3CD;
         }
+        .el-input__suffix {
+            display: none;
+        }
         .el-form-item__error {
             padding-left: 43px;
         }
         .el-dialog__body .el-input__icon {
             line-height: 32px;
+        }
+        .el-dialog__body .el-select {
+            width: 100%;
         }
     </style>
 </head>
@@ -172,50 +178,67 @@
                           prefix-icon="el-icon-edit" placeholder="请输入验证码"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button @click="dialogAccountVisible = false">取消</el-button>
+                <el-button @click="dialogPersionVisible = false">取消</el-button>
                 <el-button type="primary" @click="submitForm('ruleForm2')">确定</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
     <el-dialog width="382px" title="账户信息" :visible.sync="dialogAccountVisible"
                :close-on-click-modal=false>
-        <el-form :model="ruleForm1" status-icon :rules="rules1" ref="ruleForm1">
-            <el-form-item prop="old_pass">
-                <el-input v-model="ruleForm1.old_pass" prefix-icon="el-icon-edit"
-                          auto-complete="off" placeholder="请输入原密码"></el-input>
+        <el-form :model="ruleForm3" status-icon :rules="rules3" ref="ruleForm3">
+            <el-form-item prop="bank_card">
+                <el-input v-model.number="ruleForm3.bank_card" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="绑定银行卡"></el-input>
             </el-form-item>
-            <el-form-item prop="new_pass">
-                <el-input v-model="ruleForm1.new_pass" prefix-icon="el-icon-edit"
-                          auto-complete="off" placeholder="请输入新密码"></el-input>
-            </el-form-item><el-form-item prop="old_pass">
-            <el-input v-model="ruleForm1.check_pass" prefix-icon="el-icon-edit"
-                      auto-complete="off" placeholder="请确认新密码"></el-input>
-        </el-form-item>
-
+            <el-form-item prop="confirm_card">
+                <el-input v-model.number="ruleForm3.confirm_card" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="确认银行卡"></el-input>
+            </el-form-item>
+            <el-form-item prop="bank_account">
+                <i style="position: absolute; z-index: 1; color: #B9C3CD; left: 4px;" class="el-input__icon el-icon-edit"></i>
+                <el-select v-model="ruleForm3.bank_account" placeholder="开户银行">
+                    <el-option label="中国工商银行" value="中国工商银行"></el-option>
+                    <el-option label="中国农业银行" value="中国农业银行"></el-option>
+                    <el-option label="中国建设银行" value="中国建设银行"></el-option>
+                    <el-option label="中国邮政银行" value="中国邮政银行"></el-option>
+                    <el-option label="广发银行" value="广发银行"></el-option>
+                    <el-option label="中信银行" value="中信银行"></el-option>
+                    <el-option label="兴业银行" value="兴业银行"></el-option>
+                    <el-option label="浦发银行" value="浦发银行"></el-option>
+                    <el-option label="浙商银行" value="浙商银行"></el-option>
+                    <el-option label="恒丰银行" value="恒丰银行"></el-option>
+                    <el-option label="光大银行" value="光大银行"></el-option>
+                    <el-option label="招商银行" value="招商银行"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item prop="bank_branch">
+                <el-input v-model="ruleForm3.bank_branch" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入开户支行"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button @click="dialogAccountVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitForm('ruleForm3')">确定</el-button>
+            </el-form-item>
         </el-form>
     </el-dialog>
     <el-dialog width="382px" title="登录密码" :visible.sync="dialogPasswordVisible"
                :close-on-click-modal=false>
-        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2">
-            <el-form-item prop="account">
-                <el-input v-model="ruleForm2.account" prefix-icon="el-icon-edit"
-                          auto-complete="off" placeholder="请输入用户名"></el-input>
+        <el-form :model="ruleForm1" status-icon :rules="rules1" ref="ruleForm1">
+            <el-form-item prop="old_pass">
+                <el-input type="password" v-model="ruleForm1.old_pass" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入原密码"></el-input>
             </el-form-item>
-            <el-form-item prop="ID">
-                <el-input v-model="ruleForm2.ID" prefix-icon="el-icon-edit"
-                          auto-complete="off" placeholder="请输入身份证号"></el-input>
+            <el-form-item prop="new_pass">
+                <el-input type="password" v-model="ruleForm1.new_pass" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入新密码"></el-input>
             </el-form-item>
-            <el-form-item prop="tel">
-                <el-input v-model="ruleForm2.tel" prefix-icon="el-icon-edit"
-                          auto-complete="off" placeholder="请输入手机号"></el-input>
-            </el-form-item>
-            <el-form-item prop="code">
-                <el-input v-model.number="ruleForm2.code"
-                          prefix-icon="el-icon-edit" placeholder="请输入验证码"></el-input>
+            <el-form-item prop="check_pass">
+                <el-input type="password" v-model="ruleForm1.check_pass" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请确认新密码"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button @click="dialogAccountVisible = false">取消</el-button>
-                <el-button type="primary" @click="submitForm('ruleForm2')">确定</el-button>
+                <el-button @click="dialogPasswordVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitForm('ruleForm1')">确定</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -225,6 +248,32 @@
         var header = new Vue({
             el: '#header',
             data () {
+                var validateOldPass = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请输入旧密码'));
+                    } else {
+                        callback();
+                    }
+                };
+                var validateNewPass1 = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请输入新密码'));
+                    } else {
+                        if (this.ruleForm1.check_pass !== '') {
+                            this.$refs.ruleForm1.validateField('check_pass');
+                        }
+                        callback();
+                    }
+                };
+                var validateNewPass2 = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请再次输入新密码'));
+                    } else if (value !== this.ruleForm1.new_pass) {
+                        callback(new Error('两次输入密码不一致!'));
+                    } else {
+                        callback();
+                    }
+                };
                 var validateAccount = (rule, value, callback) => {
                     if (!value) {
                         return callback(new Error('用户名不能为空'));
@@ -269,6 +318,29 @@
                         }
                     }
                 };
+                var validateBank = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请输入银行卡号'));
+                    } else {
+                        if (!(/[0-9]{16,19}/g).test(value)) {
+                            callback(new Error('请输入正确格式的银行卡号'));
+                        } else {
+                            if (this.ruleForm3.confirm_card !== '') {
+                                this.$refs.ruleForm3.validateField('confirm_card');
+                            }
+                            callback();
+                        }
+                    }
+                };
+                var validateCheckBank = (rule, value, callback) => {
+                    if (value === '') {
+                        callback(new Error('请再次确认银行卡号'));
+                    } else if (value !== this.ruleForm3.bank_card) {
+                        callback(new Error('两次输入银行卡号不一致!'));
+                    } else {
+                        callback();
+                    }
+                };
                 return {
                     dialogPersionVisible: false,
                     dialogAccountVisible: false,
@@ -285,11 +357,22 @@
                         code: ''
                     },
                     ruleForm3: {
-                        card: '',
+                        bank_card: '',
                         confirm_card: '',
-                        check_pass: ''
+                        bank_account: '',
+                        bank_branch: ''
                     },
-                    rules1: {},
+                    rules1: {
+                        old_pass: [
+                            { validator: validateOldPass, trigger: 'blur' }
+                        ],
+                        new_pass: [
+                            { validator: validateNewPass1, trigger: 'blur' }
+                        ],
+                        check_pass: [
+                            { validator: validateNewPass2, trigger: 'blur' }
+                        ]
+                    },
                     rules2: {
                         account: [
                             { validator: validateAccount, trigger: 'blur' }
@@ -302,6 +385,20 @@
                         ],
                         code: [
                             { validator: validateCode, trigger: 'blur' }
+                        ]
+                    },
+                    rules3: {
+                        bank_card: [
+                            { validator: validateBank, trigger: 'blur' }
+                        ],
+                        confirm_card: [
+                            { validator: validateCheckBank, trigger: 'blur' }
+                        ],
+                        bank_account: [
+                            { required: true, message: '请选择开户银行', trigger: 'change' }
+                        ],
+                        bank_branch: [
+                            { required: true, message: '请输入开户支行', trigger: 'blur' }
                         ]
                     }
                 };
@@ -319,7 +416,13 @@
                 submitForm(formName) {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
-                            this.dialogAccountVisible = false;
+                            if (formName === 'ruleForm2') {
+                                this.dialogPersionVisible = false;
+                            } else if (formName === 'ruleForm1') {
+                                this.dialogPasswordVisible = false;
+                            } else {
+                                this.dialogAccountVisible = false;
+                            }
                         } else {
                             console.log('error submit!!');
                             return false;

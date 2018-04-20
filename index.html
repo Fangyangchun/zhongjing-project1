@@ -13,9 +13,6 @@
         .forms {
             width: 290px;
         }
-        .el-input {
-            margin-top: 30px;
-        }
         .el-input__inner {
             font-family: PingFangSC-Regular;
             border-radius: 0px;
@@ -44,32 +41,25 @@
             color: #BBBBBB;
             letter-spacing: 0;
         }
-        .forms .el-button {
-            position: absolute;
+        .forms .login_btn.el-button {
             line-height: 17px;
             padding: 3px 0px;
             width: 76px;
             border: 1px solid #4993E5;
-            right: 10px;
-            bottom: 5px;
         }
-        .forms .el-button--text {
+        /*.forms .el-button--text {
             font-size: 12px;
             color: #4993E5;
             letter-spacing: 0;
-        }
-        .forms .el-button:hover {
+        }*/
+        /*.forms .el-button:hover {
             border: 1px solid #4993E5;
-        }
-        .forms .el-button:focus {
+        }*/
+        /*.forms .el-button:focus {
             color: #BBBBBB;
             border: 1px solid #BBBBBB;
-        }
-        .submit_info {
-            position: absolute;
-            bottom: 60px;
-        }
-        .submit_info .el-button.is-round {
+        }*/
+        .login_btn.el-button.is-round {
             width: 141px;
             height: 42px;
             padding: 0;
@@ -78,6 +68,24 @@
             font-family: PingFangSC-Regular;
             font-size: 18px;
             color: #FFFFFF;
+            margin-top: 22px;
+        }
+        .el-form-item__error {
+            left: 35px;
+        }
+        .el-input__suffix {
+            display: none;
+        }
+        .el-button.el-button--text.active {
+            border: 1px solid #4993E5;
+            color: #4993E5;
+        }
+        .el-button.el-button--text.is-disabled.active, .el-button.el-button--text.is-disabled {
+            border: 1px solid #CCCCCC;
+            color: #AAAAAA;
+        }
+        .el-input.is-disabled .el-input__inner {
+            background-color: white;
         }
     </style>
 </head>
@@ -88,27 +96,29 @@
             <div class="form_box">
                 <p>内部股权交易系统</p>
                 <div class="forms">
-                    <el-input
-                            placeholder="请输入身份证号"
-                            prefix-icon="el-icon-date"
-                            v-model="ID_number">
-                    </el-input>
-                    <div style="position: relative;">
-                        <el-input
-                                placeholder="请输入手机号"
-                                prefix-icon="el-icon-date"
-                                v-model="TEL_number">
-                        </el-input>
-                        <el-button type="text">发送验证码</el-button>
-                    </div>
-                    <el-input
-                            placeholder="请输入验证码"
-                            prefix-icon="el-icon-date"
-                            v-model="Verifi_code">
-                    </el-input>
-                </div>
-                <div class="submit_info">
-                    <el-button type="primary" round @click="loginCheck">登录</el-button>
+                    <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
+                        <el-form-item prop="ID">
+                            <el-input v-model="ruleForm.ID" prefix-icon="el-icon-edit"
+                                      auto-complete="off" placeholder="请输入身份证号"></el-input>
+                        </el-form-item>
+                        <el-form-item prop="tel">
+                            <el-input v-model="ruleForm.tel" prefix-icon="el-icon-edit"
+                                      auto-complete="off"  :disabled=modifyTel
+                                      placeholder="请输入手机号"></el-input>
+                            <el-button style="position: absolute; bottom: 10px;
+                             right: 10px; padding: 0 8px; line-height: 22px; font-size: 12px;"
+                                       v-bind:class="{ active: isActive }" @click="modifyTel=true"
+                                       :disabled=btnActive type="text">{{ btnText }}</el-button>
+                        </el-form-item>
+                        <el-form-item prop="code">
+                            <el-input v-model.number="ruleForm.code"
+                                      prefix-icon="el-icon-edit" placeholder="请输入验证码"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" class="login_btn"
+                                       round @click="loginCheck('ruleForm')">登录</el-button>
+                        </el-form-item>
+                    </el-form>
                 </div>
             </div>
         </div>
@@ -117,16 +127,108 @@
         $(function () {
             var app = new Vue({
                 el: '#app',
-                data: {
-                    ID_number: '',
-                    TEL_number: '',
-                    Verifi_code: ''
-
+                data () {
+                    var validateID = (rule, value, callback) => {
+                        var IDreg = /^(([1][1-5])|([2][1-3])|([3][1-7])|([4][1-6])|([5][0-4])|([6][1-5])|([7][1])|([8][1-2]))\d{4}(([1][9]\d{2})|([2]\d{3}))(([0][1-9])|([1][0-2]))(([0][1-9])|([1-2][0-9])|([3][0-1]))\d{3}[0-9xX]$/;
+                        if (!value) {
+                            return callback(new Error('身份证号不能为空'));
+                        } else {
+                            if (!IDreg.test(value)) {
+                                callback(new Error('请输入正确格式的身份证号'));
+                            } else {
+                                callback();
+                            }
+                        }
+                    };
+                    var validateTel = (rule, value, callback) => {
+                        var telreg = /^1[3|4|5|7|8][0-9]{9}$/;
+                        if (value === '') {
+                            callback(new Error('请输入手机号码'));
+                        } else {
+                            if (!telreg.test(value)) {
+                                callback(new Error('请输入正确格式的手机号码'));
+                            } else {
+                                callback();
+                            }
+                        }
+                    };
+                    var validateCode = (rule, value, callback) => {
+                        if (value === '') {
+                            callback(new Error('请输入验证码'));
+                        } else if (!Number.isInteger(value)) {
+                            callback(new Error('请输入数值型验证码!'));
+                        } else {
+                            if (value.toString().length !== 6) {
+                                callback(new Error('请输入6位验证'));
+                            } else {
+                                callback();
+                            }
+                        }
+                    };
+                    return {
+                        btnText: '发送验证码',
+                        count: 60,
+                        timer: null,
+                        modifyTel: false,
+                        btnActive: true,
+                        ruleForm: {
+                            ID: '',
+                            tel: '',
+                            code: ''
+                        },
+                        rules: {
+                            ID: [
+                                { validator: validateID, trigger: 'blur' }
+                            ],
+                            tel: [
+                                { validator: validateTel, trigger: 'blur' }
+                            ],
+                            code: [
+                                { validator: validateCode, trigger: 'blur' }
+                            ]
+                        }
+                    }
+                },
+                computed: {
+                    isActive: function () {
+                        return /^1[3|4|5|7|8][0-9]{9}$/.test(this.ruleForm.tel);
+                    }
                 },
                 methods: {
-                    loginCheck () {
-                        window.location.href = `src/html/backend.html`
-                        + `?role=3&&account=fangyc&&resource=home`;
+                    loginCheck (formName) {
+                        this.$refs[formName].validate((valid) => {
+                            if (valid) {
+                                window.location.href = `src/html/backend.html`
+                                    + `?role=3&&account=fangyc&&resource=home`;
+                            } else {
+                                console.log('error submit!!');
+                                return false;
+                            }
+                        });
+                    }
+                },
+                watch: {
+                    isActive: function (newVal, oldVal) {
+                        this.btnActive = oldVal;
+                    },
+                    modifyTel: function (newActive, oldActive) {
+                        if (this.modifyTel) {
+                            this.btnActive = true;
+                            this.btnText = `${this.count}后重发`;
+                            var that = this;
+                            this.timer = setInterval(function () {
+                                if (that.count === 1) {
+                                    clearInterval(that.timer);
+                                    that.btnText = '发送验证码';
+                                    that.count = 60;
+                                    that.modifyTel = false;
+                                    that.btnActive = false;
+                                } else {
+                                    that.count--;
+                                    that.btnText = `${that.count}后重发`;
+                                }
+                            }, 1000)
+                        }
                     }
                 }
             });
