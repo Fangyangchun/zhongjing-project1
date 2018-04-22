@@ -1,0 +1,200 @@
+#home {
+    width: 100%;
+    height: 100%;
+}
+.info {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    height: 120px;
+    margin-bottom: 20px;
+}
+.info_detail {
+    width: calc(50% - 10px);
+    background: white;
+    height: 100%;
+    border-radius: 4px;
+    align-items: center;
+    display: flex;
+}
+.company {
+    width: 20%;
+    margin-left: 5%;
+}
+.num {
+    width: 20%;
+}
+.prices {
+    width: 13%;
+}
+.tip {
+    font-family: PingFangSC-Semibold;
+    font-size: 22px;
+    color: #6B778C;
+}
+.tip_detail {
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #999999;
+}
+.handle {
+    margin-left: 10%;
+}
+.handle button {
+    width: 64px;
+    height: 26px;
+    border-radius: 100px;
+    outline: 0;
+    border: none;
+    cursor: pointer;
+    font-family: PingFangSC-Medium;
+    font-size: 14px;
+    color: #FFFFFF;
+}
+.buy {
+    background: #FB7979;
+    margin-right: 20px;
+}
+.sell {
+    background: #3BCDB1;
+}
+.table_wrapper {
+    width: calc(100% - 20px);
+    height: calc(100% - 140px);
+    background: white;
+    padding-left: 20px;
+    border-radius: 4px;
+    overflow-y: auto;
+}
+.table_content {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+#tab-published, #tab-transaction {
+    width: 72px;
+    text-align: center;
+    padding: 0;
+    outline: none;
+}
+.el-tabs__nav .el-tabs__active-bar {
+    width: 72px!important;
+}
+.el-tabs__nav-wrap::after {
+    background-color: #E4E3E3;
+    height: 1px;
+}
+.el-tabs__active-bar {
+    background-color: #4B92E0;
+}
+.el-tabs__item {
+    height: 59px;
+    line-height: 59px;
+}
+.el-table th.is-leaf {
+    border: none;
+    background: #F9F9F9;
+    font-family: PingFangSC-Medium;
+    font-size: 14px;
+    color: #1F2D3D;
+    padding: 6px 0;
+}
+.el-table td {
+    color: #666666;
+    padding: 4px 0 3px;
+    font-family: PingFangSC-Regular;
+}
+.el-table tr {
+    height: 40px;
+}
+.el-button+.el-button {
+    margin-left: 0px;
+}
+.el-button--mini, .el-button--small {
+    font-size: 14px;
+}
+.el-button--text {
+    font-family: PingFangSC-Regular;
+    color: #2678D2;
+}
+.pagination_box {
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px 0 10px;
+}
+.pagination_box i {
+    padding-left: 0;
+}
+.el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li {
+    margin: 0;
+    background: #FFFFFF;
+    border: 1px solid #D3DCE6;
+    font-family: HelveticaNeue;
+    color: #475669;
+    min-width: 28px;
+    border-radius: 0;
+}
+.el-pagination.is-background .btn-next, .el-pagination.is-background .el-pager li {
+    border-left: none;
+}
+.el-pagination.is-background .btn-prev i, .el-pagination.is-background .btn-next i {
+    color: #99A9BF;
+}
+.el-pagination.is-background .btn-prev.disabled i, .el-pagination.is-background .btn-next.disabled i {
+    color: #D3DCE6;
+}
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+    background: #2678D2;
+    font-family: HelveticaNeue;
+}
+.el-pagination span:not([class*=suffix]) {
+    margin: 0 10px;
+    color: #475669;
+}
+.block {
+    position: absolute;
+    right: 30px;
+    top: 12px;
+    z-index: 1;
+}
+.el-input__inner {
+    border-radius: 37px;
+    height: 35px;
+    line-height: 35px;
+    border: 1px solid #E4E4E4;
+}
+.el-date-editor .el-range-input {
+    font-family: PingFangSC-Medium;
+    font-size: 12px;
+    color: #333333;
+}
+.el-date-editor .el-range__icon {
+    font-size: 12px;
+    line-height: 1;
+}
+.el-date-editor .el-range__close-icon {
+    line-height: 1;
+}
+.el-date-editor .el-range-separator {
+    line-height: 27px;
+    color: #333333;
+}
+.el-date-editor .el-range-input::-webkit-input-placeholder {
+    font-size: 12px;
+    color: #AAAAAA;
+}
+.el-date-editor .el-range-inpu::-moz-placeholder {
+    font-size: 12px;
+    color: #AAAAAA;
+}
+.el-date-editor--daterange.el-input, .el-date-editor--daterange.el-input__inner, .el-date-editor--timerange.el-input, .el-date-editor--timerange.el-input__inner {
+    width: 300px;
+}
+.el-popper[x-placement^=top] {
+    font-size: 16px!important;
+    color: #666666!important;
+    font-weight: bold!important;
+}
+.el-popover--plain {
+    padding: 10px 0 10px 10px!important;
+}

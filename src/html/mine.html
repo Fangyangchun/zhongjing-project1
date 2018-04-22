@@ -4,90 +4,274 @@
     <meta charset="UTF-8">
     <title>中经汇金-我的</title>
     <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../css/home.css">
     <script src="../../lib/jquery.min.js"></script>
     <script src="../../lib/vue.js"></script>
     <script src="../../lib/element-ui/lib/index.js"></script>
 </head>
 <body>
 <div id="mine">
-    <el-table
-            ref="singleTable"
-            :data="tableData"
-            border
-            highlight-current-row
-            @current-change="handleCurrentChange"
-            style="width: 100%">
-        <el-table-column
-                type="index"
-                width="50">
-        </el-table-column>
-        <el-table-column
-                prop="date"
-                label="日期"
-                width="180">
-        </el-table-column>
-        <el-table-column
-                prop="name"
-                label="姓名"
-                width="180">
-        </el-table-column>
-        <el-table-column
-                prop="address"
-                label="地址">
-        </el-table-column>
-        <el-table-column
-                label="操作"
-                width="100">
-            <template slot-scope="scope">
-                <el-button @click="handleClick(scope.row.date)" type="text" size="small">查看</el-button>
-                <el-button type="text" size="small">编辑</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
-    <div style="margin-top: 20px">
-        <el-button @click="setCurrent(tableData[1])">选中第二行</el-button>
-        <el-button @click="setCurrent()">取消选择</el-button>
+    <div class="info">
+        <div class="info_detail">
+            <div class="company">
+                <p class="tip">梦古堂</p>
+                <p class="tip_detail">股票名称</p>
+            </div>
+            <div class="num">
+                <p class="tip">100202</p>
+                <p class="tip_detail">股数</p>
+            </div>
+            <div class="prices">
+                <p class="tip">11.67</p>
+                <p class="tip_detail">参考单价(元)</p>
+            </div>
+            <div class="handle">
+                <button class="buy">买入</button>
+                <button class="sell">卖出</button>
+            </div>
+        </div>
+        <div class="info_detail">
+            <div class="company">
+                <p class="tip">中经汇金</p>
+                <p class="tip_detail">股票名称</p>
+            </div>
+            <div class="num">
+                <p class="tip">698336</p>
+                <p class="tip_detail">股数</p>
+            </div>
+            <div class="prices">
+                <p class="tip">30.67</p>
+                <p class="tip_detail">参考单价(元)</p>
+            </div>
+            <div class="handle">
+                <button class="buy">买入</button>
+                <button class="sell">卖出</button>
+            </div>
+        </div>
+    </div>
+    <div class="table_wrapper">
+        <div class="table_content">
+            <div class="block">
+                <el-date-picker v-model="value" type="daterange"
+                                align="right"
+                                unlink-panels
+                                range-separator="-"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                :picker-options="pickerOptions"
+                                :default-value="new Date(`${nowYear}-${nowMonth}-1`)"
+                                @change="dateChangeHandle"
+                                value-format="yyyy-MM-dd">
+                </el-date-picker>
+            </div>
+            <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tab-pane label="我发布的" name="published">
+                    <div style="width: calc(100% - 20px);">
+                        <el-table :data="published">
+                            <el-table-column prop="name" label="交易股票">
+                            </el-table-column>
+                            <el-table-column prop=total_num min-width="100px" label="发布数量(股)">
+                            </el-table-column>
+                            <el-table-column prop=locking_num min-width="100px" label="锁定数量(股)">
+                            </el-table-column>
+                            <el-table-column prop=tradable_num min-width="110px" label="可交易数量(股)">
+                            </el-table-column>
+                            <el-table-column prop=price label="发布单价(元)">
+                            </el-table-column>
+                            <el-table-column prop="publish_date" min-width="150px" label="发布时间" header-align="center"
+                                                align="center">
+                            </el-table-column>
+                            <el-table-column prop="note" min-width="150px" label="备注信息">
+                            </el-table-column>
+                            <el-table-column label="操作" header-align="center"
+                                                align="center">
+                                <template slot-scope="scope">
+                                    <el-button  @click="buyClick(scope, scope.row)"
+                                        type="text" size="small">修改</el-button>
+                                    <span style="font-size: 14px; color: #2678D2;">|</span>
+                                    <el-button  @click="buyClick(scope, scope.row)"
+                                                type="text" size="small">撤销</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div class="pagination_box">
+                            <el-pagination background layout="prev, pager, next, jumper"
+                                            :page-size=pagesize :total=publish_total
+                                            @current-change="handleCurrentChange1">
+                            </el-pagination>
+                        </div>
+                    </div>
+                </el-tab-pane>
+                <el-tab-pane label="历史交易" name="transaction">
+                    <div style="width: calc(100% - 20px);">
+                        <el-table :data="transaction">
+                            <el-table-column prop="name" label="交易股票">
+                            </el-table-column>
+                            <el-table-column prop="buyers" label="购买者">
+                            </el-table-column>
+                            <el-table-column prop=price label="交易单价(元)">
+                            </el-table-column>
+                            <el-table-column prop=trading_num label="交易数量(股)">
+                            </el-table-column>
+                            <el-table-column prop="finished_date" header-align="center"
+                                                align="center" min-width="150px" label="交易完成时间">
+                            </el-table-column>
+                            <el-table-column prop="note" min-width="150px" label="备注信息">
+                                </el-table-column>
+                            <el-table-column label="操作" header-align="center"
+                                                align="center">
+                                <template slot-scope="scope">
+                                    <el-button  @click="buyClick(scope, scope.row)"
+                                        type="text" size="small">删除记录</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div class="pagination_box">
+                            <el-pagination background layout="prev, pager, next, jumper"
+                                            :page-size=pagesize :total=transaction_total
+                                            @current-change="handleCurrentChange2">
+                            </el-pagination>
+                        </div>
+                    </div>
+                </el-tab-pane>
+                <el-tab-pane label="我的订单" name="orders">
+                        <div style="width: calc(100% - 20px);">
+                            <el-table :data="orders">
+                                <el-table-column min-width="120px" prop="ordersNum" label="订单号">
+                                </el-table-column>
+                                <el-table-column prop="type" header-align="center"
+                                align="center" label="订单类型">
+                                </el-table-column>
+                                <el-table-column prop=price label="交易单价(元)">
+                                </el-table-column>
+                                <el-table-column prop=trading_num label="交易数量(股)">
+                                </el-table-column>
+                                <el-table-column prop="trading_time" label="下单时间" header-align="center"
+                                align="center" min-width="150px">
+                                </el-table-column>
+                                <el-table-column prop="note" label="备注信息">
+                                </el-table-column>
+                                <el-table-column prop="status" header-align="center"
+                                align="center" label="订单状态">
+                                </el-table-column>
+                            </el-table>
+                            <div class="pagination_box">
+                                <el-pagination background layout="prev, pager, next, jumper"
+                                                :page-size=pagesize :total=transaction_total
+                                                @current-change="handleCurrentChange2">
+                                </el-pagination>
+                            </div>
+                        </div>
+                    </el-tab-pane>
+            </el-tabs>
+        </div>
     </div>
 </div>
-<script type="text/javascript">
-    $(function () {
-        var mine = new Vue({
-            el: '#mine',
-            data: {
-                tableData: [{
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1518 弄'
-                }, {
-                    date: '2016-05-04',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1517 弄'
-                }, {
-                    date: '2016-05-01',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1519 弄'
-                }, {
-                    date: '2016-05-03',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1516 弄'
-                }],
-                currentRow: null
-            },
-            methods: {
-                setCurrent(row) {
-                    this.$refs.singleTable.setCurrentRow(row);
+    <script type="text/javascript">
+        $(function () {
+            var home = new Vue({
+                el: '#mine',
+                data: {
+                    nowYear: new Date().getFullYear(),
+                    nowMonth: new Date().getMonth(),
+                    activeName: 'published',
+                    pagesize: 8,
+                    publish_total: 12,
+                    transaction_total: 12,
+                    value: '',
+                    pickerOptions: {
+                        shortcuts: [{
+                            text: '今天',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                picker.$emit('pick', [start, end]);
+                            }
+                        },{
+                            text: '最近一周',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近一个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近三个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }],
+                        disabledDate (time) {
+                            return time.getTime() > Date.now() - 8.64e6;
+                        }
+                    },
+                    published: [{
+                        name: '梦古堂',
+                        total_num: 10000,
+                        locking_num: 5000,
+                        tradable_num: 5000,
+                        price: 10.77,
+                        publish_date: '2017-02-12 16:27:56',
+                        note: '线下交易只接受杭州同城交易',
+                        tel: '15116925248'
+                    }],
+                    transaction: [{
+                        name: '中经汇金',
+                        buyers: '周雅琼 女士',
+                        price: 10.77,
+                        trading_num: 1000,
+                        finished_date: '2017-02-12 16:27:56',
+                        note: '------'
+                    }],
+                    orders: [{
+                        ordersNum: '35435345634634563',
+                        type: '买入',
+                        price: 10.99,
+                        trading_num: 10000,
+                        trading_time: '2017-08-19 15:19:56',
+                        note: '-----',
+                        status: '完成'
+                    }]
                 },
-                handleClick (data) {
-                    console.log(data);
-                },
-                handleCurrentChange (val) {
-                    console.log(val);
-                    this.currentRow = val;
-
+                methods: {
+                    handleClick (tab, event) {
+                        // console.log(tab.name);
+                        if (this.activeName === 'transaction') {
+                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
+                        } else {
+                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '0px');
+                        }
+                    },
+                    buyClick (scope, row) {
+                        // console.log(scope, row);
+                    },
+                    dateChangeHandle (val) {
+                        if (val) {
+                            console.log(val);
+                        } else {
+                            console.log('读取无日期筛选的数据');
+                        }
+                    },
+                    handleCurrentChange1 (val) {
+                        console.log(val);
+                    },
+                    handleCurrentChange2 (val) {
+                        console.log(val);
+                    }
                 }
-            }
+            });
         });
-    })
-</script>
+    </script>
 </body>
 </html>
