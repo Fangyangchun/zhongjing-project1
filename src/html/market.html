@@ -6,15 +6,122 @@
     <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
     <script src="../../lib/jquery.min.js"></script>
     <script src="../../lib/vue.js"></script>
-    <!--<script src="../../lib/vue-router.js"></script>-->
     <script src="../../lib/element-ui/lib/index.js"></script>
+    <script src="../../lib/echarts.min.js"></script>
+    <style>
+        #market {
+            width: 100%;
+            height: calc(100% - 124px);
+            background: white;
+        }
+        #stock {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
-    <h1>大盘市场</h1>
-    <div class="footerpage"></div>
+    <div id="market">
+        <div id="stock"></div>
+    </div>
     <script type="text/javascript">
         $(function () {
+            var dom = document.getElementById("stock");
+            var myChart = echarts.init(dom);
+            var app = {};
+            var option = null;
 
+// 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
+            var data0 = splitData([
+                ['2013-1-24', 10.09],
+                ['2013-1-25', 9.99],
+                ['2013-1-28', 10.01],
+                ['20131-29', 10.01],
+                ['2013-1-30', 10.003],
+                ['2013-1-31', 10.03],
+                ['2013-2-1', 10.11],
+                ['2013-2-4', 9.89],
+                ['2013-2-5', 10.00],
+                ['2013-2-6', 10.02],
+                ['2013-2-7', 10.33],
+                ['2013-2-8', 10.08]
+            ]);
+
+            function splitData(rawData) {
+                var categoryData = [];
+                var values = [];
+                for (var i = 0; i < rawData.length; i++) {
+                    categoryData.push(rawData[i].splice(0, 1)[0]);
+                    values.push(rawData[i])
+                }
+                return {
+                    categoryData: categoryData,
+                    values: values
+                };
+            }
+
+            function calculateMA() {
+                var result = [];
+                for (var i = 0, len = data0.values.length; i < len; i++) {
+                    result.push(data0.values[i][0]);
+                }
+                return result;
+            }
+            option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                grid: {
+                    left: '10%',
+                    right: '10%',
+                    bottom: '15%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: data0.categoryData,
+                    scale: true,
+                    boundaryGap : false,
+                    axisLine: {onZero: false},
+                    splitLine: {show: false}
+                },
+                yAxis: {
+                    scale: true,
+                    splitArea: {
+                        show: true
+                    }
+                },
+                dataZoom: [
+                    {
+                        type: 'inside',
+                        start: 50,
+                        end: 100
+                    },
+                    {
+                        show: true,
+                        type: 'slider',
+                        y: '90%',
+                        start: 50,
+                        end: 100
+                    }
+                ],
+                series: [
+                    {
+                        name: 'MA5',
+                        type: 'line',
+                        data: calculateMA(),
+                        smooth: true,
+                        lineStyle: {
+                            normal: {opacity: 0.5}
+                        }
+                    }
+                ]
+            };
+            if (option && typeof option === "object") {
+                myChart.setOption(option, true);
+            }
         })
     </script>
 </body>

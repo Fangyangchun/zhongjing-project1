@@ -184,15 +184,17 @@
                 },
                 methods: {
                     loginCheck (formName) {
-                        this.$refs[formName].validate((valid) => {
-                            if (valid) {
-                                window.location.href = `src/html/backend.html`
+                        window.location.href = `src/html/backend.html`
                                     + `?role=3&&account=fangyc&&resource=home`;
-                            } else {
-                                console.log('error submit!!');
-                                return false;
-                            }
-                        });
+                        // this.$refs[formName].validate((valid) => {
+                        //     if (valid) {
+                        //         window.location.href = `src/html/backend.html`
+                        //             + `?role=3&&account=fangyc&&resource=home`;
+                        //     } else {
+                        //         console.log('error submit!!');
+                        //         return false;
+                        //     }
+                        // });
                     }
                 },
                 watch: {
