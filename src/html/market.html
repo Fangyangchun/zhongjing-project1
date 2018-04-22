@@ -14,7 +14,43 @@
             height: calc(100% - 124px);
             background: white;
         }
-        #stock {
+        .stock_wrapper {
+            width: 100%;
+            height: 100%;
+        }
+        .el-tabs__header {
+            margin: 0;
+        }
+        .el-tabs.el-tabs--top {
+            width: 100%;
+            height: 100%;
+        }
+        .el-tabs__item.is-top, .el-tabs__active-bar.is-top {
+            width: 72px;
+            text-align: center;
+            padding: 0;
+            outline: none;
+        }
+        .el-tabs__nav .el-tabs__active-bar {
+            width: 72px!important;
+        }
+        .el-tabs__nav-wrap::after {
+            background-color: #E4E3E3;
+            height: 1px;
+        }
+        .el-tabs__active-bar {
+            background-color: #4B92E0;
+        }
+        .el-tabs__item {
+            height: 59px;
+            line-height: 59px;
+        }
+        .el-tabs__content {
+            width: 100%;
+            height: calc(100% - 79px);
+            margin-top: -20px;
+        }
+        .el-tab-pane {
             width: 100%;
             height: 100%;
         }
@@ -22,106 +58,144 @@
 </head>
 <body>
     <div id="market">
-        <div id="stock"></div>
+        <div class="stock_wrapper">
+            <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tab-pane label="中经汇金" name="中经汇金">
+                    <div v-if="activeName==='中经汇金'" style="width: 100%; height: 100%;" id="中经汇金"></div>
+                </el-tab-pane>
+                <el-tab-pane label="梦古堂" name="梦古堂">
+                        <div v-if="activeName==='梦古堂'" style="width: 100%; height: 100%;" id="梦古堂"></div>
+                </el-tab-pane>
+                <el-tab-pane label="阿里巴巴" name="阿里巴巴">
+                        <div v-if="activeName==='阿里巴巴'" style="width: 100%; height: 100%;" id="阿里巴巴"></div>
+                    </el-tab-pane>
+            </el-tabs>
+        </div>
     </div>
     <script type="text/javascript">
         $(function () {
-            var dom = document.getElementById("stock");
-            var myChart = echarts.init(dom);
-            var app = {};
-            var option = null;
-
-// 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
-            var data0 = splitData([
-                ['2013-1-24', 10.09],
-                ['2013-1-25', 9.99],
-                ['2013-1-28', 10.01],
-                ['20131-29', 10.01],
-                ['2013-1-30', 10.003],
-                ['2013-1-31', 10.03],
-                ['2013-2-1', 10.11],
-                ['2013-2-4', 9.89],
-                ['2013-2-5', 10.00],
-                ['2013-2-6', 10.02],
-                ['2013-2-7', 10.33],
-                ['2013-2-8', 10.08]
-            ]);
-
-            function splitData(rawData) {
-                var categoryData = [];
-                var values = [];
-                for (var i = 0; i < rawData.length; i++) {
-                    categoryData.push(rawData[i].splice(0, 1)[0]);
-                    values.push(rawData[i])
-                }
-                return {
-                    categoryData: categoryData,
-                    values: values
-                };
-            }
-
-            function calculateMA() {
-                var result = [];
-                for (var i = 0, len = data0.values.length; i < len; i++) {
-                    result.push(data0.values[i][0]);
-                }
-                return result;
-            }
-            option = {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross'
-                    }
+            var market = new Vue({
+                el: '#market',
+                data: {
+                    activeName: '中经汇金',
+                    firstActiveName: '中经汇金',
+                    chart: null,
                 },
-                grid: {
-                    left: '10%',
-                    right: '10%',
-                    bottom: '15%'
-                },
-                xAxis: {
-                    type: 'category',
-                    data: data0.categoryData,
-                    scale: true,
-                    boundaryGap : false,
-                    axisLine: {onZero: false},
-                    splitLine: {show: false}
-                },
-                yAxis: {
-                    scale: true,
-                    splitArea: {
-                        show: true
-                    }
-                },
-                dataZoom: [
-                    {
-                        type: 'inside',
-                        start: 50,
-                        end: 100
-                    },
-                    {
-                        show: true,
-                        type: 'slider',
-                        y: '90%',
-                        start: 50,
-                        end: 100
-                    }
-                ],
-                series: [
-                    {
-                        name: 'MA5',
-                        type: 'line',
-                        data: calculateMA(),
-                        smooth: true,
-                        lineStyle: {
-                            normal: {opacity: 0.5}
+                methods: {
+                    splitData (rawData) {
+                        var categoryData = [];
+                        var values = [];
+                        for (var i = 0; i < rawData.length; i++) {
+                            categoryData.push(rawData[i].splice(0, 1)[0]);
+                            values.push(rawData[i])
                         }
+                        return {
+                            categoryData: categoryData,
+                            values: values
+                        };
+                    },
+                    calculateMA(data) {
+                        var result = [];
+                        for (var i = 0, len = data.values.length; i < len; i++) {
+                            result.push(data.values[i][0]);
+                        }
+                        return result;
+                    },
+                    drawStock (id) {
+                        if (this.chart) {
+                            this.chart = null;
+                        }
+                        this.chart = echarts.init(document.getElementById(id));
+                        var data0 = this.splitData([
+                            ['2013-1-24', 10.09],
+                            ['2013-1-25', 9.99],
+                            ['2013-1-28', 10.01],
+                            ['20131-29', 10.01],
+                            ['2013-1-30', 10.003],
+                            ['2013-1-31', 10.03],
+                            ['2013-2-1', 10.11],
+                            ['2013-2-4', 9.89],
+                            ['2013-2-5', 10.00],
+                            ['2013-2-6', 10.02],
+                            ['2013-2-7', 10.33],
+                            ['2013-2-8', 10.08]
+                        ]);
+                        var option = null;
+                        option = {
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: {
+                                    type: 'cross'
+                                }
+                            },
+                            grid: {
+                                left: '5%',
+                                right: '5%',
+                                bottom: '20%'
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: data0.categoryData,
+                                scale: true,
+                                boundaryGap : false,
+                                axisLine: {onZero: false},
+                                splitLine: {show: false}
+                            },
+                            yAxis: {
+                                scale: true,
+                                splitArea: {
+                                    show: true
+                                }
+                            },
+                            dataZoom: [
+                                {
+                                    type: 'inside',
+                                    start: 50,
+                                    end: 100
+                                },
+                                {
+                                    show: true,
+                                    type: 'slider',
+                                    y: '90%',
+                                    start: 50,
+                                    end: 100
+                                }
+                            ],
+                            series: [
+                                {
+                                    name: '中经汇金',
+                                    type: 'line',
+                                    data: this.calculateMA(data0),
+                                    smooth: true,
+                                    lineStyle: {
+                                        normal: {opacity: 0.5}
+                                    }
+                                }
+                            ]
+                        };
+                        this.chart.setOption(option, true);
+                    },
+                    handleClick (tab, event) {
+                        // console.log(tab.name);
+                        if (this.activeName === this.firstActiveName) {
+                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '0px');
+                        } else {
+                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
+                        }
+                        var that = this;
+                        setTimeout(function () {
+                            that.drawStock(that.activeName);
+                        }, 0);
+                        
                     }
-                ]
-            };
-            if (option && typeof option === "object") {
-                myChart.setOption(option, true);
-            }
+
+                },
+                mounted () {
+                    this.$nextTick(function () {
+                        this.drawStock('中经汇金');
+                    })
+                }
+            });
         })
     </script>
 </body>
