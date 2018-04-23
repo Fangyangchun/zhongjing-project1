@@ -144,11 +144,12 @@
                             </el-table-column>
                             <el-table-column prop="note" min-width="150px" label="备注信息">
                                     <template slot-scope="scope">
-                                        <el-popover width="120" placement="top" popper-class='note'
+                                        <el-popover v-if="scope.row.note!=='-----'" width="120" placement="top" popper-class='note'
                                                 trigger="click" :content=scope.row.note>
                                             <span slot="reference">
                                                 {{ scope.row.note.length > 8 ? `${scope.row.note.slice(0, 5)}…` : scope.row.note }}</span>
                                         </el-popover>
+                                        <span v-if="scope.row.note==='-----'">{{ scope.row.note }}</span>
                                     </template>
                             </el-table-column>
                             <el-table-column label="操作" header-align="center"
@@ -185,11 +186,12 @@
                             </el-table-column>
                             <el-table-column prop="note" min-width="150px" label="备注信息">
                                     <template slot-scope="scope">
-                                        <el-popover width="120" placement="top" popper-class='note'
+                                        <el-popover v-if="scope.row.note!=='-----'" width="120" placement="top" popper-class='note'
                                                 trigger="click" :content=scope.row.note>
                                             <span slot="reference">
                                                 {{ scope.row.note.length > 8 ? `${scope.row.note.slice(0, 5)}…` : scope.row.note }}</span>
                                         </el-popover>
+                                        <span v-if="scope.row.note==='-----'">{{ scope.row.note }}</span>
                                     </template>
                             </el-table-column>
                             <el-table-column label="操作" header-align="center"
@@ -224,11 +226,12 @@
                                 </el-table-column>
                                 <el-table-column prop="note" label="备注信息">
                                         <template slot-scope="scope">
-                                            <el-popover width="120" placement="top" popper-class='note'
+                                            <el-popover v-if="scope.row.note!=='-----'" width="120" placement="top" popper-class='note'
                                                     trigger="click" :content=scope.row.note>
                                                 <span slot="reference">
                                                     {{ scope.row.note.length > 8 ? `${scope.row.note.slice(0, 5)}…` : scope.row.note }}</span>
                                             </el-popover>
+                                            <span v-if="scope.row.note==='-----'">{{ scope.row.note }}</span>
                                         </template>
                                 </el-table-column>
                                 <el-table-column prop="status" header-align="center"
@@ -390,7 +393,14 @@
                             price: 10.77,
                             trading_num: 1000,
                             finished_date: '2017-02-12 16:27:56',
-                            note: '------'
+                            note: '-----'
+                        }, {
+                            name: '中经汇金',
+                            buyers: '周雅琼 女士',
+                            price: 10.77,
+                            trading_num: 1000,
+                            finished_date: '2017-02-12 16:27:56',
+                            note: '线下交易只接受杭州内同城交易，确定交易先联系股票持有者'
                         }],
                         orders: [{
                             ordersNum: '35435345634634563',
