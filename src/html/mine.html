@@ -9,6 +9,63 @@
     <script src="../../lib/vue.js"></script>
     <script src="../../lib/element-ui/lib/index.js"></script>
 </head>
+<style>
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header {
+        line-height: 44px!important;
+        background: transparent!important;
+        border-bottom: 1px solid #DAE4EA;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__title {
+        line-height: 44px!important;
+        font-size: 16px!important;
+        font-family: AppleSystemUIFont;
+        color: #1F2D3D!important;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn {
+        height: 44px!important;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn i {
+        color: #1F2D3D!important;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__body {
+        text-align: center;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__body p {
+        font-family: PingFangSC-Regular;
+        font-size: 15px;
+        color: #666666;
+    }
+    .el-dialog__body .el-form-item.total.el-form-item--feedback .paramsBtn {
+        position: absolute; 
+        left: 55%;
+        top: 0;
+    }
+    .el-dialog__body .el-form-item__content .el-button.el-button--default.is-round {
+        margin: 0;
+        font-size: 12px;
+        padding: 4px 7px!important;
+        border: 1px solid #86D9BB;
+        font-family: PingFangSC-Regular;
+        font-size: 12px;
+        color: #69C8A6!important;
+    }
+    .el-dialog__body .el-form-item__content .el-button.el-button--default.is-round:hover,
+    .el-dialog__body .el-form-item__content .el-button.el-button--default.is-round:focus {
+        background: red;
+    } 
+    .el-dialog__body .el-input.el-input--prefix {
+        border-bottom: 1px solid #DAE4EA;
+    }
+    .el-dialog__body .el-input.el-input--prefix .el-input__inner {
+        border: none;
+    }
+    .el-dialog__body .el-input.el-input--prefix.total-num .el-input__inner {
+        width: 50%;
+    }
+    .el-dialog__body .el-form-item.total.el-form-item--feedback .el-form-item__content {
+        text-align: left;
+    }
+</style>
 <body>
 <div id="mine">
     <div class="info">
@@ -27,7 +84,7 @@
             </div>
             <div class="handle">
                 <button class="buy">买入</button>
-                <button class="sell">卖出</button>
+                <button class="sell" @click="publishSell('梦古堂')">卖出</button>
             </div>
         </div>
         <div class="info_detail">
@@ -45,7 +102,7 @@
             </div>
             <div class="handle">
                 <button class="buy">买入</button>
-                <button class="sell">卖出</button>
+                <button class="sell" @click="publishSell('中经汇金')">卖出</button>
             </div>
         </div>
     </div>
@@ -86,11 +143,10 @@
                             <el-table-column label="操作" header-align="center"
                                                 align="center">
                                 <template slot-scope="scope">
-                                    <el-button  @click="buyClick(scope, scope.row)"
-                                        type="text" size="small">修改</el-button>
+                                    <el-button type="text" size="small" 
+                                        @click="modifyPublish(scope.row)">修改</el-button>
                                     <span style="font-size: 14px; color: #2678D2;">|</span>
-                                    <el-button  @click="buyClick(scope, scope.row)"
-                                                type="text" size="small">撤销</el-button>
+                                    <el-button type="text" size="small" @click="confirmBox('undo')">撤销</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -121,8 +177,7 @@
                             <el-table-column label="操作" header-align="center"
                                                 align="center">
                                 <template slot-scope="scope">
-                                    <el-button  @click="buyClick(scope, scope.row)"
-                                        type="text" size="small">删除记录</el-button>
+                                    <el-button type="text" size="small" @click="confirmBox('delete')">删除记录</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -166,95 +221,189 @@
             </el-tabs>
         </div>
     </div>
+    <el-dialog width="382px" :title="dialogTitle" :visible.sync="dialogVisible"
+               :close-on-click-modal=false>
+        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
+            <el-form-item prop="name">
+                <el-input v-model="ruleForm.name" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="股票名称" disabled></el-input>
+            </el-form-item>
+            <el-form-item class="total" prop="total_num">
+                <el-input class="total-num" v-model.number="ruleForm.total_num" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入总股数"></el-input>
+                          <div class="paramsBtn">
+                            <el-button round @click="computedNum(0.1)">10%</el-button>
+                            <el-button round @click="computedNum(0.3)">30%</el-button>
+                            <el-button round @click="computedNum(0.5)">50%</el-button>
+                          </div>
+            </el-form-item>
+            <el-form-item prop="locking_num">
+                <el-input v-model.number="ruleForm.locking_num" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请设置锁定股数"></el-input>
+            </el-form-item>
+            <el-form-item prop="price">
+                <el-input v-model.number="ruleForm.price" prefix-icon="el-icon-edit"
+                          auto-complete="off" :placeholder=`请输入单价(参考单价±${this.volatility*100}%内)`></el-input>
+            </el-form-item>
+            <el-form-item prop="note">
+                <el-input v-model="ruleForm.note" prefix-icon="el-icon-edit"
+                          auto-complete="off" placeholder="请输入备注信息(少于20个字符)"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button @click="dialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+    <el-dialog class="confirm_dialog" width="250px" title="提示" :visible.sync="dialogTips"
+               :close-on-click-modal=false>
+        <p>{{ dialogTipText }}</p>
+        <el-button @click="dialogTips = false">取消</el-button>
+        <el-button type="primary" @click="confirmBtn">确定</el-button>
+    </el-dialog>
 </div>
     <script type="text/javascript">
         $(function () {
             var home = new Vue({
                 el: '#mine',
-                data: {
-                    nowYear: new Date().getFullYear(),
-                    nowMonth: new Date().getMonth(),
-                    activeName: 'published',
-                    pagesize: 8,
-                    publish_total: 12,
-                    transaction_total: 12,
-                    value: '',
-                    pickerOptions: {
-                        shortcuts: [{
-                            text: '今天',
-                            onClick(picker) {
-                                const end = new Date();
-                                const start = new Date();
-                                picker.$emit('pick', [start, end]);
+                data () {
+                    var validateTotalNum = (rule, value, callback) => {
+                        if (value === '') {
+                            callback(new Error('请输入总股数'));
+                        } else if (value > this.total_num) {
+                            callback(new Error('发布总股数必须小于持有股数'));
+                        } else {
+                            if (this.ruleForm.locking_num !== '') {
+                                this.$refs.ruleForm.validateField('locking_num');
                             }
-                        },{
-                            text: '最近一周',
-                            onClick(picker) {
-                                const end = new Date();
-                                const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                                picker.$emit('pick', [start, end]);
-                            }
-                        }, {
-                            text: '最近一个月',
-                            onClick(picker) {
-                                const end = new Date();
-                                const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                                picker.$emit('pick', [start, end]);
-                            }
-                        }, {
-                            text: '最近三个月',
-                            onClick(picker) {
-                                const end = new Date();
-                                const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                                picker.$emit('pick', [start, end]);
-                            }
-                        }],
-                        disabledDate (time) {
-                            return time.getTime() > Date.now() - 8.64e6;
+                            callback();
                         }
-                    },
-                    published: [{
-                        name: '梦古堂',
+                    };
+                    var validateLockingNum = (rule, value, callback) => {
+                        if (value > this.ruleForm.total_num) {
+                            callback(new Error('锁定股数必须小于发布总股数!'));
+                        } else {
+                            callback();
+                        }
+                    };
+                    var validatePrice = (rule, value, callback) => {
+                        if (value === '') {
+                            return callback(new Error('请输入单价'));
+                        } else {
+                            if (value < this.reference_price * (1 - this.volatility) 
+                            || value > this.reference_price * (1 + this.volatility)) {
+                                callback(new Error('发布单价必须在参考单价±5%之间!'));
+                            }
+                            callback();
+                        }
+                    };
+                    return {
+                        nowYear: new Date().getFullYear(),
+                        nowMonth: new Date().getMonth(),
+                        activeName: 'published',
+                        pagesize: 8,
+                        publish_total: 12,
+                        transaction_total: 12,
+                        value: '',
+                        pickerOptions: {
+                            shortcuts: [{
+                                text: '今天',
+                                onClick(picker) {
+                                    const end = new Date();
+                                    const start = new Date();
+                                    picker.$emit('pick', [start, end]);
+                                }
+                            },{
+                                text: '最近一周',
+                                onClick(picker) {
+                                    const end = new Date();
+                                    const start = new Date();
+                                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                                    picker.$emit('pick', [start, end]);
+                                }
+                            }, {
+                                text: '最近一个月',
+                                onClick(picker) {
+                                    const end = new Date();
+                                    const start = new Date();
+                                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                                    picker.$emit('pick', [start, end]);
+                                }
+                            }, {
+                                text: '最近三个月',
+                                onClick(picker) {
+                                    const end = new Date();
+                                    const start = new Date();
+                                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                                    picker.$emit('pick', [start, end]);
+                                }
+                            }],
+                            disabledDate (time) {
+                                return time.getTime() > Date.now() - 8.64e6;
+                            }
+                        },
+                        dialogVisible: false,
+                        dialogTitle: '',
                         total_num: 10000,
-                        locking_num: 5000,
-                        tradable_num: 5000,
-                        price: 10.77,
-                        publish_date: '2017-02-12 16:27:56',
-                        note: '线下交易只接受杭州同城交易',
-                        tel: '15116925248'
-                    }],
-                    transaction: [{
-                        name: '中经汇金',
-                        buyers: '周雅琼 女士',
-                        price: 10.77,
-                        trading_num: 1000,
-                        finished_date: '2017-02-12 16:27:56',
-                        note: '------'
-                    }],
-                    orders: [{
-                        ordersNum: '35435345634634563',
-                        type: '买入',
-                        price: 10.99,
-                        trading_num: 10000,
-                        trading_time: '2017-08-19 15:19:56',
-                        note: '-----',
-                        status: '完成'
-                    }]
+                        reference_price: 10,
+                        volatility: 0.05,
+                        dialogTips: false,
+                        dialogTipText: '',
+                        published: [{
+                            name: '梦古堂',
+                            total_num: 10000,
+                            locking_num: 5000,
+                            tradable_num: 5000,
+                            price: 10.77,
+                            publish_date: '2017-02-12 16:27:56',
+                            note: '线下交易只接受杭州同城交易',
+                            tel: '15116925248'
+                        }],
+                        transaction: [{
+                            name: '中经汇金',
+                            buyers: '周雅琼 女士',
+                            price: 10.77,
+                            trading_num: 1000,
+                            finished_date: '2017-02-12 16:27:56',
+                            note: '------'
+                        }],
+                        orders: [{
+                            ordersNum: '35435345634634563',
+                            type: '买入',
+                            price: 10.99,
+                            trading_num: 10000,
+                            trading_time: '2017-08-19 15:19:56',
+                            note: '-----',
+                            status: '完成'
+                        }],
+                        ruleForm: {
+                            name: this.dialogTitle,
+                            total_num: '',
+                            locking_num: '',
+                            price: '',
+                            note: ''
+                        },
+                        rules: {
+                            total_num: [
+                                { validator: validateTotalNum, trigger: 'blur' }
+                            ],
+                            locking_num: [
+                                { validator: validateLockingNum, trigger: 'blur' }
+                            ],
+                            price: [
+                                { validator: validatePrice, trigger: 'blur' }
+                            ]
+                        }
+                    }
                 },
                 methods: {
                     handleClick (tab, event) {
                         // console.log(tab.name);
-                        if (this.activeName === 'transaction') {
-                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
-                        } else {
+                        if (this.activeName === 'published') {
                             $('.el-tabs__nav .el-tabs__active-bar').css('left', '0px');
+                        } else {
+                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
                         }
-                    },
-                    buyClick (scope, row) {
-                        // console.log(scope, row);
                     },
                     dateChangeHandle (val) {
                         if (val) {
@@ -268,6 +417,41 @@
                     },
                     handleCurrentChange2 (val) {
                         console.log(val);
+                    },
+                    publishSell (nameStr) {
+                        this.dialogTitle = nameStr;
+                        this.ruleForm.name = nameStr;
+                        this.dialogVisible = true;
+                    },
+                    modifyPublish (data) {
+                        console.log(data);
+                        this.dialogTitle = data.name;
+                        this.dialogVisible = true;
+                    },
+                    submitForm (formName) {
+                        this.$refs[formName].validate((valid) => {
+                            if (valid) {
+                                this.dialogVisible = false;
+                            } else {
+                                console.log('error submit!!');
+                                return false;
+                            }
+                        });
+                    },
+                    confirmBox (str) {
+                        if (str === 'undo') {
+                            this.dialogTipText = '确定撤销该笔交易？';
+                        } else {
+                            this.dialogTipText = '确定删除该笔交易记录？';
+                        }
+                        this.dialogTips = true;
+                    },
+                    confirmBtn () {
+                        console.log('确定撤销');
+                        this.dialogTips = false;
+                    },
+                    computedNum (num) {
+                        this.ruleForm.total_num = this.total_num * num;
                     }
                 }
             });

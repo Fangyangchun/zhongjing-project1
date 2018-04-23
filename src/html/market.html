@@ -10,9 +10,10 @@
     <script src="../../lib/echarts.min.js"></script>
     <style>
         #market {
-            width: 100%;
+            width: calc(100% - 20px);
             height: calc(100% - 124px);
             background: white;
+            padding-left: 20px;
         }
         .stock_wrapper {
             width: 100%;
@@ -129,8 +130,8 @@
                                 }
                             },
                             grid: {
-                                left: '5%',
-                                right: '5%',
+                                left: '3%',
+                                right: '4%',
                                 bottom: '20%'
                             },
                             xAxis: {

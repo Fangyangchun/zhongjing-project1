@@ -71,7 +71,7 @@
     height: 100%;
     position: relative;
 }
-#tab-published, #tab-transaction {
+#tab-published, #tab-transaction, #tab-orders {
     width: 72px;
     text-align: center;
     padding: 0;
