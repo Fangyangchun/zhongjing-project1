@@ -93,19 +93,35 @@
                 :close-on-click-modal=false>
             <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
                 <el-form-item prop="account">
-                    <el-input v-model="ruleForm.account" prefix-icon="el-icon-edit"
+                        <div class="icon_img">
+                            <img v-if="account_error" src="../images/account_pre.png" alt="">
+                            <img v-if="!account_error" src="../images/account_after.png" alt="">
+                        </div>
+                    <el-input v-model="ruleForm.account"
                             auto-complete="off" placeholder="请输入用户名"></el-input>
                 </el-form-item>
                 <el-form-item prop="ID">
-                    <el-input v-model="ruleForm.ID" prefix-icon="el-icon-edit"
+                        <div class="icon_img">
+                            <img v-if="ID_error" src="../images/ID_pre.png" alt="">
+                            <img v-if="!ID_error" src="../images/ID_after.png" alt="">
+                        </div>
+                    <el-input v-model="ruleForm.ID"
                             auto-complete="off" placeholder="请输入身份证号"></el-input>
                 </el-form-item>
                 <el-form-item prop="tel">
-                    <el-input v-model="ruleForm.tel" prefix-icon="el-icon-edit"
+                        <div class="icon_img">
+                            <img v-if="tel_error" src="../images/tel_pre.png" alt="">
+                            <img v-if="!tel_error" src="../images/tel_after.png" alt="">
+                        </div>
+                    <el-input v-model="ruleForm.tel"
                             auto-complete="off" placeholder='请输入手机号'></el-input>
                 </el-form-item>
                 <el-form-item prop="stock_num">
-                    <el-input v-model.number="ruleForm.stock_num" prefix-icon="el-icon-edit"
+                        <div class="icon_img">
+                            <img v-if="stock_num_error" src="../images/stock_num_pre.png" alt="">
+                            <img v-if="!stock_num_error" src="../images/stock_num_after.png" alt="">
+                        </div>
+                    <el-input v-model.number="ruleForm.stock_num"
                             auto-complete="off" placeholder="请输入持有股数"></el-input>
                 </el-form-item>
                 <el-form-item>
@@ -126,14 +142,26 @@
             var admin = new Vue({
                 el: '#admin',
                 data () {
+                    var validateAccount = (rule, value, callback) => {
+                        if (value === '') {
+                            this.account_error = true;
+                            callback(new Error('请输入用户名'));
+                        } else {
+                            this.account_error = false;
+                            callback();
+                        }
+                    };
                     var validateID = (rule, value, callback) => {
                         var IDreg = /^(([1][1-5])|([2][1-3])|([3][1-7])|([4][1-6])|([5][0-4])|([6][1-5])|([7][1])|([8][1-2]))\d{4}(([1][9]\d{2})|([2]\d{3}))(([0][1-9])|([1][0-2]))(([0][1-9])|([1-2][0-9])|([3][0-1]))\d{3}[0-9xX]$/;
                         if (!value) {
+                            this.ID_error = true;
                             return callback(new Error('身份证号不能为空'));
                         } else {
                             if (!IDreg.test(value)) {
+                                this.ID_error = true;
                                 callback(new Error('请输入正确格式的身份证号'));
                             } else {
+                                this.ID_error = false;
                                 callback();
                             }
                         }
@@ -141,21 +169,27 @@
                     var validateTel = (rule, value, callback) => {
                         var telreg = /^1[3|4|5|7|8][0-9]{9}$/;
                         if (value === '') {
+                            this.tel_error = true;
                             callback(new Error('请输入手机号码'));
                         } else {
                             if (!telreg.test(value)) {
+                                this.tel_error = true;
                                 callback(new Error('请输入正确格式的手机号码'));
                             } else {
+                                this.tel_error = false;
                                 callback();
                             }
                         }
                     };
                     var validateStock = (rule, value, callback) => {
                         if (value === '') {
+                            this.stock_num_error = true;
                             callback(new Error('请输入持有股数'));
                         } else if (!Number.isInteger(value)) {
+                            this.stock_num_error = true;
                             callback(new Error('请输入数值型!'));
                         } else {
+                            this.stock_num_error = false;
                             callback();
                         }
                     };
@@ -166,6 +200,10 @@
                         entryDialogVisible: false,
                         dialogTips: false,
                         dialogTipText: '确认删除该用户信息',
+                        account_error: true,
+                        ID_error: true,
+                        tel_error: true,
+                        stock_num_error: true,
                         adminData: [{
                             account: '中经汇金',
                             ID: '330782199309255424',
@@ -187,7 +225,7 @@
                         },
                         rules: {
                             account: [
-                                { required: true, message: '请输入用户名', trigger: 'blur' }
+                                { validator: validateAccount, trigger: 'blur' }
                             ],
                             ID: [
                                 { validator: validateID, trigger: 'blur' }

@@ -53,13 +53,13 @@
     .el-dialog__body .el-form-item__content .el-button.el-button--default.is-round:focus {
         background: #EBFFFA;
     } 
-    .el-dialog__body .el-input.el-input--prefix {
+    .el-dialog__body .el-input.el-input {
         border-bottom: 1px solid #DAE4EA;
     }
-    .el-dialog__body .el-input.el-input--prefix .el-input__inner {
+    .el-dialog__body .el-input.el-input .el-input__inner {
         border: none;
     }
-    .el-dialog__body .el-input.el-input--prefix.total-num .el-input__inner {
+    .el-dialog__body .el-input.el-input.total-num .el-input__inner {
         width: 50%;
     }
     .el-dialog__body .el-form-item.total.el-form-item--feedback .el-form-item__content {
@@ -253,11 +253,18 @@
                :close-on-click-modal=false>
         <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
             <el-form-item prop="name">
-                <el-input v-model="ruleForm.name" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img src="../images/account_after.png" alt="">
+                    </div>
+                <el-input v-model="ruleForm.name"
                           auto-complete="off" placeholder="股票名称" disabled></el-input>
             </el-form-item>
             <el-form-item class="total" prop="total_num">
-                <el-input class="total-num" v-model.number="ruleForm.total_num" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="total_num_error" src="../images/stock_num_pre.png" alt="">
+                        <img v-if="!total_num_error" src="../images/stock_num_after.png" alt="">
+                    </div>
+                <el-input class="total-num" v-model.number="ruleForm.total_num"
                           auto-complete="off" placeholder="请输入总股数"></el-input>
                           <div class="paramsBtn">
                             <el-button round @click="computedNum(0.1)">10%</el-button>
@@ -266,15 +273,27 @@
                           </div>
             </el-form-item>
             <el-form-item prop="locking_num">
-                <el-input v-model.number="ruleForm.locking_num" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="lock_num_error" src="../images/stock_num_pre.png" alt="">
+                        <img v-if="!lock_num_error" src="../images/stock_num_after.png" alt="">
+                    </div>
+                <el-input v-model.number="ruleForm.locking_num"
                           auto-complete="off" placeholder="请设置锁定股数"></el-input>
             </el-form-item>
             <el-form-item prop="price">
-                <el-input v-model.number="ruleForm.price" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="price_error" src="../images/price_pre.png" alt="">
+                        <img v-if="!price_error" src="../images/price_after.png" alt="">
+                    </div>
+                <el-input v-model.number="ruleForm.price"
                           auto-complete="off" :placeholder=`请输入单价(参考单价±${this.volatility*100}%内)`></el-input>
             </el-form-item>
             <el-form-item prop="note">
-                <el-input v-model="ruleForm.note" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="note_error" src="../images/note_pre.png" alt="">
+                        <img v-if="!note_error" src="../images/nore_after.png" alt="">
+                    </div>
+                <el-input v-model="ruleForm.note"
                           auto-complete="off" placeholder="请输入备注信息(少于20个字符)"></el-input>
             </el-form-item>
             <el-form-item>
@@ -297,31 +316,51 @@
                 data () {
                     var validateTotalNum = (rule, value, callback) => {
                         if (value === '') {
+                            this.total_num_error = true;
                             callback(new Error('请输入总股数'));
                         } else if (value > this.total_num) {
+                            this.total_num_error = true;
                             callback(new Error('发布总股数必须小于持有股数'));
                         } else {
                             if (this.ruleForm.locking_num !== '') {
                                 this.$refs.ruleForm.validateField('locking_num');
                             }
+                            this.total_num_error = false;
                             callback();
                         }
                     };
                     var validateLockingNum = (rule, value, callback) => {
-                        if (value > this.ruleForm.total_num) {
+                        if (value === '') {
+                            this.lock_num_error = true;
+                            callback();
+                        } else if (value > this.ruleForm.total_num) {
+                            this.lock_num_error = true;
                             callback(new Error('锁定股数必须小于发布总股数!'));
                         } else {
+                            this.lock_num_error = false;
                             callback();
                         }
                     };
                     var validatePrice = (rule, value, callback) => {
                         if (value === '') {
+                            this.price_error = true;
                             return callback(new Error('请输入单价'));
                         } else {
                             if (value < this.reference_price * (1 - this.volatility) 
                             || value > this.reference_price * (1 + this.volatility)) {
+                                this.price_error = true;
                                 callback(new Error('发布单价必须在参考单价±5%之间!'));
                             }
+                            this.price_error = false;
+                            callback();
+                        }
+                    };
+                    var validateNote = (rule, value, callback) => {
+                        if (value === '') {
+                            this.note_error = true;
+                            callback();
+                        } else {
+                            this.note_error = false;
                             callback();
                         }
                     };
@@ -333,6 +372,10 @@
                         publish_total: 12,
                         transaction_total: 12,
                         value: '',
+                        total_num_error: true,
+                        lock_num_error: true,
+                        price_error: true,
+                        note_error: true,
                         pickerOptions: {
                             shortcuts: [{
                                 text: '今天',
@@ -436,6 +479,9 @@
                             ],
                             price: [
                                 { validator: validatePrice, trigger: 'blur' }
+                            ],
+                            note: [
+                                { validator: validateNote, trigger: 'blur' }
                             ]
                         }
                     }

@@ -67,19 +67,35 @@
                :close-on-click-modal=false>
             <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
                 <el-form-item prop="name">
-                    <el-input v-model="ruleForm.name" prefix-icon="el-icon-edit"
+                        <div class="icon_img">
+                            <img v-if="name_error" src="../images/account_pre.png" alt="">
+                            <img v-if="!name_error" src="../images/account_after.png" alt="">
+                        </div>
+                    <el-input v-model="ruleForm.name"
                             auto-complete="off" placeholder="股票名称" :disabled="dialogTitle==='修改'"></el-input>
                 </el-form-item>
                 <el-form-item prop="sell_percent">
-                    <el-input v-model.number="ruleForm.sell_percent" prefix-icon="el-icon-edit"
+                        <div class="icon_img">
+                            <img v-if="stock_num_error" src="../images/stock_num_pre.png" alt="">
+                            <img v-if="!stock_num_error" src="../images/stock_num_after.png" alt="">
+                        </div>
+                    <el-input v-model.number="ruleForm.sell_percent"
                             auto-complete="off" placeholder="买卖数量(%)"></el-input>
                 </el-form-item>
                 <el-form-item prop="price_percent">
-                    <el-input v-model.number="ruleForm.price_percent" prefix-icon="el-icon-edit"
+                        <div class="icon_img">
+                            <img v-if="sell_price_error" src="../images/price_pre.png" alt="">
+                            <img v-if="!sell_price_error" src="../images/price_after.png" alt="">
+                        </div>
+                    <el-input v-model.number="ruleForm.price_percent"
                             auto-complete="off" placeholder='买卖单价(%)'></el-input>
                 </el-form-item>
                 <el-form-item prop="price">
-                    <el-input v-model.number="ruleForm.price" prefix-icon="el-icon-edit"
+                        <div class="icon_img">
+                            <img v-if="price_error" src="../images/price_pre.png" alt="">
+                            <img v-if="!price_error" src="../images/price_after.png" alt="">
+                        </div>
+                    <el-input v-model.number="ruleForm.price"
                             auto-complete="off" placeholder="参考单价(元)"></el-input>
                 </el-form-item>
                 <el-form-item>
@@ -94,14 +110,54 @@
             var params = new Vue({
                 el: '#params',
                 data () {
-                    var validatePPercent = (rule, value, callback) => {
+                    var validateName = (rule, value, callback) => {
                         if (value === '') {
-                            callback(new Error('请输入该参数数值'));
+                            this.name_error = true;
+                            callback(new Error('请输入股票名称'));
+                        } else {
+                            this.name_error = false;
+                            callback();
+                        }
+                    };
+                    var validateStock = (rule, value, callback) => {
+                        if (value === '') {
+                            this.stock_num_error = true;
+                            callback(new Error('请输入买卖数量的百分比'));
                         } else if (!Number.isInteger(value)) {
+                            this.stock_num_error = true;
                             callback(new Error('请输入数值型!'));
                         } else if (value <= 0 || value >= 100) {
+                            this.stock_num_error = true;
                             return callback(new Error('请输入大于0且小于100的数值!'));
                         } else {
+                            this.stock_num_error = false;
+                            callback();
+                        }
+                    };
+                    var validatePricePercent = (rule, value, callback) => {
+                        if (value === '') {
+                            this.sell_price_error = true;
+                            callback(new Error('请输入买卖单价百分比'));
+                        } else if (!Number.isInteger(value)) {
+                            this.sell_price_error = true;
+                            callback(new Error('请输入数值型!'));
+                        } else if (value <= 0 || value >= 100) {
+                            this.sell_price_error = true;
+                            return callback(new Error('请输入大于0且小于100的数值!'));
+                        } else {
+                            this.sell_price_error = false;
+                            callback();
+                        }
+                    };
+                    var validatePrice = (rule, value, callback) => {
+                        if (value === '') {
+                            this.price_error = true;
+                            callback(new Error('请输入参考单价'));
+                        } else if (!Number.isInteger(value)) {
+                            this.price_error = true;
+                            callback(new Error('请输入数值型!'));
+                        } else {
+                            this.price_error = false;
                             callback();
                         }
                     };
@@ -110,6 +166,10 @@
                         entry_num: 12,
                         dialogTitle: '录入',
                         entryDialogVisible: false,
+                        name_error: true,
+                        stock_num_error: true,
+                        sell_price_error: true,
+                        price_error: true,
                         paramsData: [{
                             name: '中经汇金',
                             sell_percent: 0.05,
@@ -124,16 +184,16 @@
                         },
                         rules: {
                             name: [
-                             { required: true, message: '请输入股票名称', trigger: 'blur' }
+                             { validator: validateName, trigger: 'blur' }
                             ],
                             sell_percent: [
-                                { validator: validatePPercent, trigger: 'blur' }
+                                { validator: validateStock, trigger: 'blur' }
                             ],
                             price_percent: [
-                                { validator: validatePPercent, trigger: 'blur' }
+                                { validator: validatePricePercent, trigger: 'blur' }
                             ],
                             price: [
-                                { required: true, message: '请输入股票的参考单价', trigger: 'blur' }
+                                { validator: validatePrice, trigger: 'blur' }
                             ]
                         }
                     }

@@ -23,6 +23,7 @@
         .setting {
             display: flex;
             margin-right: 30px;
+            align-items: center;
         }
 
         .setting p {
@@ -38,6 +39,10 @@
             font-size: 16px;
             cursor: pointer;
         }
+        .el-dropdown {
+            top: 2px;
+            margin-right: 45px;
+        }
         .el-dropdown-menu__item--divided:before {
             height: 0!important;
         }
@@ -52,7 +57,7 @@
         .el-dropdown-menu__item {
             line-height: 44px!important;
             padding: 0 25px!important;
-            ont-family: PingFangSC-Regular!important;
+            font-family: PingFangSC-Regular!important;
             color: #666666!important;
         }
         .el-dialog__header {
@@ -79,9 +84,6 @@
             color: white!important;
             font-size: 18px!important;
         }
-        [class*=" el-icon-"], [class^=el-icon-] {
-            font-weight: bold!important;
-        }
         .el-dialog__body .el-button {
             padding: 12px 16px!important;
             color: #475669!important;
@@ -94,22 +96,24 @@
             border-color: #4993E5!important;
             margin-left: 5px;
         }
-        .el-dialog__body .el-input--prefix .el-input__inner, .el-dialog__body .el-select .el-input__inner {
+        .el-dialog__body .el-input {
+            border-bottom: 1px solid #DAE4EA;
+        }
+        .el-dialog__body .el-input .el-input__inner, .el-dialog__body .el-select .el-input__inner {
             border-radius: 0;
             border: none;
-            border-bottom: 1px solid #DAE4EA;
             padding-left: 43px;
             color: #333333;
             height: 24px;
             line-height: 24px;
         }
-        .el-dialog__body .el-input--prefix .el-input__inner::-webkit-input-placeholder {
+        .el-dialog__body .el-input .el-input__inner::-webkit-input-placeholder {
             font-family: PingFangSC-Regular;
             font-size: 14px;
             color: #BBBBBB;
             letter-spacing: 0;
         }
-        .el-dialog__body .el-input--prefix .el-input__inner::-moz-placeholder {
+        .el-dialog__body .el-input .el-input__inner::-moz-placeholder {
             font-family: PingFangSC-Regular;
             font-size: 14px;
             color: #BBBBBB;
@@ -119,7 +123,7 @@
             text-align: right;
             line-height: 35px;
         }
-        .el-dialog__body .el-input__prefix, .el-input__suffix {
+        .el-dialog__body .el-input, .el-input__suffix {
             color: #B9C3CD;
         }
         .el-input__suffix {
@@ -154,20 +158,28 @@
         .el-dialog__body .el-input.is-disabled .el-input__inner {
             background-color: white;
         }
+        .icon_img {
+            position: absolute;
+            height: 30px;
+            width: 35px;
+            left: 3px;
+            top: 0;
+            display: flex;
+            align-items: center;
+            z-index: 1;
+        }
     </style>
 </head>
 <body>
 <div id="header">
     <div class="logo">
-        <p style="color: white;">这里是logo</p>
+        <img src="../images/logo.png" alt="">
     </div>
     <div class="setting">
-        <p style="margin-right: 10px;">欢迎您，151****5248!</p>
+        <p style="margin-right: 50px;">欢迎您，151****5248!</p>
         <p>
             <el-dropdown trigger="click" @command="handleCommand">
-                <span>
-                    <i class="icon_settings el-icon-edit"></i>
-                </span>
+                <img style="cursor: pointer;" src="../images/setting.png" alt="">
                 <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item command="persional">个人信息</el-dropdown-item>
                     <el-dropdown-item command="account" divided>账户信息</el-dropdown-item>
@@ -175,22 +187,34 @@
                 </el-dropdown-menu>
             </el-dropdown>
         </p>
-        <p><i class="icon_settings  el-icon-edit"></i></p>
+        <p><img style="cursor: pointer; margin-top: 2px;" src="../images/logout.png" alt=""></p>
     </div>
 
     <el-dialog width="382px" title="个人信息" :visible.sync="dialogPersionVisible"
                :close-on-click-modal=false>
         <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2">
             <el-form-item prop="account">
-                <el-input v-model="ruleForm2.account" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="account_error" src="../images/account_pre.png" alt="">
+                        <img v-if="!account_error" src="../images/account_after.png" alt="">
+                    </div>
+                <el-input v-model="ruleForm2.account"
                           auto-complete="off" placeholder="请输入用户名"></el-input>
             </el-form-item>
             <el-form-item prop="ID">
-                <el-input v-model="ruleForm2.ID" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="ID_error" src="../images/ID_pre.png" alt="">
+                        <img v-if="!ID_error" src="../images/ID_after.png" alt="">
+                    </div>
+                <el-input v-model="ruleForm2.ID"
                           auto-complete="off" placeholder="请输入身份证号"></el-input>
             </el-form-item>
             <el-form-item prop="tel">
-                <el-input v-model="ruleForm2.tel" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="tel_error" src="../images/tel_pre.png" alt="">
+                        <img v-if="!tel_error" src="../images/tel_after.png" alt="">
+                    </div>
+                <el-input v-model="ruleForm2.tel"
                           auto-complete="off" :disabled=modifyTel
                           placeholder="请输入手机号"></el-input>
                 <el-button class="timerBtn" v-bind:class="{ active: isActive }"
@@ -198,8 +222,11 @@
                            :disabled=btnActive type="text">{{ btnText }}</el-button>
             </el-form-item>
             <el-form-item prop="code">
-                <el-input v-model.number="ruleForm2.code"
-                          prefix-icon="el-icon-edit" placeholder="请输入验证码"></el-input>
+                    <div class="icon_img">
+                        <img v-if="code_error" src="../images/code_pre.png" alt="">
+                        <img v-if="!code_error" src="../images/code_after.png" alt="">
+                    </div>
+                <el-input v-model.number="ruleForm2.code" placeholder="请输入验证码"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button @click="dialogPersionVisible = false">取消</el-button>
@@ -211,15 +238,26 @@
                :close-on-click-modal=false>
         <el-form :model="ruleForm3" status-icon :rules="rules3" ref="ruleForm3">
             <el-form-item prop="bank_card">
-                <el-input v-model.number="ruleForm3.bank_card" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="bank_code_error" src="../images/bank_pre.png" alt="">
+                        <img v-if="!bank_code_error" src="../images/bank_after.png" alt="">
+                    </div>
+                <el-input v-model.number="ruleForm3.bank_card"
                           auto-complete="off" placeholder="绑定银行卡"></el-input>
             </el-form-item>
             <el-form-item prop="confirm_card">
-                <el-input v-model.number="ruleForm3.confirm_card" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="bank_confirm_error" src="../images/bank_pre.png" alt="">
+                        <img v-if="!bank_confirm_error" src="../images/bank_after.png" alt="">
+                    </div>
+                <el-input v-model.number="ruleForm3.confirm_card"
                           auto-complete="off" placeholder="确认银行卡"></el-input>
             </el-form-item>
             <el-form-item prop="bank_account">
-                <i style="position: absolute; z-index: 1; color: #B9C3CD; left: 4px;" class="el-input__icon el-icon-edit"></i>
+                    <div class="icon_img">
+                        <img v-if="bank_error" src="../images/address_pre.png" alt="">
+                        <img v-if="!bank_error" src="../images/address_after.png" alt="">
+                    </div>
                 <el-select v-model="ruleForm3.bank_account" placeholder="开户银行">
                     <el-option label="中国工商银行" value="中国工商银行"></el-option>
                     <el-option label="中国农业银行" value="中国农业银行"></el-option>
@@ -236,7 +274,11 @@
                 </el-select>
             </el-form-item>
             <el-form-item prop="bank_branch">
-                <el-input v-model="ruleForm3.bank_branch" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="address_error" src="../images/address_pre.png" alt="">
+                        <img v-if="!address_error" src="../images/address_after.png" alt="">
+                    </div>
+                <el-input v-model="ruleForm3.bank_branch"
                           auto-complete="off" placeholder="请输入开户支行"></el-input>
             </el-form-item>
             <el-form-item>
@@ -249,15 +291,27 @@
                :close-on-click-modal=false>
         <el-form :model="ruleForm1" status-icon :rules="rules1" ref="ruleForm1">
             <el-form-item prop="old_pass">
-                <el-input type="password" v-model="ruleForm1.old_pass" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="old_pass_error" src="../images/pass_pre.png" alt="">
+                        <img v-if="!old_pass_error" src="../images/pass_after.png" alt="">
+                    </div>
+                <el-input type="password" v-model="ruleForm1.old_pass"
                           auto-complete="off" placeholder="请输入原密码"></el-input>
             </el-form-item>
             <el-form-item prop="new_pass">
-                <el-input type="password" v-model="ruleForm1.new_pass" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="new_pass_error" src="../images/pass_pre.png" alt="">
+                        <img v-if="!new_pass_error" src="../images/pass_after.png" alt="">
+                    </div>
+                <el-input type="password" v-model="ruleForm1.new_pass"
                           auto-complete="off" placeholder="请输入新密码"></el-input>
             </el-form-item>
             <el-form-item prop="check_pass">
-                <el-input type="password" v-model="ruleForm1.check_pass" prefix-icon="el-icon-edit"
+                    <div class="icon_img">
+                        <img v-if="check_pass_error" src="../images/pass_pre.png" alt="">
+                        <img v-if="!check_pass_error" src="../images/pass_after.png" alt="">
+                    </div>
+                <el-input type="password" v-model="ruleForm1.check_pass"
                           auto-complete="off" placeholder="请确认新密码"></el-input>
             </el-form-item>
             <el-form-item>
@@ -274,45 +328,57 @@
             data () {
                 var validateOldPass = (rule, value, callback) => {
                     if (value === '') {
+                        this.old_pass_error = true;
                         callback(new Error('请输入旧密码'));
                     } else {
+                        this.old_pass_error = false;
                         callback();
                     }
                 };
                 var validateNewPass1 = (rule, value, callback) => {
                     if (value === '') {
+                        this.new_pass_error = true;
                         callback(new Error('请输入新密码'));
                     } else {
                         if (this.ruleForm1.check_pass !== '') {
                             this.$refs.ruleForm1.validateField('check_pass');
                         }
+                        this.new_pass_error = false;
                         callback();
                     }
                 };
                 var validateNewPass2 = (rule, value, callback) => {
                     if (value === '') {
+                        this.check_pass_error = true;
                         callback(new Error('请再次输入新密码'));
                     } else if (value !== this.ruleForm1.new_pass) {
+                        this.check_pass_error = true;
                         callback(new Error('两次输入密码不一致!'));
                     } else {
+                        this.check_pass_error = false;
                         callback();
                     }
                 };
                 var validateAccount = (rule, value, callback) => {
                     if (!value) {
+                        this.account_error = true;
                         return callback(new Error('用户名不能为空'));
                     } else {
+                        this.account_error = false;
                         callback();
                     }
                 };
                 var validateID = (rule, value, callback) => {
                     var IDreg = /^(([1][1-5])|([2][1-3])|([3][1-7])|([4][1-6])|([5][0-4])|([6][1-5])|([7][1])|([8][1-2]))\d{4}(([1][9]\d{2})|([2]\d{3}))(([0][1-9])|([1][0-2]))(([0][1-9])|([1-2][0-9])|([3][0-1]))\d{3}[0-9xX]$/;
                     if (!value) {
+                        this.ID_error = true;
                         return callback(new Error('身份证号不能为空'));
                     } else {
                         if (!IDreg.test(value)) {
+                            this.ID_error = true;
                             callback(new Error('请输入正确格式的身份证号'));
                         } else {
+                            this.ID_error = false;
                             callback();
                         }
                     }
@@ -320,22 +386,28 @@
                 var validateTel = (rule, value, callback) => {
                     var telreg = /^1[3|4|5|7|8][0-9]{9}$/;
                     if (value === '') {
+                        this.tel_error = true;
                         callback(new Error('请输入手机号码'));
                     } else {
                         if (!telreg.test(value)) {
+                            this.tel_error = true;
                             callback(new Error('请输入正确格式的手机号码'));
                         } else {
+                            this.tel_error = false;
                             callback();
                         }
                     }
                 };
                 var validateCode = (rule, value, callback) => {
                     if (value === '') {
+                        this.code_error = true;
                         callback(new Error('请输入验证码'));
                     } else if (!Number.isInteger(value)) {
+                        this.code_error = true;
                         callback(new Error('请输入数值型验证码!'));
                     } else {
                         if (value.toString().length !== 6) {
+                            this.code_error = true;
                             callback(new Error('请输入6位验证'));
                         } else {
                             callback();
@@ -344,24 +416,48 @@
                 };
                 var validateBank = (rule, value, callback) => {
                     if (value === '') {
+                        this.bank_code_error = true;
                         callback(new Error('请输入银行卡号'));
                     } else {
                         if (!(/[0-9]{16,19}/g).test(value)) {
+                            this.bank_code_error = true;
                             callback(new Error('请输入正确格式的银行卡号'));
                         } else {
                             if (this.ruleForm3.confirm_card !== '') {
                                 this.$refs.ruleForm3.validateField('confirm_card');
                             }
+                            this.bank_code_error = false;
                             callback();
                         }
                     }
                 };
                 var validateCheckBank = (rule, value, callback) => {
                     if (value === '') {
+                        this.bank_confirm_error = true;
                         callback(new Error('请再次确认银行卡号'));
                     } else if (value !== this.ruleForm3.bank_card) {
+                        this.bank_confirm_error = true;
                         callback(new Error('两次输入银行卡号不一致!'));
                     } else {
+                        this.bank_confirm_error = false;
+                        callback();
+                    }
+                };
+                var validateBankAccount = (rule, value, callback) => {
+                    if (value === '') {
+                        this.bank_error = true;
+                        callback(new Error('请选择开户银行'));
+                    } else {
+                        this.bank_error = false;
+                        callback();
+                    }
+                };
+                var validateBankBranch = (rule, value, callback) => {
+                    if (value === '') {
+                        this.address_error = true;
+                        callback(new Error('请输入开户支行'));
+                    } else {
+                        this.address_error = false;
                         callback();
                     }
                 };
@@ -374,6 +470,17 @@
                     dialogPersionVisible: false,
                     dialogAccountVisible: false,
                     dialogPasswordVisible: false,
+                    account_error: true,
+                    ID_error: true,
+                    tel_error: true,
+                    code_error: true,
+                    bank_code_error: true,
+                    bank_confirm_error: true,
+                    bank_error: true,
+                    address_error: true,
+                    old_pass_error: true,
+                    new_pass_error: true,
+                    check_pass_error: true,
                     ruleForm1: {
                         old_pass: '',
                         new_pass: '',
@@ -424,10 +531,10 @@
                             { validator: validateCheckBank, trigger: 'blur' }
                         ],
                         bank_account: [
-                            { required: true, message: '请选择开户银行', trigger: 'change' }
+                            { validator: validateBankAccount, trigger: 'change' }
                         ],
                         bank_branch: [
-                            { required: true, message: '请输入开户支行', trigger: 'blur' }
+                            { validator: validateBankBranch, trigger: 'blur' }
                         ]
                     }
                 };

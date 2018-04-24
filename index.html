@@ -13,18 +13,24 @@
         .forms {
             width: 290px;
         }
+        .el-input {
+            border-bottom: 1px solid #DAE4EA;          
+        }
         .el-input__inner {
             font-family: PingFangSC-Regular;
             border-radius: 0px;
             border: none;
-            border-bottom: 1px solid #DAE4EA;
+            border-bottom: none;
             color: #333333;
             font-size: 14px;
             height: 30px;
             line-height: 30px;
         }
-        .el-input--prefix .el-input__inner {
+        .el-input .el-input__inner {
             padding-left: 35px;
+        }
+        .tel_input .el-input .el-input__inner {
+            width: 70%;
         }
         .el-input__icon {
             line-height: 30px;
@@ -75,32 +81,58 @@
         .el-input.is-disabled .el-input__inner {
             background-color: white;
         }
+        .el-form-item__content {
+            line-height: 30px;
+        }
+        .icon_img {
+            position: absolute;
+            height: 30px;
+            width: 35px;
+            left: 3px;
+            top: 0;
+            display: flex;
+            align-items: center;
+            z-index: 1;
+        }
     </style>
 </head>
 <body>
     <div id="app">
         <div class="content_box">
-            <div class="login_img"></div>
+            <div class="login_img">
+                <img src="src/images/login.png" alt="">
+            </div>
             <div class="form_box">
                 <p>内部股权交易系统</p>
                 <div class="forms">
                     <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
                         <el-form-item prop="ID">
-                            <el-input v-model="ruleForm.ID" prefix-icon="el-icon-edit"
+                            <div class="icon_img">
+                                <img v-if="ID_error" src="src/images/ID_pre.png" alt="">
+                                <img v-if="!ID_error" src="src/images/ID_after.png" alt="">
+                            </div>
+                            <el-input v-model="ruleForm.ID"
                                       auto-complete="off" placeholder="请输入身份证号"></el-input>
                         </el-form-item>
-                        <el-form-item prop="tel">
-                            <el-input v-model="ruleForm.tel" prefix-icon="el-icon-edit"
+                        <el-form-item prop="tel" class="tel_input">
+                            <div class="icon_img">
+                                <img v-if="tel_error" src="src/images/tel_pre.png" alt="">
+                                <img v-if="!tel_error" src="src/images/tel_after.png" alt="">
+                            </div>
+                            <el-input v-model="ruleForm.tel"
                                       auto-complete="off" :disabled=modifyTel
                                       placeholder="请输入手机号"></el-input>
-                            <el-button style="position: absolute; bottom: 10px;
+                            <el-button style="position: absolute; bottom: 6px;
                              right: 10px; padding: 0 8px; line-height: 22px; font-size: 12px;"
                                        v-bind:class="{ active: isActive }" @click="modifyTel=true"
                                        :disabled=btnActive type="text">{{ btnText }}</el-button>
                         </el-form-item>
                         <el-form-item prop="code">
-                            <el-input v-model.number="ruleForm.code"
-                                      prefix-icon="el-icon-edit" placeholder="请输入验证码"></el-input>
+                            <div class="icon_img">
+                                <img v-if="code_error" src="src/images/code_pre.png" alt="">
+                                <img v-if="!code_error" src="src/images/code_after.png" alt="">
+                            </div>
+                            <el-input v-model.number="ruleForm.code" placeholder="请输入验证码"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" class="login_btn"
@@ -119,11 +151,14 @@
                     var validateID = (rule, value, callback) => {
                         var IDreg = /^(([1][1-5])|([2][1-3])|([3][1-7])|([4][1-6])|([5][0-4])|([6][1-5])|([7][1])|([8][1-2]))\d{4}(([1][9]\d{2})|([2]\d{3}))(([0][1-9])|([1][0-2]))(([0][1-9])|([1-2][0-9])|([3][0-1]))\d{3}[0-9xX]$/;
                         if (!value) {
+                            this.ID_error = true;
                             return callback(new Error('身份证号不能为空'));
                         } else {
                             if (!IDreg.test(value)) {
+                                this.ID_error = true;
                                 callback(new Error('请输入正确格式的身份证号'));
                             } else {
+                                this.ID_error = false;
                                 callback();
                             }
                         }
@@ -131,24 +166,31 @@
                     var validateTel = (rule, value, callback) => {
                         var telreg = /^1[3|4|5|7|8][0-9]{9}$/;
                         if (value === '') {
+                            this.tel_error = true;
                             callback(new Error('请输入手机号码'));
                         } else {
                             if (!telreg.test(value)) {
+                                this.tel_error = true;
                                 callback(new Error('请输入正确格式的手机号码'));
                             } else {
+                                this.tel_error = false;
                                 callback();
                             }
                         }
                     };
                     var validateCode = (rule, value, callback) => {
                         if (value === '') {
+                            this.code_error = true;
                             callback(new Error('请输入验证码'));
                         } else if (!Number.isInteger(value)) {
+                            this.code_error = true;
                             callback(new Error('请输入数值型验证码!'));
                         } else {
                             if (value.toString().length !== 6) {
+                                this.code_error = true;
                                 callback(new Error('请输入6位验证'));
                             } else {
+                                this.code_error = false;
                                 callback();
                             }
                         }
@@ -159,6 +201,9 @@
                         timer: null,
                         modifyTel: false,
                         btnActive: true,
+                        ID_error: true,
+                        tel_error: true,
+                        code_error: true,
                         ruleForm: {
                             ID: '',
                             tel: '',
@@ -200,6 +245,7 @@
                 watch: {
                     isActive: function (newVal, oldVal) {
                         this.btnActive = oldVal;
+                        // this.tel_error = oldVal;
                     },
                     modifyTel: function (newActive, oldActive) {
                         if (this.modifyTel) {
