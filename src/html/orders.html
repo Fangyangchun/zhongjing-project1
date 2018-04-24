@@ -3,8 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <title>订单管理</title>
+    <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../css/home.css">
+    <script src="../../lib/jquery.min.js"></script>
+    <script src="../../lib/vue.js"></script>
+    <script src="../../lib/element-ui/lib/index.js"></script>
 </head>
+<style>
+    #orders {
+        width: 100%;
+        background: white;
+    }
+    .entyrTable {
+        width: 100%;
+        padding-top: 28px;
+        margin-left: 20px;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header {
+        line-height: 44px!important;
+        background: transparent!important;
+        border-bottom: 1px solid #DAE4EA;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__title {
+        line-height: 44px!important;
+        font-size: 16px!important;
+        font-family: AppleSystemUIFont;
+        color: #1F2D3D!important;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn {
+        height: 44px!important;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn i {
+        color: #1F2D3D!important;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__body {
+        text-align: center;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__body p {
+        font-family: PingFangSC-Regular;
+        font-size: 15px;
+        color: #666666;
+    }
+</style>
 <body>
-    <h1>订单管理</h1>
+<div id='orders'>
+    <div class="entyrTable">
+        <div style="width: calc(100% - 40px); padding-bottom: 20px;">
+            <el-table :data="ordersData">
+                <el-table-column min-width="120px" prop="order_number" label="订单号">
+                    </el-table-column>
+                <el-table-column min-width="120px" prop="buyer" label="买入方">
+                    </el-table-column>
+                <el-table-column min-width="120px" prop="seller" label="卖出方">
+                </el-table-column>
+                <el-table-column prop=sell_num label="交易数量(股)">
+                </el-table-column>
+                <el-table-column prop=price label="参考单价(元)">
+                </el-table-column>
+                <el-table-column label="操作" header-align="center"
+                                            align="center">
+                    <template slot-scope="scope">
+                        <el-button type="text" size="small" @click="reviewOrders(true, scope.row)">通过</el-button>
+                        <span style="font-size: 14px; color: #2678D2;">|</span>
+                        <el-button type="text" size="small" @click="reviewOrders(false, scope.row)">不通过</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination_box">
+                <el-pagination background layout="prev, pager, next, jumper"
+                                :page-size=pagesize :total=entry_num
+                                @current-change="currentPageChange">
+                </el-pagination>
+            </div>
+        </div>
+    </div>
+    <el-dialog class="confirm_dialog" width="250px" title="提示" :visible.sync="dialogTips"
+               :close-on-click-modal=false>
+        <p>{{ dialogTipText }}</p>
+        <el-button @click="dialogTips = false">取消</el-button>
+        <el-button type="primary" @click="confirmBtn">确定</el-button>
+    </el-dialog>
+</div>
+<script>
+    $(function () {
+        var orders = new Vue({
+            el: '#orders',
+            data () {
+                return {
+                    pagesize: 8,
+                    entry_num: 12,
+                    dialogTipText: '',
+                    dialogTips: false,
+                    ordersData: [{
+                        order_number: '12378789398459038545',
+                        buyer: '方阳春',
+                        seller: '周雅琼',
+                        sell_num: 100000,
+                        price: 10.97
+                    }, {
+                        order_number: '12378789398459038545',
+                        buyer: '方阳春',
+                        seller: '周雅琼',
+                        sell_num: 100000,
+                        price: 10.97
+                    }]
+                }
+            },
+            methods: {
+                currentPageChange (num) {
+                    console.log(num);
+                },
+                reviewOrders (bool, data) {
+                    if (bool) {
+                        this.dialogTipText = '确认通过该订单?';
+                    } else {
+                        this.dialogTipText = '确认不通过该订单?';
+                    }
+                    this.dialogTips = true;
+                },
+                confirmBtn () {
+                    console.log('确认');
+                    this.dialogTips = false;
+                }
+            }
+        })
+    })
+</script>
 </body>
 </html>

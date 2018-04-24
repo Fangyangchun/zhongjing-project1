@@ -4,25 +4,167 @@
     <meta charset="UTF-8">
     <title>参数配置</title>
     <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../css/home.css">
     <script src="../../lib/jquery.min.js"></script>
     <script src="../../lib/vue.js"></script>
     <script src="../../lib/element-ui/lib/index.js"></script>
-    <style>
-        #params {
-            width: 100%;
-            background: white;
-        }
-        .handle {
-
-        }
-    </style>
 </head>
+<style>
+    #params {
+        width: 100%;
+        background: white;
+    }
+    .entryBtn {
+        padding: 25px 0 25px 45px;
+    }
+    .entryBtn .el-button.is-round {
+        padding: 5px 17px;
+        background: #4993E5;
+    }
+    .entyrTable {
+        width: 100%;
+        margin-left: 20px;
+    }
+</style>
 <body>
     <div id='params'>
-        <div class="handle">
-            <el-button type="primary" round>主要按钮</el-button>
-            <el-button type="primary" round>主要按钮</el-button>
+        <div class="entryBtn">
+            <el-button @click="entryType" type="primary" round>录入</el-button>
         </div>
+        <div class="entyrTable">
+            <div style="width: calc(100% - 40px); padding-bottom: 20px;">
+                <el-table :data="paramsData">
+                    <el-table-column min-width="120px" prop="name" label="股票名称">
+                        </el-table-column>
+                    <el-table-column min-width="120px" prop=sell_percent label="买卖数量(%)">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.sell_percent * 100 }}%</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop=price_percent label="买卖单价(%)">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.price_percent * 100 }}%</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop=price label="参考单价(元)">
+                    </el-table-column>
+                    <el-table-column label="操作" header-align="center"
+                                                align="center">
+                        <template slot-scope="scope">
+                            <el-button type="text" size="small" @click="modifyParams(scope.row)">修改</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div class="pagination_box">
+                    <el-pagination background layout="prev, pager, next, jumper"
+                                    :page-size=pagesize :total=entry_num
+                                    @current-change="currentPageChange">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+        <el-dialog width="382px" :title="dialogTitle" :visible.sync="entryDialogVisible"
+               :close-on-click-modal=false>
+            <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
+                <el-form-item prop="name">
+                    <el-input v-model="ruleForm.name" prefix-icon="el-icon-edit"
+                            auto-complete="off" placeholder="股票名称" :disabled="dialogTitle==='修改'"></el-input>
+                </el-form-item>
+                <el-form-item prop="sell_percent">
+                    <el-input v-model.number="ruleForm.sell_percent" prefix-icon="el-icon-edit"
+                            auto-complete="off" placeholder="买卖数量(%)"></el-input>
+                </el-form-item>
+                <el-form-item prop="price_percent">
+                    <el-input v-model.number="ruleForm.price_percent" prefix-icon="el-icon-edit"
+                            auto-complete="off" placeholder='买卖单价(%)'></el-input>
+                </el-form-item>
+                <el-form-item prop="price">
+                    <el-input v-model.number="ruleForm.price" prefix-icon="el-icon-edit"
+                            auto-complete="off" placeholder="参考单价(元)"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="entryDialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
     </div>
+    <script>
+        $(function () {
+            var params = new Vue({
+                el: '#params',
+                data () {
+                    var validatePPercent = (rule, value, callback) => {
+                        if (value === '') {
+                            callback(new Error('请输入该参数数值'));
+                        } else if (!Number.isInteger(value)) {
+                            callback(new Error('请输入数值型!'));
+                        } else if (value <= 0 || value >= 100) {
+                            return callback(new Error('请输入大于0且小于100的数值!'));
+                        } else {
+                            callback();
+                        }
+                    };
+                    return {
+                        pagesize: 8,
+                        entry_num: 12,
+                        dialogTitle: '录入',
+                        entryDialogVisible: false,
+                        paramsData: [{
+                            name: '中经汇金',
+                            sell_percent: 0.05,
+                            price_percent: 0.1,
+                            price: 10
+                        }],
+                        ruleForm: {
+                            name: '中经汇金',
+                            sell_percent: '',
+                            price_percent: '',
+                            price: ''
+                        },
+                        rules: {
+                            name: [
+                             { required: true, message: '请输入股票名称', trigger: 'blur' }
+                            ],
+                            sell_percent: [
+                                { validator: validatePPercent, trigger: 'blur' }
+                            ],
+                            price_percent: [
+                                { validator: validatePPercent, trigger: 'blur' }
+                            ],
+                            price: [
+                                { required: true, message: '请输入股票的参考单价', trigger: 'blur' }
+                            ]
+                        }
+                    }
+                },
+                methods: {
+                    entryType () {
+                        this.dialogTitle = '录入';
+                        this.entryDialogVisible = true;
+                    },
+                    modifyParams (data) {
+                        this.dialogTitle = '修改';
+                        this.entryDialogVisible = true;
+                        console.log(data);
+                    },
+                    currentPageChange (num) {
+                        console.log(num);
+                    },
+                    submitForm (formName) {
+                        this.$refs[formName].validate((valid) => {
+                            if (valid) {
+                                console.log('修改成功');
+                                this.entryDialogVisible = false;
+                            } else {
+                                console.log('error submit!!');
+                                return false;
+                            }
+                        });
+                    }
+                }
+            })
+        })
+    </script>
 </body>
 </html>

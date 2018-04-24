@@ -3,8 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <title>管理员</title>
+    <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../css/home.css">
+    <script src="../../lib/jquery.min.js"></script>
+    <script src="../../lib/vue.js"></script>
+    <script src="../../lib/element-ui/lib/index.js"></script>
 </head>
+<style>
+    #admin {
+        width: 100%;
+        background: white;
+    }
+    .entryBtn {
+        padding: 25px 0 25px 45px;
+    }
+    .entryBtn .el-button.is-round {
+        padding: 5px 17px;
+        background: #4993E5;
+    }
+    .entyrTable {
+        width: 100%;
+        margin-left: 20px;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header {
+        line-height: 44px!important;
+        background: transparent!important;
+        border-bottom: 1px solid #DAE4EA;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__title {
+        line-height: 44px!important;
+        font-size: 16px!important;
+        font-family: AppleSystemUIFont;
+        color: #1F2D3D!important;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn {
+        height: 44px!important;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn i {
+        color: #1F2D3D!important;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__body {
+        text-align: center;
+    }
+    .el-dialog__wrapper.confirm_dialog .el-dialog__body p {
+        font-family: PingFangSC-Regular;
+        font-size: 15px;
+        color: #666666;
+    }
+</style>
 <body>
-    <h1>管理员</h1>
+    <div id="admin">
+        <div class="entryBtn">
+            <el-button @click="entryType" type="primary" round>录入</el-button>
+        </div>
+        <div class="entyrTable">
+            <div style="width: calc(100% - 40px); padding-bottom: 20px;">
+                <el-table :data="adminData">
+                    <el-table-column min-width="120px" prop="account" label="用户名">
+                        </el-table-column>
+                    <el-table-column min-width="120px" prop="ID" label="身份证">
+                    </el-table-column>
+                    <el-table-column prop="tel" label="绑定手机号">
+                    </el-table-column>
+                    <el-table-column prop=bank_num label="绑定银行号">
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.bank_num? scope.row.bank_num : '-----' }}</span>
+                            </template>
+                        </el-table-column>
+                    <el-table-column prop=stock_num label="持有股数">
+                    </el-table-column>
+                    <el-table-column label="操作" header-align="center"
+                                                align="center">
+                        <template slot-scope="scope">
+                            <el-button type="text" size="small" @click="modifyParams(scope.row)">修改</el-button>
+                            <span style="font-size: 14px; color: #2678D2;">|</span>
+                            <el-button type="text" size="small" @click="deleteAccount(scope.row);">删除</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div class="pagination_box">
+                    <el-pagination background layout="prev, pager, next, jumper"
+                                    :page-size=pagesize :total=entry_num
+                                    @current-change="currentPageChange">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+        <el-dialog width="382px" :title="dialogTitle" :visible.sync="entryDialogVisible"
+                :close-on-click-modal=false>
+            <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
+                <el-form-item prop="account">
+                    <el-input v-model="ruleForm.account" prefix-icon="el-icon-edit"
+                            auto-complete="off" placeholder="请输入用户名"></el-input>
+                </el-form-item>
+                <el-form-item prop="ID">
+                    <el-input v-model="ruleForm.ID" prefix-icon="el-icon-edit"
+                            auto-complete="off" placeholder="请输入身份证号"></el-input>
+                </el-form-item>
+                <el-form-item prop="tel">
+                    <el-input v-model="ruleForm.tel" prefix-icon="el-icon-edit"
+                            auto-complete="off" placeholder='请输入手机号'></el-input>
+                </el-form-item>
+                <el-form-item prop="stock_num">
+                    <el-input v-model.number="ruleForm.stock_num" prefix-icon="el-icon-edit"
+                            auto-complete="off" placeholder="请输入持有股数"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="entryDialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
+        <el-dialog class="confirm_dialog" width="250px" title="提示" :visible.sync="dialogTips"
+               :close-on-click-modal=false>
+            <p>{{ dialogTipText }}</p>
+            <el-button @click="dialogTips = false">取消</el-button>
+            <el-button type="primary" @click="confirmBtn">确定</el-button>
+        </el-dialog>
+    </div>
+    <script>
+        $(function () {
+            var admin = new Vue({
+                el: '#admin',
+                data () {
+                    var validateID = (rule, value, callback) => {
+                        var IDreg = /^(([1][1-5])|([2][1-3])|([3][1-7])|([4][1-6])|([5][0-4])|([6][1-5])|([7][1])|([8][1-2]))\d{4}(([1][9]\d{2})|([2]\d{3}))(([0][1-9])|([1][0-2]))(([0][1-9])|([1-2][0-9])|([3][0-1]))\d{3}[0-9xX]$/;
+                        if (!value) {
+                            return callback(new Error('身份证号不能为空'));
+                        } else {
+                            if (!IDreg.test(value)) {
+                                callback(new Error('请输入正确格式的身份证号'));
+                            } else {
+                                callback();
+                            }
+                        }
+                    };
+                    var validateTel = (rule, value, callback) => {
+                        var telreg = /^1[3|4|5|7|8][0-9]{9}$/;
+                        if (value === '') {
+                            callback(new Error('请输入手机号码'));
+                        } else {
+                            if (!telreg.test(value)) {
+                                callback(new Error('请输入正确格式的手机号码'));
+                            } else {
+                                callback();
+                            }
+                        }
+                    };
+                    var validateStock = (rule, value, callback) => {
+                        if (value === '') {
+                            callback(new Error('请输入持有股数'));
+                        } else if (!Number.isInteger(value)) {
+                            callback(new Error('请输入数值型!'));
+                        } else {
+                            callback();
+                        }
+                    };
+                    return {
+                        pagesize: 8,
+                        entry_num: 12,
+                        dialogTitle: '录入',
+                        entryDialogVisible: false,
+                        dialogTips: false,
+                        dialogTipText: '确认删除该用户信息',
+                        adminData: [{
+                            account: '中经汇金',
+                            ID: '330782199309255424',
+                            tel: '15116925248',
+                            bank_num: '988988944433443',
+                            stock_num: 100000
+                        }, {
+                            account: '中经汇金',
+                            ID: '330782199309255424',
+                            tel: '15116925248',
+                            bank_num: '',
+                            stock_num: 100000
+                        }],
+                        ruleForm: {
+                            account: '',
+                            ID: '',
+                            tel: '',
+                            stock_num: ''
+                        },
+                        rules: {
+                            account: [
+                                { required: true, message: '请输入用户名', trigger: 'blur' }
+                            ],
+                            ID: [
+                                { validator: validateID, trigger: 'blur' }
+                            ],
+                            tel: [
+                                { validator: validateTel, trigger: 'blur' }
+                            ],
+                            stock_num: [
+                                { validator: validateStock, trigger: 'blur' }
+                            ]
+                        }
+                    }
+                },
+                methods: {
+                    entryType () {
+                        this.dialogTitle = '录入';
+                        this.entryDialogVisible = true;
+                    },
+                    modifyParams (data) {
+                        this.dialogTitle = '修改';
+                        this.entryDialogVisible = true;
+                        console.log(data);
+                    },
+                    currentPageChange (num) {
+                        console.log(num);
+                    },
+                    submitForm (formName) {
+                        this.$refs[formName].validate((valid) => {
+                            if (valid) {
+                                console.log('修改成功');
+                                this.entryDialogVisible = false;
+                            } else {
+                                console.log('error submit!!');
+                                return false;
+                            }
+                        });
+                    },
+                    deleteAccount (data) {
+                        console.log(data);
+                        this.dialogTips = true;
+                    },
+                    confirmBtn () {
+                        console.log('确认删除该用户信息');
+                        this.dialogTips = false;
+                    }
+                }
+            })
+        })
+    </script>
 </body>
 </html>

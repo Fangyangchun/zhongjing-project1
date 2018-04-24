@@ -36,17 +36,11 @@
             $('.orders i').css('color', '#C3C8D4');
             break;
         default:
-            $('.menu').html(`<div onclick="jumpInto('home')" class="home" style="width: 100%; height: 95px; background: #3F434F; border-bottom: 1px solid #40434e; display: flex; flex-wrap: wrap; align-items: center; cursor: pointer;"><div style="width: 100%;"><p style="width: 100%; text-align: center;"><i style="padding: 0; font-size: 16px; color: #737782;" class="el-icon-edit"></i></p>
-<p style="width: 100%; text-align: center; font-size: 14px; color: #8C91A0; margin-top: 10px;">主页</p></div></div>
-                <div onclick="jumpInto('market')" class="market" style="width: 100%; height: 95px; background: #3F434F; border-bottom: 1px solid #40434e; border-top: 1px solid #353843; display: flex; flex-wrap: wrap; align-items: center; cursor: pointer;"><div style="width: 100%;"><p style="width: 100%; text-align: center;"><i style="padding: 0; font-size: 16px; color: #737782;" class="el-icon-edit"></i></p>
+            $('.menu').html(`</div><div onclick="jumpInto('market')" class="market" style="width: 100%; height: 95px; background: #3F434F; border-bottom: 1px solid #40434e; display: flex; flex-wrap: wrap; align-items: center; cursor: pointer;"><div style="width: 100%;"><p style="width: 100%; text-align: center;"><i style="padding: 0; font-size: 16px; color: #737782;" class="el-icon-edit"></i></p>
                 <p style="width: 100%; font-size: 14px; color: #8C91A0; text-align: center; margin-top: 10px;">大盘市场</p></div></div>
                 <div onclick="jumpInto('mine')" class="mine" style="width: 100%; height: 95px; background: #3F434F; border-top: 1px solid #353843; display: flex; flex-wrap: wrap; align-items: center; cursor: pointer;"><div style="width: 100%;"><p style="width: 100%; text-align: center;"><i style="padding: 0; font-size: 16px; color: #737782;" class="el-icon-edit"></i></p>
                 <p style="width: 100%; font-size: 14px; color: #8C91A0; text-align: center; margin-top: 10px;">我的</p></div></div>`);
-            if (resources === 'home') {
-                $('.home').css('background', '#323743');
-                $('.home p').css('color', '#C3C8D4');
-                $('.home i').css('color', '#C3C8D4');
-            } else if (resources === 'market') {
+            if (resources === 'market') {
                 $('.market').css('background', '#323743');
                 $('.market p').css('color', '#C3C8D4');
                 $('.market i').css('color', '#C3C8D4');
