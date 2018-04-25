@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../css/index.css">
+    <script src="../../lib/jquery.min.js"></script>
+    <script src="../../lib/vue.js"></script>
+    <script src="../../lib/element-ui/lib/index.js"></script>
+    <title>设置密码</title>
+</head>
+<style>
+    #wrapper {
+        width: 100%;
+        height: 100%;
+        background: #f7f7f7;
+        display: flex;
+    }
+    .setting {
+        width: 520px;
+        height: 360px;
+        background: #FFFFFF;
+        box-shadow: 0 1px 5px 0 rgba(227,227,227,0.50);
+        border-radius: 4px;
+        margin: auto;
+    }
+    .setting p {
+        text-align: center;
+        font-family: PingFangSC-Regular;
+        font-size: 24px;
+        color: #333333;
+        text-align: center;
+        padding: 40px 0 35px;
+    }
+    .forms {
+        margin-left: 95px;
+        width: 330px;
+        text-align: center;
+        margin-top: 30px;
+    }
+</style>
+<body>
+    <div id="wrapper">
+        <div class="setting">
+            <p>设置登录密码</p>
+            <div class="forms">
+                <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
+                    <el-form-item prop="new_pass">
+                        <div class="icon_img">
+                            <img v-if="pass_error" src="../images/pass_pre.png" alt="">
+                            <img v-if="!pass_error" src="../images/pass_after.png" alt="">
+                        </div>
+                        <el-input type="password" v-model="ruleForm.new_pass"
+                                    auto-complete="off" placeholder="请设置登录密码"></el-input>
+                    </el-form-item>
+                    <el-form-item prop="confirm_pass">
+                        <div class="icon_img">
+                            <img v-if="check_pass_error" src="../images/pass_pre.png" alt="">
+                            <img v-if="!check_pass_error" src="../images/pass_after.png" alt="">
+                        </div>
+                        <el-input type="password" v-model="ruleForm.confirm_pass"
+                            auto-complete="off" placeholder="请确认登录密码"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button style="margin-top: 35px;" type="primary" class="login_btn"
+                                    round @click="settingCheck('ruleForm')">确定</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            var wrapper = new Vue({
+                el: '#wrapper',
+                data () {
+                    var validatePass = (rule, value, callback) => {
+                        var passwordReg = /^[A-Z\_a-z0-9]{6,12}$/;
+                        if (value === '') {
+                            this.pass_error = true;
+                            callback(new Error('请设置登录密码'));
+                        } else {
+                            if (!passwordReg.test(value)) {
+                                this.pass_error = true;
+                                callback(new Error('请输入6-12位的数字、字母或下划线'));
+                            } else {
+                                if (this.ruleForm.confirm_pass !== '') {
+                                    this.$refs.ruleForm.validateField('confirm_pass');
+                                }
+                                this.pass_error = false;
+                                callback();
+                            }
+                        }
+                    };
+                    var validateCheckPass = (rule, value, callback) => {
+                        if (value === '') {
+                            this.check_pass_error = true;
+                            callback(new Error('请再次确认登录密码'));
+                        } else if (value !== this.ruleForm.new_pass) {
+                            this.check_pass_error = true;
+                            callback(new Error('两次输入密码不一致!'));
+                        } else {
+                            this.check_pass_error = false;
+                            callback();
+                        }
+                    };
+                    return {
+                        pass_error: true,
+                        check_pass_error: true,
+                        ruleForm: {
+                            new_pass: '',
+                            confirm_pass: ''
+                        },
+                        rules: {
+                            new_pass: [
+                                { validator: validatePass, trigger: 'blur' }
+                            ],
+                            confirm_pass: [
+                                { validator: validateCheckPass, trigger: 'blur' }
+                            ]
+                        }
+                    }
+                },
+                methods: {
+                    settingCheck (formName) {
+                        this.$refs[formName].validate((valid) => {
+                            if (valid) {
+                                window.location.href = `backend.html`
+                                    + `?role=3&&account=fangyc&&resource=market`;
+                            } else {
+                                console.log('error submit!!');
+                                return false;
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

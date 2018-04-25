@@ -5,6 +5,7 @@
     <title>会员登录</title>
     <link rel="stylesheet" href="lib/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="src/css/styles.css">
+    <link rel="stylesheet" href="src/css/index.css">
     <script src="lib/jquery.min.js"></script>
     <script src="lib/vue.js"></script>
     <!--<script src="lib/vue-router.js"></script>-->
@@ -12,87 +13,6 @@
     <style>
         .forms {
             width: 290px;
-        }
-        .el-input {
-            border-bottom: 1px solid #DAE4EA;          
-        }
-        .el-input__inner {
-            font-family: PingFangSC-Regular;
-            border-radius: 0px;
-            border: none;
-            border-bottom: none;
-            color: #333333;
-            font-size: 14px;
-            height: 30px;
-            line-height: 30px;
-        }
-        .el-input .el-input__inner {
-            padding-left: 35px;
-        }
-        .tel_input .el-input .el-input__inner {
-            width: 70%;
-        }
-        .el-input__icon {
-            line-height: 30px;
-        }
-        .el-input__inner::-webkit-input-placeholder {
-            font-family: PingFangSC-Regular;
-            font-size: 14px;
-            color: #BBBBBB;
-            letter-spacing: 0;
-        }
-        .el-input__inner::-moz-placeholder {
-            font-family: PingFangSC-Regular;
-            font-size: 14px;
-            color: #BBBBBB;
-            letter-spacing: 0;
-        }
-        .forms .login_btn.el-button {
-            line-height: 17px;
-            padding: 3px 0px;
-            width: 76px;
-            border: 1px solid #4993E5;
-        }
-        .login_btn.el-button.is-round {
-            width: 141px;
-            height: 42px;
-            padding: 0;
-            box-shadow: 0 6px 4px 0 #B5D8FF;
-            border-radius: 75px;
-            font-family: PingFangSC-Regular;
-            font-size: 18px;
-            color: #FFFFFF;
-            margin-top: 22px;
-        }
-        .el-form-item__error {
-            left: 35px;
-        }
-        .el-input__suffix {
-            display: none;
-        }
-        .el-button.el-button--text.active {
-            border: 1px solid #4993E5;
-            color: #4993E5;
-        }
-        .el-button.el-button--text.is-disabled.active, .el-button.el-button--text.is-disabled {
-            border: 1px solid #CCCCCC;
-            color: #AAAAAA;
-        }
-        .el-input.is-disabled .el-input__inner {
-            background-color: white;
-        }
-        .el-form-item__content {
-            line-height: 30px;
-        }
-        .icon_img {
-            position: absolute;
-            height: 30px;
-            width: 35px;
-            left: 3px;
-            top: 0;
-            display: flex;
-            align-items: center;
-            z-index: 1;
         }
     </style>
 </head>
@@ -229,12 +149,11 @@
                 },
                 methods: {
                     loginCheck (formName) {
-                        window.location.href = `src/html/backend.html`
-                                    + `?role=3&&account=fangyc&&resource=market`;
+                        window.location.href = `src/html/setting.html`;
                         // this.$refs[formName].validate((valid) => {
                         //     if (valid) {
                         //         window.location.href = `src/html/backend.html`
-                        //             + `?role=3&&account=fangyc&&resource=home`;
+                        //             + `?role=3&&account=fangyc&&resource=market`;
                         //     } else {
                         //         console.log('error submit!!');
                         //         return false;
@@ -265,7 +184,23 @@
                                 }
                             }, 1000)
                         }
-                    }
+                    },
+
+                }
+            });
+
+            $.ajax({
+                type : 'GET',
+                dataType : 'JSON',
+                url : 'http://127.0.0.1:8080/zjdeel/systemprop/selectAll.do',
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(XMLHttpRequest);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                    console.log(`it's error`);
+                },
+                success : function(data) {
+                    console.log(data);
                 }
             });
         });
