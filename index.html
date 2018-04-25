@@ -189,20 +189,23 @@
                 }
             });
 
-            $.ajax({
-                type : 'GET',
-                dataType : 'JSON',
-                url : 'http://127.0.0.1:8080/zjdeel/systemprop/selectAll.do',
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    console.log(XMLHttpRequest);
-                    console.log(textStatus);
-                    console.log(errorThrown);
-                    console.log(`it's error`);
-                },
-                success : function(data) {
-                    console.log(data);
-                }
-            });
+            // $.ajax({
+            //     type : 'POST',
+            //     dataType : 'JSON',
+            //     data: {
+            //         phoneNumber: '13656813261'
+            //     },
+            //     url : 'http://192.168.1.102:8080/zjdeel/sms/sendMsg.do',
+            //     error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //         console.log(XMLHttpRequest);
+            //         console.log(textStatus);
+            //         console.log(errorThrown);
+            //         console.log(`it's error`);
+            //     },
+            //     success: function(data) {
+            //         console.log(data);
+            //     }
+            // });
         });
     </script>
 </body>

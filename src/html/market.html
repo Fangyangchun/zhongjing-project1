@@ -16,7 +16,7 @@
         }
         .stock_wrapper {
             width: (100% - 20px);
-            height: calc(55% - 10px);
+            height: calc(55%);
             padding-left: 20px;
             background: white;
         }
@@ -49,8 +49,27 @@
         }
         .stock_wrapper .el-tabs__content {
             width: 100%;
-            height: calc(100% - 79px);
-            margin-top: -20px;
+            height: calc(100% - 59px);
+            margin-top: 10px;
+        }
+        .stock_detail {
+            display: flex;
+            align-items: center;
+            height: 62px;
+            top: -6px;
+            left: 104px;
+            z-index: 1;
+            position: absolute;
+        }
+        .stock_detail p {
+            font-family: DINAlternate-Bold;
+            font-size: 26px;
+            color: #222222;
+        }
+        .stock_detail p span {
+            font-family: PingFangSC-Regular;
+            font-size: 12px;
+            color: #999999;
         }
         .el-tab-pane {
             width: 100%;
@@ -58,7 +77,7 @@
         }
         .stock_table {
             width: (100% - 20px);
-            height: calc(45% - 10px);
+            height: calc(45% - 20px);
             background: white;
             padding-left: 20px;
             margin-top: 20px;
@@ -74,13 +93,25 @@
         <div class="stock_wrapper">
             <el-tabs v-model="activeName" @tab-click="handleClick1">
                 <el-tab-pane label="中经汇金" name="中经汇金">
-                    <div v-if="activeName==='中经汇金'" style="width: 100%; height: 100%;" id="中经汇金"></div>
+                    <div class="stock_detail">
+                        <p style="margin-right: 64px;">{{ reference_price }}&nbsp;<span>参考单价(元)</span></p>
+                        <p>{{ available_sale }}&nbsp;<span>在售股数(股)</span></p>
+                    </div>
+                    <div v-if="activeName==='中经汇金'" style="width: calc(100% - 50px); height: calc(100% - 20px);" id="中经汇金"></div>
                 </el-tab-pane>
                 <el-tab-pane label="梦古堂" name="梦古堂">
-                        <div v-if="activeName==='梦古堂'" style="width: 100%; height: 100%;" id="梦古堂"></div>
+                        <div class="stock_detail">
+                            <p style="margin-right: 64px;">{{ reference_price }}&nbsp;<span>参考单价(元)</span></p>
+                            <p>{{ available_sale }}&nbsp;<span>在售股数(股)</span></p>
+                        </div>
+                        <div v-if="activeName==='梦古堂'" style="width: calc(100% - 50px); height: calc(100% - 20px);" id="梦古堂"></div>
                 </el-tab-pane>
                 <el-tab-pane label="阿里巴巴" name="阿里巴巴">
-                        <div v-if="activeName==='阿里巴巴'" style="width: 100%; height: 100%;" id="阿里巴巴"></div>
+                        <div class="stock_detail">
+                            <p style="margin-right: 64px;">{{ reference_price }}&nbsp;<span>参考单价(元)</span></p>
+                            <p>{{ available_sale }}&nbsp;<span>在售股数(股)</span></p>
+                        </div>
+                        <div v-if="activeName==='阿里巴巴'" style="width: calc(100% - 50px); height: calc(100% - 20px);" id="阿里巴巴"></div>
                     </el-tab-pane>
             </el-tabs>
         </div>
@@ -183,7 +214,7 @@
             var market = new Vue({
                 el: '#market',
                 data: {
-                    activeName: '中经汇金',
+                    activeName: '',
                     firstActiveName: '中经汇金',
                     chart: null,
                     nowYear: new Date().getFullYear(),
@@ -193,6 +224,8 @@
                     publish_total: 12,
                     transaction_total: 12,
                     value: '',
+                    reference_price: 67.24,
+                    available_sale: 123456,
                     pickerOptions: {
                         shortcuts: [{
                             text: '今天',
@@ -324,8 +357,8 @@
                                 }
                             },
                             grid: {
-                                left: '3%',
-                                right: '4%',
+                                left: '40px',
+                                right: '50px',
                                 bottom: '20%'
                             },
                             xAxis: {
@@ -333,13 +366,36 @@
                                 data: data0.categoryData,
                                 scale: true,
                                 boundaryGap : false,
-                                axisLine: {onZero: false},
-                                splitLine: {show: false}
+                                axisLine: {
+                                    onZero: false,
+                                    lineStyle: {
+                                        color: '#999999'
+                                    }
+                                },
+                                axisTick: {
+                                    show: false
+                                },
+                                splitLine: {show: false},
                             },
                             yAxis: {
                                 scale: true,
                                 splitArea: {
-                                    show: true
+                                    show: true,
+                                    areaStyle: {
+                                        color: ['#fefefe', '#F9F9F9']
+                                    }
+                                },
+                                axisLine: {
+                                    onZero: false,
+                                    lineStyle: {
+                                        color: '#999999'
+                                    }
+                                },
+                                axisTick: {
+                                    show: false
+                                },
+                                splitLine: {
+                                    show: false
                                 }
                             },
                             dataZoom: [
@@ -373,9 +429,9 @@
                     handleClick1 (tab, event) {
                         // console.log(tab.name);
                         if (this.activeName === this.firstActiveName) {
-                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '0px');
+                            $('.stock_wrapper .el-tabs__nav .el-tabs__active-bar').css('left', '0px');
                         } else {
-                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
+                            $('.stock_wrapper .el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
                         }
                         var that = this;
                         setTimeout(function () {
@@ -385,9 +441,9 @@
                     handleClick2 (tab, event) {
                         // console.log(tab.name);
                         if (this.activeName2 === 'transaction') {
-                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
+                            $('.stock_table .el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
                         } else {
-                            $('.el-tabs__nav .el-tabs__active-bar').css('left', '0px');
+                            $('.stock_table .el-tabs__nav .el-tabs__active-bar').css('left', '0px');
                         }
                     },
                     dateChangeHandle (val) {
@@ -405,9 +461,15 @@
                     }
                 },
                 mounted () {
+                    var that = this;
                     this.$nextTick(function () {
-                        this.drawStock('中经汇金');
-                    })
+                        setTimeout(function () {
+                            that.activeName = '中经汇金';
+                        }, 300);
+                        setTimeout(function () {
+                            that.drawStock('中经汇金');
+                        }, 305);
+                    })  
                 }
             });
         })
