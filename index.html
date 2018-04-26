@@ -29,31 +29,34 @@
                     <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
                         <el-form-item prop="ID">
                             <div class="icon_img">
-                                <img v-if="ID_error" src="src/images/ID_pre.png" alt="">
-                                <img v-if="!ID_error" src="src/images/ID_after.png" alt="">
+                                <img :src=`src/images/ID_${ID_error}.png` alt="">
                             </div>
                             <el-input v-model="ruleForm.ID"
-                                      auto-complete="off" placeholder="请输入身份证号"></el-input>
+                                      auto-complete="off" @input="checkIDStatus" placeholder="请输入身份证号"></el-input>
                         </el-form-item>
-                        <el-form-item prop="tel" class="tel_input">
+                        <el-form-item v-if="loginStatus" prop="login_pass">
                             <div class="icon_img">
-                                <img v-if="tel_error" src="src/images/tel_pre.png" alt="">
-                                <img v-if="!tel_error" src="src/images/tel_after.png" alt="">
+                                <img :src=`src/images/pass_${pass_error}.png` alt="">
+                            </div>
+                            <el-input type="password" v-model="ruleForm.login_pass" placeholder="请输入登入密码"></el-input>
+                        </el-form-item>
+                        <el-form-item v-if="!loginStatus" prop="tel" class="tel_input">
+                            <div class="icon_img">
+                                <img :src=`src/images/tel_${tel_error}.png` alt="">
                             </div>
                             <el-input v-model="ruleForm.tel"
                                       auto-complete="off" :disabled=modifyTel
                                       placeholder="请输入手机号"></el-input>
                             <el-button style="position: absolute; bottom: 6px;
                              right: 10px; padding: 0 8px; line-height: 22px; font-size: 12px;"
-                                       v-bind:class="{ active: isActive }" @click="modifyTel=true"
+                                       v-bind:class="{ active: isActive }" @click="sendCode"
                                        :disabled=btnActive type="text">{{ btnText }}</el-button>
                         </el-form-item>
-                        <el-form-item prop="code">
+                        <el-form-item v-if="!loginStatus" prop="code">
                             <div class="icon_img">
-                                <img v-if="code_error" src="src/images/code_pre.png" alt="">
-                                <img v-if="!code_error" src="src/images/code_after.png" alt="">
+                                <img :src=`src/images/code_${code_error}.png` alt="">
                             </div>
-                            <el-input v-model.number="ruleForm.code" placeholder="请输入验证码"></el-input>
+                            <el-input v-model="ruleForm.code" placeholder="请输入验证码"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" class="login_btn"
@@ -73,14 +76,11 @@
                     var validateID = (rule, value, callback) => {
                         var IDreg = /^(([1][1-5])|([2][1-3])|([3][1-7])|([4][1-6])|([5][0-4])|([6][1-5])|([7][1])|([8][1-2]))\d{4}(([1][9]\d{2})|([2]\d{3}))(([0][1-9])|([1][0-2]))(([0][1-9])|([1-2][0-9])|([3][0-1]))\d{3}[0-9xX]$/;
                         if (!value) {
-                            this.ID_error = true;
                             return callback(new Error('身份证号不能为空'));
                         } else {
                             if (!IDreg.test(value)) {
-                                this.ID_error = true;
                                 callback(new Error('请输入正确格式的身份证号'));
                             } else {
-                                this.ID_error = false;
                                 callback();
                             }
                         }
@@ -88,33 +88,31 @@
                     var validateTel = (rule, value, callback) => {
                         var telreg = /^1[3|4|5|7|8][0-9]{9}$/;
                         if (value === '') {
-                            this.tel_error = true;
                             callback(new Error('请输入手机号码'));
                         } else {
                             if (!telreg.test(value)) {
-                                this.tel_error = true;
                                 callback(new Error('请输入正确格式的手机号码'));
                             } else {
-                                this.tel_error = false;
                                 callback();
                             }
                         }
                     };
                     var validateCode = (rule, value, callback) => {
                         if (value === '') {
-                            this.code_error = true;
                             callback(new Error('请输入验证码'));
-                        } else if (!Number.isInteger(value)) {
-                            this.code_error = true;
-                            callback(new Error('请输入数值型验证码!'));
                         } else {
-                            if (value.toString().length !== 6) {
-                                this.code_error = true;
-                                callback(new Error('请输入6位验证'));
+                            if (value.length !== 6) {
+                                callback(new Error('请输入6位验证码'));
                             } else {
-                                this.code_error = false;
                                 callback();
                             }
+                        }
+                    };
+                    var validatePass = (rule, value, callback) => {
+                        if (value === '') {
+                            callback(new Error('请输入登录密码'));
+                        } else {
+                            callback();
                         }
                     };
                     return {
@@ -123,17 +121,24 @@
                         timer: null,
                         modifyTel: false,
                         btnActive: true,
-                        ID_error: true,
-                        tel_error: true,
-                        code_error: true,
+                        has_login: true,
+                        // ID_error: true,
+                        // tel_error: true,
+                        // code_error: true,
+                        // pass_error: true,
+                        xhr: null,
                         ruleForm: {
                             ID: '',
+                            login_pass: '',
                             tel: '',
                             code: ''
                         },
                         rules: {
                             ID: [
                                 { validator: validateID, trigger: 'blur' }
+                            ],
+                            login_pass: [
+                                { validator: validatePass, trigger: 'blur' }
                             ],
                             tel: [
                                 { validator: validateTel, trigger: 'blur' }
@@ -147,20 +152,208 @@
                 computed: {
                     isActive: function () {
                         return /^1[3|4|5|7|8][0-9]{9}$/.test(this.ruleForm.tel);
+                    },
+                    loginStatus: {
+                        get: function () {
+                            return this.has_login;
+                        },
+                        set: function (newValue) {
+                            this.has_login = newValue;
+                        }
+                    },
+                    ID_error: function () {
+                        return /^(([1][1-5])|([2][1-3])|([3][1-7])|([4][1-6])|([5][0-4])|([6][1-5])|([7][1])|([8][1-2]))\d{4}(([1][9]\d{2})|([2]\d{3}))(([0][1-9])|([1][0-2]))(([0][1-9])|([1-2][0-9])|([3][0-1]))\d{3}[0-9xX]$/.test(this.ruleForm.ID)?'after':'pre';
+                    },
+                    tel_error: function () {
+                        return /^1[3|4|5|7|8][0-9]{9}$/.test(this.ruleForm.tel)?'after':'pre';
+                    },
+                    code_error: function () {
+                        return this.ruleForm.code.length===6?'after':'pre';;
+                    },
+                    pass_error: function () {
+                        return this.ruleForm.login_pass.length?'after':'pre';;
                     }
                 },
                 methods: {
+                    checkIDStatus (value) {
+                        this.ruleForm.tel = '';
+                        this.ruleForm.code = '';
+                        this.ruleForm.login_pass = '';
+                        clearInterval(this.timer);
+                        this.btnText = '发送验证码';
+                        this.count = 60;
+                        this.modifyTel = false;
+                        var that = this;
+                        if (value.length === 18) {
+                            if (this.ID_error) {
+                                if (this.xhr) {
+                                    this.xhr.abort();
+                                }
+                                this.xhr = $.ajax({
+                                    type : 'POST',
+                                    dataType : 'JSON',
+                                    data: {
+                                        identify: value
+                                    },
+                                    url : 'http://192.168.1.111:8080/zjdeel/user/checkLoginStatus.do',
+                                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                        that.ruleForm.ID = '';
+                                        that.ruleForm.tel = '';
+                                        that.ruleForm.code = '';
+                                        that.ruleForm.login_pass = '';
+                                        if (errorThrown) {
+                                            that.$message({
+                                                showClose: true,
+                                                message: errorThrown,
+                                                type: 'warning'
+                                            });
+                                        } else {
+                                            that.$message({
+                                                showClose: true,
+                                                message: '请求失败，请稍后重试!',
+                                                type: 'warning'
+                                            });
+                                        }
+                                    },
+                                    success: function(data) {
+                                        if (data.hasOwnProperty('msg')) {
+                                            that.$message({
+                                                showClose: true,
+                                                message: data.msg,
+                                                type: 'warning'
+                                            });
+                                        } else {
+                                            that.loginStatus = data.res;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    },
+                    sendCode () {
+                        var that = this;
+                        $.ajax({
+                            type : 'POST',
+                            dataType : 'JSON',
+                            data: {
+                                identify: this.ruleForm.ID,
+                                phoneNumber: this.ruleForm.tel
+                            },
+                            url : 'http://192.168.1.111:8080/zjdeel/sms/sendMsg.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '验证码发送失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function(data) {
+                                if (data.res === 'success') {
+                                    that.modifyTel = true;
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
                     loginCheck (formName) {
-                        window.location.href = `src/html/setting.html`;
-                        // this.$refs[formName].validate((valid) => {
-                        //     if (valid) {
-                        //         window.location.href = `src/html/backend.html`
-                        //             + `?role=3&&account=fangyc&&resource=market`;
-                        //     } else {
-                        //         console.log('error submit!!');
-                        //         return false;
-                        //     }
-                        // });
+                        var that = this;
+                        this.$refs[formName].validate((valid) => {
+                            if (valid) {
+                                if (this.has_login) {
+                                    $.ajax({
+                                        type : 'POST',
+                                        dataType : 'JSON',
+                                        data: {
+                                            identifyCard: this.ruleForm.ID,
+                                            password: this.ruleForm.login_pass
+                                        },
+                                        url : 'http://192.168.1.111:8080/zjdeel/user/login.do',
+                                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                            if (errorThrown) {
+                                                that.$message({
+                                                    showClose: true,
+                                                    message: data.msg,
+                                                    type: 'warning'
+                                                });
+                                            } else {
+                                                that.$message({
+                                                    showClose: true,
+                                                    message: '登录失败，请稍后重试!',
+                                                    type: 'warning'
+                                                });
+                                            }
+                                        },
+                                        success: function(data) {
+                                            console.log(data);
+                                            // window.location.href = `backend.html`
+                                                //     + `?role=3&&account=fangyc&&resource=market`;
+                                            // if (data.res === 'success') {
+                                            //     window.location.href = `src/html/setting.html`;
+                                            // } else {
+                                            //     that.$message({
+                                            //         showClose: true,
+                                            //         message: data.msg,
+                                            //         type: 'warning'
+                                            //     });
+                                            // }
+                                        }
+                                    });
+                                } else {
+                                    $.ajax({
+                                        type : 'POST',
+                                        dataType : 'JSON',
+                                        data: {
+                                            phoneNumber: this.ruleForm.tel,
+                                            phoneCode: this.ruleForm.code
+                                        },
+                                        url : 'http://192.168.1.111:8080/zjdeel/sms/validate.do',
+                                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                            if (errorThrown) {
+                                                that.$message({
+                                                    showClose: true,
+                                                    message: data.msg,
+                                                    type: 'warning'
+                                                });
+                                            } else {
+                                                that.$message({
+                                                    showClose: true,
+                                                    message: '登录失败，请稍后重试!',
+                                                    type: 'warning'
+                                                });
+                                            }
+                                        },
+                                        success: function(data) {
+                                            console.log(data);
+                                            if (data.res === 'success') {
+                                                window.location.href = `src/html/setting.html`;
+                                            } else {
+                                                that.$message({
+                                                    showClose: true,
+                                                    message: data.msg,
+                                                    type: 'warning'
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            } else {
+                                console.log('error submit!!');
+                                return false;
+                            }
+                        });
                     }
                 },
                 watch: {
@@ -186,28 +379,9 @@
                                 }
                             }, 1000)
                         }
-                    },
-
+                    }
                 }
             });
-
-            // $.ajax({
-            //     type : 'POST',
-            //     dataType : 'JSON',
-            //     data: {
-            //         phoneNumber: '13656813261'
-            //     },
-            //     url : 'http://192.168.1.102:8080/zjdeel/sms/sendMsg.do',
-            //     error: function (XMLHttpRequest, textStatus, errorThrown) {
-            //         console.log(XMLHttpRequest);
-            //         console.log(textStatus);
-            //         console.log(errorThrown);
-            //         console.log(`it's error`);
-            //     },
-            //     success: function(data) {
-            //         console.log(data);
-            //     }
-            // });
         });
     </script>
 </body>
