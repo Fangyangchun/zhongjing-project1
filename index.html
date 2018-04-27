@@ -69,7 +69,6 @@
     </div>
     <script type="text/javascript">
         $(function () {
-            console.log($.md5('zhongjinghuijin'));
             var app = new Vue({
                 el: '#app',
                 data () {
@@ -278,7 +277,7 @@
                                         dataType : 'JSON',
                                         data: {
                                             identifyCard: this.ruleForm.ID,
-                                            password: this.ruleForm.login_pass
+                                            password: $.md5(this.ruleForm.login_pass)
                                         },
                                         url : 'http://192.168.1.111:8080/zjdeel/user/login.do',
                                         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -297,18 +296,16 @@
                                             }
                                         },
                                         success: function(data) {
-                                            console.log(data);
-                                            // window.location.href = `backend.html`
-                                                //     + `?role=3&&account=fangyc&&resource=market`;
-                                            // if (data.res === 'success') {
-                                            //     window.location.href = `src/html/setting.html`;
-                                            // } else {
-                                            //     that.$message({
-                                            //         showClose: true,
-                                            //         message: data.msg,
-                                            //         type: 'warning'
-                                            //     });
-                                            // }
+                                            if (data.res === 'success') {
+                                                window.location.href = `src/html/backend.html`
+                                                    + `?role=${data.data.roldid}&&account=${data.data.username}&&resource=market&&sessionId=${data.sessionId}&&userId=${data.data.id}`;
+                                            } else {
+                                                that.$message({
+                                                    showClose: true,
+                                                    message: data.msg,
+                                                    type: 'warning'
+                                                });
+                                            }
                                         }
                                     });
                                 } else {

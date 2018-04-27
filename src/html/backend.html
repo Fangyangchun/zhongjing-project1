@@ -21,16 +21,21 @@
         var roleStr = baseUrl.match(/(\?|&&)+?role=[1-4]+/g);
         var accountStr = baseUrl.match(/(\?|&&)+?account=[A-Za-z0-9]+/g);
         var dataStr = baseUrl.match(/(\?|&&)+?resource=[A-Za-z0-9_]+/g);
-        var role, account, resStr;
+        var sessionStr = baseUrl.match(/(\?|&&)+?sessionId=[A-Za-z0-9]+/g);
+        var userIdStr = baseUrl.match(/(\?|&&)+?userId=[A-Za-z0-9]+/g);
+        var role, account, resStr, sessionId, userId;
         if (roleStr && accountStr && dataStr) {
             role = roleStr[0].split('=')[1];
             account = accountStr[0].split('=')[1];
             resStr = dataStr[0].split('=')[1];
+            sessionId = sessionStr[0].split('=')[1];
+            userId = userIdStr[0].split('=')[1];
             switch (role) {
                 case '1':
                     if (!(resStr === 'admin' || resStr === 'params')) {
                         $(".wrapper").load("error.html");
                     } else {
+                        saveSession(role, account, sessionId, userId);
                         contentShow(resStr);
                     }
                     break;
@@ -38,6 +43,7 @@
                     if (!(resStr === 'orders')) {
                         $(".wrapper").load("error.html");
                     } else {
+                        saveSession(role, account, sessionId, userId);
                         contentShow(resStr);
                     }
                     break;
@@ -45,6 +51,7 @@
                     if (!(resStr === 'market' || resStr === 'mine')) {
                         $(".wrapper").load("error.html");
                     } else {
+                        saveSession(role, account, sessionId, userId);
                         contentShow(resStr);
                     }
                     break;
@@ -53,6 +60,13 @@
             }
         } else {
             $(".wrapper").load("error.html");
+        }
+
+        function saveSession(role, account, sessionId, userId) {
+            sessionStorage.setItem('role', role);
+            sessionStorage.setItem('account', account);
+            sessionStorage.setItem('sessionId', sessionId);
+            sessionStorage.setItem('userId', userId);
         }
 
         function contentShow(str) {
