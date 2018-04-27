@@ -15,7 +15,7 @@
         <img src="../images/logo.png" alt="">
     </div>
     <div class="setting">
-        <p style="margin-right: 50px;">欢迎您，151****5248!</p>
+        <p style="margin-right: 50px;">欢迎您，{{ account }}!</p>
         <p>
             <el-dropdown trigger="click" @command="handleCommand">
                 <img style="cursor: pointer;" src="../images/setting.png" alt="">
@@ -301,6 +301,10 @@
                     }
                 };
                 return {
+                    userId: sessionStorage.getItem('userId'),
+                    role: sessionStorage.getItem('role'),
+                    account: sessionStorage.getItem('account'),
+                    sessionId: sessionStorage.getItem('sessionId'),
                     btnText: '发送验证码',
                     count: 60,
                     timer: null,
