@@ -1,134 +1,49 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>中经汇金-大盘市场</title>
     <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="../css/home.css">
+    <link rel="stylesheet" href="../css/market.css">
     <script src="../../lib/jquery.min.js"></script>
     <script src="../../lib/vue.js"></script>
     <script src="../../lib/element-ui/lib/index.js"></script>
     <script src="../../lib/echarts.min.js"></script>
-    <style>
-        #market {
-            width: 100%;
-            height: 100%;
-        }
-        .stock_wrapper {
-            width: (100% - 20px);
-            height: calc(55%);
-            padding-left: 20px;
-            background: white;
-        }
-        .stock_wrapper .el-tabs__header {
-            margin: 0;
-        }
-        .el-tabs.el-tabs--top {
-            width: 100%;
-            height: 100%;
-        }
-        .el-tabs__item.is-top, .el-tabs__active-bar.is-top {
-            width: 72px;
-            text-align: center;
-            padding: 0;
-            outline: none;
-        }
-        .el-tabs__nav .el-tabs__active-bar {
-            width: 72px!important;
-        }
-        .el-tabs__nav-wrap::after {
-            background-color: #E4E3E3;
-            height: 1px;
-        }
-        .el-tabs__active-bar {
-            background-color: #4B92E0;
-        }
-        .el-tabs__item {
-            height: 59px;
-            line-height: 59px;
-        }
-        .stock_wrapper .el-tabs__content {
-            width: 100%;
-            height: calc(100% - 59px);
-            margin-top: 10px;
-        }
-        .stock_detail {
-            display: flex;
-            align-items: center;
-            height: 62px;
-            top: -6px;
-            left: 104px;
-            z-index: 1;
-            position: absolute;
-        }
-        .stock_detail p {
-            font-family: DINAlternate-Bold;
-            font-size: 26px;
-            color: #222222;
-        }
-        .stock_detail p span {
-            font-family: PingFangSC-Regular;
-            font-size: 12px;
-            color: #999999;
-        }
-        .el-tab-pane {
-            width: 100%;
-            height: 100%;
-        }
-        .stock_table {
-            width: (100% - 20px);
-            height: calc(45% - 20px);
-            background: white;
-            padding-left: 20px;
-            margin-top: 20px;
-        }
-        .el-popover.el-popper.note.el-popover--plain {
-            font-size: 12px!important;
-            padding: 10px!important;
-        }
-    </style>
 </head>
+
 <body>
     <div id="market">
         <div class="stock_wrapper">
             <el-tabs v-model="activeName" @tab-click="handleClick1">
-                <el-tab-pane label="中经汇金" name="中经汇金">
+                <el-tab-pane v-for="tab in stockNames" :label="tab.stockname" :name="tab.stockname" :key="tab.stockname">
                     <div class="stock_detail">
-                        <p style="margin-right: 64px;">{{ reference_price }}&nbsp;<span>参考单价(元)</span></p>
-                        <p>{{ available_sale }}&nbsp;<span>在售股数(股)</span></p>
+                        <p style="margin-right: 64px;">{{ tab.refprice }}
+                            <span>参考单价(元)</span>
+                        </p>
+                        <p>{{ tab.totlecount }}
+                            <span>在售股数(股)</span>
+                        </p>
                     </div>
-                    <div v-if="activeName==='中经汇金'" style="width: calc(100% - 50px); height: calc(100% - 20px);" id="中经汇金"></div>
+                    <div v-if="activeName===tab.stockname" style="width: calc(100% - 50px); height: calc(100% - 20px);" :id="tab.stockname"></div>
                 </el-tab-pane>
-                <el-tab-pane label="梦古堂" name="梦古堂">
-                        <div class="stock_detail">
-                            <p style="margin-right: 64px;">{{ reference_price }}&nbsp;<span>参考单价(元)</span></p>
-                            <p>{{ available_sale }}&nbsp;<span>在售股数(股)</span></p>
-                        </div>
-                        <div v-if="activeName==='梦古堂'" style="width: calc(100% - 50px); height: calc(100% - 20px);" id="梦古堂"></div>
-                </el-tab-pane>
-                <el-tab-pane label="阿里巴巴" name="阿里巴巴">
-                        <div class="stock_detail">
-                            <p style="margin-right: 64px;">{{ reference_price }}&nbsp;<span>参考单价(元)</span></p>
-                            <p>{{ available_sale }}&nbsp;<span>在售股数(股)</span></p>
-                        </div>
-                        <div v-if="activeName==='阿里巴巴'" style="width: calc(100% - 50px); height: calc(100% - 20px);" id="阿里巴巴"></div>
-                    </el-tab-pane>
             </el-tabs>
         </div>
         <div class="stock_table">
             <div class="table_content">
                 <div class="block">
-                    <el-date-picker v-model="value" type="daterange"
-                                    align="right"
-                                    unlink-panels
-                                    range-separator="-"
-                                    start-placeholder="开始日期"
-                                    end-placeholder="结束日期"
-                                    :picker-options="pickerOptions"
-                                    :default-value="new Date(`${nowYear}-${nowMonth}-1`)"
-                                    @change="dateChangeHandle"
-                                    value-format="yyyy-MM-dd">
-                    </el-date-picker>
+                    <div class="check_block" style="margin-right: 35px;">
+                        <el-checkbox-group v-model="checkedStocks" @change="selectSomeStock">
+                            <el-checkbox v-for="item in stockNames" :label="item.stockname" :key="item.stockname">{{ item.stockname }}</el-checkbox>
+                        </el-checkbox-group>
+                    </div>
+                    <div class="check_block">
+                            <el-date-picker v-model="value" type="daterange" align="right" unlink-panels range-separator="-" start-placeholder="开始日期"
+                            end-placeholder="结束日期" :picker-options="pickerOptions" :default-value="new Date(`${nowYear}-${nowMonth}-1`)"
+                            @change="dateChangeHandle" value-format="yyyy-MM-dd">
+                        </el-date-picker>
+                    </div>
                 </div>
                 <el-tabs v-model="activeName2" @tab-click="handleClick2">
                     <el-tab-pane label="发布中" name="published">
@@ -137,6 +52,9 @@
                                 <el-table-column prop="name" label="交易股票">
                                 </el-table-column>
                                 <el-table-column prop="announcer" label="发布者">
+                                        <template slot-scope="scope">
+                                            {{ scope.row.announcer }}&nbsp;{{ scope.row.sex === 1? '先生' : '女士' }}
+                                        </template>
                                 </el-table-column>
                                 <el-table-column prop=total_num min-width="100px" label="发布数量(股)">
                                 </el-table-column>
@@ -144,38 +62,30 @@
                                 </el-table-column>
                                 <el-table-column prop=price label="发布单价(元)">
                                 </el-table-column>
-                                <el-table-column prop="publish_date" min-width="150px" label="发布时间" header-align="center"
-                                                 align="center">
+                                <el-table-column prop="publish_date" min-width="150px" label="发布时间" header-align="center" align="center">
                                 </el-table-column>
                                 <el-table-column prop="note" min-width="150px" label="备注信息">
-                                        <template slot-scope="scope">
-                                            <!-- {{ scope.row.note.length > 8 ? `${scope.row.note.slice(0, 5)}…` : scope.row.note }} -->
-                                            <el-popover v-if="scope.row.note.length > 8" width="120" placement="top" popper-class='note'
-                                                    trigger="click" :content=scope.row.note>
-                                                <span slot="reference">
-                                                        {{scope.row.note.slice(0, 5)}}…</span>
-                                            </el-popover>
-                                            <span v-if="scope.row.note.length < 8">{{ scope.row.note }}</span>
-                                        </template>
-                                </el-table-column>
-                                <el-table-column label="操作" header-align="center"
-                                                 align="center">
                                     <template slot-scope="scope">
-                                        <el-popover
-                                                width="60"
-                                                placement="top"
-                                                trigger="click"
-                                                :content=scope.row.tel.slice(0,3)+'-'+scope.row.tel.slice(3,7)+'-'+scope.row.tel.slice(7)>
-                                            <el-button type="text" size="small"
-                                                       slot="reference">咨询</el-button>
+                                        <!-- {{ scope.row.note.length > 8 ? `${scope.row.note.slice(0, 5)}…` : scope.row.note }} -->
+                                        <span v-if="!scope.row.note">-----</span>
+                                        <el-popover v-else-if="scope.row.note.length > 8" width="120" placement="top" popper-class='note' trigger="click" :content=scope.row.note>
+                                            <span slot="reference">
+                                                {{scope.row.note.slice(0, 5)}}…</span>
+                                        </el-popover>
+                                        <span v-else>{{ scope.row.note }}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="操作" header-align="center" align="center">
+                                    <template slot-scope="scope">
+                                        <el-popover width="60" placement="top" trigger="click" :content="scope.row.tel.slice(0,3)+ '-'+scope.row.tel.slice(3,7)+
+                                            '-'+scope.row.tel.slice(7)">
+                                            <el-button type="text" size="small" slot="reference">咨询</el-button>
                                         </el-popover>
                                     </template>
                                 </el-table-column>
                             </el-table>
                             <div class="pagination_box">
-                                <el-pagination background layout="prev, pager, next, jumper"
-                                               :page-size=pagesize :total=publish_total
-                                               @current-change="handleCurrentChange1">
+                                <el-pagination v-if="activeName2==='published'" background layout="prev, pager, next, jumper" :page-size=pagesize :total=publish_total :current-page=currentPage @current-change="handleCurrentChange">
                                 </el-pagination>
                             </div>
                         </div>
@@ -193,14 +103,11 @@
                                 </el-table-column>
                                 <el-table-column prop=price label="交易单价(元)">
                                 </el-table-column>
-                                <el-table-column prop="publish_date" header-align="center"
-                                                 align="center" min-width="150px" label="交易时间">
+                                <el-table-column prop="publish_date" header-align="center" align="center" min-width="150px" label="交易时间">
                                 </el-table-column>
                             </el-table>
                             <div class="pagination_box">
-                                <el-pagination background layout="prev, pager, next, jumper"
-                                               :page-size=pagesize :total=transaction_total
-                                               @current-change="handleCurrentChange2">
+                                <el-pagination v-if="activeName2==='transaction'" background layout="prev, pager, next, jumper" :page-size=pagesize :total=transaction_total :current-page=currentPage @current-change="handleCurrentChange">
                                 </el-pagination>
                             </div>
                         </div>
@@ -215,17 +122,20 @@
                 el: '#market',
                 data: {
                     activeName: '',
-                    firstActiveName: '中经汇金',
+                    firstActiveName: '',
+                    stockNames: [],
                     chart: null,
                     nowYear: new Date().getFullYear(),
                     nowMonth: new Date().getMonth(),
                     activeName2: 'published',
-                    pagesize: 8,
-                    publish_total: 12,
-                    transaction_total: 12,
+                    pagesize: 4,
+                    currentPage: 1,
+                    publish_total: 0,
+                    transaction_total: 0,
                     value: '',
-                    reference_price: 67.24,
-                    available_sale: 123456,
+                    checkedStocks: [],
+                    startDate: "",
+                    endDate: "",
                     pickerOptions: {
                         shortcuts: [{
                             text: '今天',
@@ -234,7 +144,7 @@
                                 const start = new Date();
                                 picker.$emit('pick', [start, end]);
                             }
-                        },{
+                        }, {
                             text: '最近一周',
                             onClick(picker) {
                                 const end = new Date();
@@ -259,58 +169,15 @@
                                 picker.$emit('pick', [start, end]);
                             }
                         }],
-                        disabledDate (time) {
+                        disabledDate(time) {
                             return time.getTime() > Date.now() - 8.64e6;
                         }
                     },
-                    published: [{
-                        name: '梦古堂',
-                        announcer: '方阳春 女士',
-                        total_num: 1000,
-                        tradable_num: 1000,
-                        price: 10.77,
-                        publish_date: '2017-02-12 16:27:56',
-                        note: '线下交易只接受杭州同城交易',
-                        tel: '15116925248'
-                    }, {
-                        name: '梦古堂',
-                        announcer: '方阳春 女士',
-                        total_num: 1000,
-                        tradable_num: 1000,
-                        price: 10.77,
-                        publish_date: '2017-02-12 16:27:56',
-                        note: '-----',
-                        tel: '15116925248'
-                    }, {
-                        name: '梦古堂',
-                        announcer: '方阳春 女士',
-                        total_num: 1000,
-                        tradable_num: 1000,
-                        price: 10.77,
-                        publish_date: '2017-02-12 16:27:56',
-                        note: '只接受杭州交易',
-                        tel: '15116925248'
-                    }, {
-                        name: '梦古堂',
-                        announcer: '方阳春 女士',
-                        total_num: 1000,
-                        tradable_num: 1000,
-                        price: 10.77,
-                        publish_date: '2017-02-12 16:27:56',
-                        note: '-----',
-                        tel: '15116925248'
-                    }],
-                    transaction: [{
-                        name: '中经汇金',
-                        announcer: '方阳春 女士',
-                        buyers: '周雅琼 女士',
-                        trading_num: 1000,
-                        price: 10.77,
-                        publish_date: '2017-02-12 16:27:56'
-                    }]
+                    published: [],
+                    transaction: []
                 },
                 methods: {
-                    splitData (rawData) {
+                    splitData(rawData) {
                         var categoryData = [];
                         var values = [];
                         for (var i = 0; i < rawData.length; i++) {
@@ -329,25 +196,12 @@
                         }
                         return result;
                     },
-                    drawStock (id) {
+                    drawStock(id, stockData) {
                         if (this.chart) {
                             this.chart = null;
                         }
                         this.chart = echarts.init(document.getElementById(id));
-                        var data0 = this.splitData([
-                            ['2013-1-24', 10.09],
-                            ['2013-1-25', 9.99],
-                            ['2013-1-28', 10.01],
-                            ['20131-29', 10.01],
-                            ['2013-1-30', 10.003],
-                            ['2013-1-31', 10.03],
-                            ['2013-2-1', 10.11],
-                            ['2013-2-4', 9.89],
-                            ['2013-2-5', 10.00],
-                            ['2013-2-6', 10.02],
-                            ['2013-2-7', 10.33],
-                            ['2013-2-8', 10.08]
-                        ]);
+                        var data0 = this.splitData(stockData);
                         var option = null;
                         option = {
                             tooltip: {
@@ -358,14 +212,14 @@
                             },
                             grid: {
                                 left: '40px',
-                                right: '30px',
+                                right: '40px',
                                 bottom: '20%'
                             },
                             xAxis: {
                                 type: 'category',
                                 data: data0.categoryData,
                                 scale: true,
-                                boundaryGap : false,
+                                boundaryGap: false,
                                 axisLine: {
                                     onZero: false,
                                     lineStyle: {
@@ -375,7 +229,9 @@
                                 axisTick: {
                                     show: false
                                 },
-                                splitLine: {show: false},
+                                splitLine: {
+                                    show: false
+                                },
                             },
                             yAxis: {
                                 scale: true,
@@ -398,8 +254,7 @@
                                     show: false
                                 }
                             },
-                            dataZoom: [
-                                {
+                            dataZoom: [{
                                     type: 'inside',
                                     start: 50,
                                     end: 100
@@ -412,67 +267,271 @@
                                     end: 100
                                 }
                             ],
-                            series: [
-                                {
-                                    name: '中经汇金',
-                                    type: 'line',
-                                    data: this.calculateMA(data0),
-                                    smooth: true,
-                                    lineStyle: {
-                                        normal: {opacity: 0.5}
+                            series: [{
+                                name: '中经汇金',
+                                type: 'line',
+                                data: this.calculateMA(data0),
+                                smooth: true,
+                                lineStyle: {
+                                    normal: {
+                                        opacity: 0.5
                                     }
                                 }
-                            ]
+                            }]
                         };
                         this.chart.setOption(option, true);
                     },
-                    handleClick1 (tab, event) {
-                        // console.log(tab.name);
+                    handleClick1(tab, event) {
                         if (this.activeName === this.firstActiveName) {
                             $('.stock_wrapper .el-tabs__nav .el-tabs__active-bar').css('left', '0px');
                         } else {
                             $('.stock_wrapper .el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
                         }
-                        var that = this;
-                        setTimeout(function () {
-                            that.drawStock(that.activeName);
-                        }, 0);
+                        this.getOneStock();
                     },
-                    handleClick2 (tab, event) {
-                        // console.log(tab.name);
+                    handleClick2(tab, event) {
                         if (this.activeName2 === 'transaction') {
                             $('.stock_table .el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
                         } else {
                             $('.stock_table .el-tabs__nav .el-tabs__active-bar').css('left', '0px');
                         }
+                        this.value = '';
+                        this.checkedStocks = [];
+                        this.currentPage = 1;
+                        this.startDate = "";
+                        this.endDate = "";
                     },
-                    dateChangeHandle (val) {
+                    dateChangeHandle(val) {
                         if (val) {
-                          console.log(val);
+                            this.startDate = val[0];
+                            this.endDate = val[1];
                         } else {
-                            console.log('读取无日期筛选的数据');
+                            this.startDate = "";
+                            this.endDate = "";
                         }
+                        this.getTables();
                     },
-                    handleCurrentChange1 (val) {
-                        console.log(val);
+                    handleCurrentChange(val) {
+                        this.currentPage = val;
+                        this.getTables();
                     },
-                    handleCurrentChange2 (val) {
-                        console.log(val);
-                    }
+                    selectSomeStock(val) {
+                        this.getTables();
+                    },
+                    getAllStock() {
+                        var that = this;
+                        $.ajax({
+                            type: 'GET',
+                            dataType: 'JSON',
+                            async: false,
+                            url: 'http://192.168.1.111:8080/zjdeel/stock/selectAll.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (Object.prototype.toString.call(data) ===
+                                    '[object Array]') {
+                                    that.activeName = data[0].stockname;
+                                    that.firstActiveName = data[0].stockname;
+                                    that.stockNames = data;
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '当前未获取到数据',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    getOneStock() {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                stockName: that.activeName
+                            },
+                            url: 'http://192.168.1.111:8080/zjdeel/stockdaily/selectAll.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (Object.prototype.toString.call(data) ===
+                                    '[object Array]') {
+                                    var newData = [];
+                                    data.forEach((val, index, arr) => {
+                                        newData.push([val.issuedate, val.price]);
+                                    });
+                                    setTimeout(function () {
+                                        that.drawStock(that.activeName, newData);
+                                    }, 0);
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '当前未获取到数据',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    getPublishedTables() {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                stockName: that.checkedStocks,
+                                startDate: that.startDate,
+                                endDate: that.endDate,
+                                pageNo: that.currentPage,
+                                pageSize: that.pagesize
+                            },
+                            url: 'http://192.168.1.111:8080/zjdeel/deal/selectDealByDate.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.total > 0) {
+                                    that.publish_total = data.total;
+                                    that.published = [];
+                                    data.list.forEach((val, index, arr) => {
+                                        var objData = {
+                                            name: val.stockname,
+                                            sex: val.sex,
+                                            announcer: val.seller,
+                                            total_num: val.dealcount,
+                                            tradable_num: val.dealcount - val.lockcount,
+                                            price: val.unitprice,
+                                            publish_date: val.createtimeStr,
+                                            note: val.remark,
+                                            tel: val.mobile,
+                                        }
+                                        that.published.push(objData);
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    getTransactionTables() {
+                        var that = this;
+                        $.ajax({
+                            type: 'GET',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                stockName: that.checkedStocks,
+                                startDate: that.startDate,
+                                endDate: that.endDate,
+                                pageNo: that.currentPage,
+                                pageSize: that.pagesize
+                            },
+                            url: 'http://192.168.1.111:8080/zjdeel/order/selectAll.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                console.log(data);
+                                if (data.total > 0) {
+                                    that.transaction_total = data.total;
+                                    that.transaction = [];
+                                    data.list.forEach((val, index, arr) => {
+                                        var objData = {
+                                            name: val.stockname,
+                                            sellerSex: val.sellerSex,
+                                            announcer: val.seller,
+                                            buyers: val.buyerName,
+                                            buyerSex: val.buyerSex,
+                                            trading_num: val.dealcount,
+                                            price: val.dealprice,
+                                            publish_date: val.createtimeStr,
+                                        };
+                                        that.transaction.push(objData);
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    getTables() {
+                        this.getTransactionTables();
+                        // if (this.activeName2 === 'published') {
+                        //     this.getPublishedTables();
+                        // } else {
+                        //     this.getTransactionTables();
+                        // }
+                    },
                 },
-                mounted () {
-                    var that = this;
-                    this.$nextTick(function () {
-                        setTimeout(function () {
-                            that.activeName = '中经汇金';
-                        }, 300);
-                        setTimeout(function () {
-                            that.drawStock('中经汇金');
-                        }, 305);
-                    })  
+                mounted() {
+                    this.getAllStock();
+                    this.getOneStock();
+                    this.getTables();
                 }
             });
         })
     </script>
 </body>
+
 </html>

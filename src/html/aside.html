@@ -12,6 +12,8 @@
     var role = URL.match(/(\?|&&)+?role=[1-4]+/g)[0].split('=')[1];
     var account = URL.match(/(\?|&&)+?account=[A-Za-z0-9]+/g)[0].split('=')[1];
     var resources = URL.match(/(\?|&&)+?resource=[A-Za-z0-9_]+/g)[0].split('=')[1];
+    var sessionStr = URL.match(/(\?|&&)+?sessionId=[A-Za-z0-9]+/g)[0].split('=')[1];
+    var userIdStr = URL.match(/(\?|&&)+?userId=[A-Za-z0-9]+/g)[0].split('=')[1];
     switch (role) {
         case '1':
             $('.menu').html(`<div onclick="jumpInto('params')" class="params" style="width: 100%; height: 95px; background: #3F434F; border-bottom: 1px solid #40434e; display: flex; flex-wrap: wrap; align-items: center; cursor: pointer;"><div style="width: 100%;"><p class="menu_icon_img" style="width: 100%; text-align: center;"><img src="../images/mine_pre.png" /></p>
@@ -58,7 +60,7 @@
 
     function jumpInto(str) {
         console.log('接口请求判定该用户的登陆信息是否已过期，若过期，重新登陆');
-        window.location.href = `backend.html?role=${role}&&account=${account}&&resource=${str}`;
+        window.location.href = `backend.html?role=${role}&&account=${account}&&resource=${str}&&sessionId=${sessionStr}&&userId=${userIdStr}`;
     }
 </script>
 </body>

@@ -1,0 +1,59 @@
+.el-dialog__wrapper.confirm_dialog .el-dialog__header {
+    line-height: 44px!important;
+    background: transparent!important;
+    border-bottom: 1px solid #DAE4EA;
+}
+.el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__title {
+    line-height: 44px!important;
+    font-size: 16px!important;
+    font-family: AppleSystemUIFont;
+    color: #1F2D3D!important;
+}
+.el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn {
+    height: 44px!important;
+}
+.el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn i {
+    color: #1F2D3D!important;
+}
+.el-dialog__wrapper.confirm_dialog .el-dialog__body {
+    text-align: center;
+}
+.el-dialog__wrapper.confirm_dialog .el-dialog__body p {
+    font-family: PingFangSC-Regular;
+    font-size: 15px;
+    color: #666666;
+}
+.el-dialog__body .el-form-item.total.el-form-item--feedback .paramsBtn {
+    position: absolute; 
+    left: 55%;
+    top: 0;
+}
+.el-dialog__body .el-form-item__content .el-button.el-button--default.is-round {
+    margin: 0;
+    font-size: 12px;
+    padding: 4px 7px!important;
+    border: 1px solid #86D9BB;
+    font-family: PingFangSC-Regular;
+    font-size: 12px;
+    color: #69C8A6!important;
+}
+.el-dialog__body .el-form-item__content .el-button.el-button--default.is-round:hover,
+.el-dialog__body .el-form-item__content .el-button.el-button--default.is-round:focus {
+    background: #EBFFFA;
+} 
+.el-dialog__body .el-input.el-input {
+    border-bottom: 1px solid #DAE4EA;
+}
+.el-dialog__body .el-input.el-input .el-input__inner {
+    border: none;
+}
+.el-dialog__body .el-input.el-input.total-num .el-input__inner {
+    width: 50%;
+}
+.el-dialog__body .el-form-item.total.el-form-item--feedback .el-form-item__content {
+    text-align: left;
+}
+.el-popover.el-popper.note.el-popover--plain {
+    font-size: 12px!important;
+    padding: 10px!important;
+}

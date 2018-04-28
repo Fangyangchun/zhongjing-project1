@@ -1,445 +1,510 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>头部</title>
     <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/mine.css">
     <script src="../../lib/jquery.min.js"></script>
     <script src="../../lib/vue.js"></script>
     <script src="../../lib/element-ui/lib/index.js"></script>
 </head>
-<body>
-<div id="header">
-    <div class="logo">
-        <img src="../images/logo.png" alt="">
-    </div>
-    <div class="setting">
-        <p style="margin-right: 50px;">欢迎您，{{ account }}!</p>
-        <p>
-            <el-dropdown trigger="click" @command="handleCommand">
-                <img style="cursor: pointer;" src="../images/setting.png" alt="">
-                <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item command="persional">个人信息</el-dropdown-item>
-                    <el-dropdown-item command="account" divided>账户信息</el-dropdown-item>
-                    <el-dropdown-item command="password" divided>登录密码</el-dropdown-item>
-                </el-dropdown-menu>
-            </el-dropdown>
-        </p>
-        <p><img style="cursor: pointer; margin-top: 2px;" src="../images/logout.png" alt=""></p>
-    </div>
 
-    <el-dialog width="382px" title="个人信息" :visible.sync="dialogPersionVisible"
-               :close-on-click-modal=false>
-        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2">
-            <el-form-item prop="account">
+<body>
+    <div id="header">
+        <div class="logo">
+            <img src="../images/logo.png" alt="">
+        </div>
+        <div class="setting">
+            <p style="margin-right: 50px;">欢迎您，{{ account }}!</p>
+            <p>
+                <el-dropdown trigger="click" @command="handleCommand">
+                    <img style="cursor: pointer;" src="../images/setting.png" alt="">
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item command="persional">个人信息</el-dropdown-item>
+                        <el-dropdown-item command="account" divided>账户信息</el-dropdown-item>
+                        <el-dropdown-item command="password" divided>登录密码</el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+            </p>
+            <p @click="dialogTips = true">
+                <img style="cursor: pointer; margin-top: 2px;" src="../images/logout.png" alt="">
+            </p>
+        </div>
+
+        <el-dialog width="382px" title="个人信息" :visible.sync="dialogPersionVisible" :close-on-click-modal=false>
+            <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2">
+                <el-form-item prop="account">
                     <div class="icon_img">
                         <img v-if="account_error" src="../images/account_pre.png" alt="">
                         <img v-if="!account_error" src="../images/account_after.png" alt="">
                     </div>
-                <el-input v-model="ruleForm2.account"
-                          auto-complete="off" placeholder="请输入用户名"></el-input>
-            </el-form-item>
-            <el-form-item prop="ID">
+                    <el-input v-model="ruleForm2.account" auto-complete="off" placeholder="请输入用户名"></el-input>
+                </el-form-item>
+                <el-form-item prop="ID">
                     <div class="icon_img">
                         <img v-if="ID_error" src="../images/ID_pre.png" alt="">
                         <img v-if="!ID_error" src="../images/ID_after.png" alt="">
                     </div>
-                <el-input v-model="ruleForm2.ID"
-                          auto-complete="off" placeholder="请输入身份证号"></el-input>
-            </el-form-item>
-            <el-form-item prop="tel">
+                    <el-input v-model="ruleForm2.ID" auto-complete="off" placeholder="请输入身份证号"></el-input>
+                </el-form-item>
+                <el-form-item prop="tel">
                     <div class="icon_img">
                         <img v-if="tel_error" src="../images/tel_pre.png" alt="">
                         <img v-if="!tel_error" src="../images/tel_after.png" alt="">
                     </div>
-                <el-input v-model="ruleForm2.tel"
-                          auto-complete="off" :disabled=modifyTel
-                          placeholder="请输入手机号"></el-input>
-                <el-button class="timerBtn" v-bind:class="{ active: isActive }"
-                           @click="modifyTel=true"
-                           :disabled=btnActive type="text">{{ btnText }}</el-button>
-            </el-form-item>
-            <el-form-item prop="code">
+                    <el-input v-model="ruleForm2.tel" auto-complete="off" :disabled=modifyTel placeholder="请输入手机号"></el-input>
+                    <el-button class="timerBtn" v-bind:class="{ active: isActive }" @click="modifyTel=true" :disabled=btnActive type="text">{{ btnText }}</el-button>
+                </el-form-item>
+                <el-form-item prop="code">
                     <div class="icon_img">
                         <img v-if="code_error" src="../images/code_pre.png" alt="">
                         <img v-if="!code_error" src="../images/code_after.png" alt="">
                     </div>
-                <el-input v-model.number="ruleForm2.code" placeholder="请输入验证码"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button @click="dialogPersionVisible = false">取消</el-button>
-                <el-button type="primary" @click="submitForm('ruleForm2')">确定</el-button>
-            </el-form-item>
-        </el-form>
-    </el-dialog>
-    <el-dialog width="382px" title="账户信息" :visible.sync="dialogAccountVisible"
-               :close-on-click-modal=false>
-        <el-form :model="ruleForm3" status-icon :rules="rules3" ref="ruleForm3">
-            <el-form-item prop="bank_card">
+                    <el-input v-model.number="ruleForm2.code" placeholder="请输入验证码"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="dialogPersionVisible = false">取消</el-button>
+                    <el-button type="primary" @click="submitForm('ruleForm2')">确定</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
+        <el-dialog width="382px" title="账户信息" :visible.sync="dialogAccountVisible" :close-on-click-modal=false>
+            <el-form :model="ruleForm3" status-icon :rules="rules3" ref="ruleForm3">
+                <el-form-item prop="bank_card">
                     <div class="icon_img">
                         <img v-if="bank_code_error" src="../images/bank_pre.png" alt="">
                         <img v-if="!bank_code_error" src="../images/bank_after.png" alt="">
                     </div>
-                <el-input v-model.number="ruleForm3.bank_card"
-                          auto-complete="off" placeholder="绑定银行卡"></el-input>
-            </el-form-item>
-            <el-form-item prop="confirm_card">
+                    <el-input v-model.number="ruleForm3.bank_card" auto-complete="off" placeholder="绑定银行卡"></el-input>
+                </el-form-item>
+                <el-form-item prop="confirm_card">
                     <div class="icon_img">
                         <img v-if="bank_confirm_error" src="../images/bank_pre.png" alt="">
                         <img v-if="!bank_confirm_error" src="../images/bank_after.png" alt="">
                     </div>
-                <el-input v-model.number="ruleForm3.confirm_card"
-                          auto-complete="off" placeholder="确认银行卡"></el-input>
-            </el-form-item>
-            <el-form-item prop="bank_account">
+                    <el-input v-model.number="ruleForm3.confirm_card" auto-complete="off" placeholder="确认银行卡"></el-input>
+                </el-form-item>
+                <el-form-item prop="bank_account">
                     <div class="icon_img">
                         <img v-if="bank_error" src="../images/address_pre.png" alt="">
                         <img v-if="!bank_error" src="../images/address_after.png" alt="">
                     </div>
-                <el-select v-model="ruleForm3.bank_account" placeholder="开户银行">
-                    <el-option label="中国工商银行" value="中国工商银行"></el-option>
-                    <el-option label="中国农业银行" value="中国农业银行"></el-option>
-                    <el-option label="中国建设银行" value="中国建设银行"></el-option>
-                    <el-option label="中国邮政银行" value="中国邮政银行"></el-option>
-                    <el-option label="广发银行" value="广发银行"></el-option>
-                    <el-option label="中信银行" value="中信银行"></el-option>
-                    <el-option label="兴业银行" value="兴业银行"></el-option>
-                    <el-option label="浦发银行" value="浦发银行"></el-option>
-                    <el-option label="浙商银行" value="浙商银行"></el-option>
-                    <el-option label="恒丰银行" value="恒丰银行"></el-option>
-                    <el-option label="光大银行" value="光大银行"></el-option>
-                    <el-option label="招商银行" value="招商银行"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item prop="bank_branch">
+                    <el-select v-model="ruleForm3.bank_account" placeholder="开户银行">
+                        <el-option label="中国工商银行" value="中国工商银行"></el-option>
+                        <el-option label="中国农业银行" value="中国农业银行"></el-option>
+                        <el-option label="中国建设银行" value="中国建设银行"></el-option>
+                        <el-option label="中国邮政银行" value="中国邮政银行"></el-option>
+                        <el-option label="广发银行" value="广发银行"></el-option>
+                        <el-option label="中信银行" value="中信银行"></el-option>
+                        <el-option label="兴业银行" value="兴业银行"></el-option>
+                        <el-option label="浦发银行" value="浦发银行"></el-option>
+                        <el-option label="浙商银行" value="浙商银行"></el-option>
+                        <el-option label="恒丰银行" value="恒丰银行"></el-option>
+                        <el-option label="光大银行" value="光大银行"></el-option>
+                        <el-option label="招商银行" value="招商银行"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item prop="bank_branch">
                     <div class="icon_img">
                         <img v-if="address_error" src="../images/address_pre.png" alt="">
                         <img v-if="!address_error" src="../images/address_after.png" alt="">
                     </div>
-                <el-input v-model="ruleForm3.bank_branch"
-                          auto-complete="off" placeholder="请输入开户支行"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button @click="dialogAccountVisible = false">取消</el-button>
-                <el-button type="primary" @click="submitForm('ruleForm3')">确定</el-button>
-            </el-form-item>
-        </el-form>
-    </el-dialog>
-    <el-dialog width="382px" title="登录密码" :visible.sync="dialogPasswordVisible"
-               :close-on-click-modal=false>
-        <el-form :model="ruleForm1" status-icon :rules="rules1" ref="ruleForm1">
-            <el-form-item prop="old_pass">
+                    <el-input v-model="ruleForm3.bank_branch" auto-complete="off" placeholder="请输入开户支行"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="dialogAccountVisible = false">取消</el-button>
+                    <el-button type="primary" @click="submitForm('ruleForm3')">确定</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
+        <el-dialog width="382px" title="登录密码" :visible.sync="dialogPasswordVisible" :close-on-click-modal=false>
+            <el-form :model="ruleForm1" status-icon :rules="rules1" ref="ruleForm1">
+                <el-form-item prop="old_pass">
                     <div class="icon_img">
                         <img v-if="old_pass_error" src="../images/pass_pre.png" alt="">
                         <img v-if="!old_pass_error" src="../images/pass_after.png" alt="">
                     </div>
-                <el-input type="password" v-model="ruleForm1.old_pass"
-                          auto-complete="off" placeholder="请输入原密码"></el-input>
-            </el-form-item>
-            <el-form-item prop="new_pass">
+                    <el-input type="password" v-model="ruleForm1.old_pass" auto-complete="off" placeholder="请输入原密码"></el-input>
+                </el-form-item>
+                <el-form-item prop="new_pass">
                     <div class="icon_img">
                         <img v-if="new_pass_error" src="../images/pass_pre.png" alt="">
                         <img v-if="!new_pass_error" src="../images/pass_after.png" alt="">
                     </div>
-                <el-input type="password" v-model="ruleForm1.new_pass"
-                          auto-complete="off" placeholder="请输入新密码"></el-input>
-            </el-form-item>
-            <el-form-item prop="check_pass">
+                    <el-input type="password" v-model="ruleForm1.new_pass" auto-complete="off" placeholder="请输入新密码"></el-input>
+                </el-form-item>
+                <el-form-item prop="check_pass">
                     <div class="icon_img">
                         <img v-if="check_pass_error" src="../images/pass_pre.png" alt="">
                         <img v-if="!check_pass_error" src="../images/pass_after.png" alt="">
                     </div>
-                <el-input type="password" v-model="ruleForm1.check_pass"
-                          auto-complete="off" placeholder="请确认新密码"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button @click="dialogPasswordVisible = false">取消</el-button>
-                <el-button type="primary" @click="submitForm('ruleForm1')">确定</el-button>
-            </el-form-item>
-        </el-form>
-    </el-dialog>
-</div>
-<script type="text/javascript">
-    $(function () {
-        var header = new Vue({
-            el: '#header',
-            data () {
-                var validateOldPass = (rule, value, callback) => {
-                    if (value === '') {
-                        this.old_pass_error = true;
-                        callback(new Error('请输入旧密码'));
-                    } else {
-                        this.old_pass_error = false;
-                        callback();
-                    }
-                };
-                var validateNewPass1 = (rule, value, callback) => {
-                    if (value === '') {
-                        this.new_pass_error = true;
-                        callback(new Error('请输入新密码'));
-                    } else {
-                        if (this.ruleForm1.check_pass !== '') {
-                            this.$refs.ruleForm1.validateField('check_pass');
+                    <el-input type="password" v-model="ruleForm1.check_pass" auto-complete="off" placeholder="请确认新密码"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="dialogPasswordVisible = false">取消</el-button>
+                    <el-button type="primary" @click="submitForm('ruleForm1')">确定</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
+        <el-dialog class="confirm_dialog" width="250px" title="提示" :visible.sync="dialogTips"
+               :close-on-click-modal=false>
+            <p>确认注销当前账户?</p>
+            <el-button @click="dialogTips = false">取消</el-button>
+            <el-button type="primary" @click="confirmBtn">确定</el-button>
+        </el-dialog>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            var header = new Vue({
+                el: '#header',
+                data() {
+                    var validateOldPass = (rule, value, callback) => {
+                        if (value === '') {
+                            this.old_pass_error = true;
+                            callback(new Error('请输入旧密码'));
+                        } else {
+                            this.old_pass_error = false;
+                            callback();
                         }
-                        this.new_pass_error = false;
-                        callback();
-                    }
-                };
-                var validateNewPass2 = (rule, value, callback) => {
-                    if (value === '') {
-                        this.check_pass_error = true;
-                        callback(new Error('请再次输入新密码'));
-                    } else if (value !== this.ruleForm1.new_pass) {
-                        this.check_pass_error = true;
-                        callback(new Error('两次输入密码不一致!'));
-                    } else {
-                        this.check_pass_error = false;
-                        callback();
-                    }
-                };
-                var validateAccount = (rule, value, callback) => {
-                    if (!value) {
-                        this.account_error = true;
-                        return callback(new Error('用户名不能为空'));
-                    } else {
-                        this.account_error = false;
-                        callback();
-                    }
-                };
-                var validateID = (rule, value, callback) => {
-                    var IDreg = /^(([1][1-5])|([2][1-3])|([3][1-7])|([4][1-6])|([5][0-4])|([6][1-5])|([7][1])|([8][1-2]))\d{4}(([1][9]\d{2})|([2]\d{3}))(([0][1-9])|([1][0-2]))(([0][1-9])|([1-2][0-9])|([3][0-1]))\d{3}[0-9xX]$/;
-                    if (!value) {
-                        this.ID_error = true;
-                        return callback(new Error('身份证号不能为空'));
-                    } else {
-                        if (!IDreg.test(value)) {
+                    };
+                    var validateNewPass1 = (rule, value, callback) => {
+                        if (value === '') {
+                            this.new_pass_error = true;
+                            callback(new Error('请输入新密码'));
+                        } else {
+                            if (this.ruleForm1.check_pass !== '') {
+                                this.$refs.ruleForm1.validateField('check_pass');
+                            }
+                            this.new_pass_error = false;
+                            callback();
+                        }
+                    };
+                    var validateNewPass2 = (rule, value, callback) => {
+                        if (value === '') {
+                            this.check_pass_error = true;
+                            callback(new Error('请再次输入新密码'));
+                        } else if (value !== this.ruleForm1.new_pass) {
+                            this.check_pass_error = true;
+                            callback(new Error('两次输入密码不一致!'));
+                        } else {
+                            this.check_pass_error = false;
+                            callback();
+                        }
+                    };
+                    var validateAccount = (rule, value, callback) => {
+                        if (!value) {
+                            this.account_error = true;
+                            return callback(new Error('用户名不能为空'));
+                        } else {
+                            this.account_error = false;
+                            callback();
+                        }
+                    };
+                    var validateID = (rule, value, callback) => {
+                        var IDreg =
+                            /^(([1][1-5])|([2][1-3])|([3][1-7])|([4][1-6])|([5][0-4])|([6][1-5])|([7][1])|([8][1-2]))\d{4}(([1][9]\d{2})|([2]\d{3}))(([0][1-9])|([1][0-2]))(([0][1-9])|([1-2][0-9])|([3][0-1]))\d{3}[0-9xX]$/;
+                        if (!value) {
                             this.ID_error = true;
-                            callback(new Error('请输入正确格式的身份证号'));
+                            return callback(new Error('身份证号不能为空'));
                         } else {
-                            this.ID_error = false;
-                            callback();
+                            if (!IDreg.test(value)) {
+                                this.ID_error = true;
+                                callback(new Error('请输入正确格式的身份证号'));
+                            } else {
+                                this.ID_error = false;
+                                callback();
+                            }
                         }
-                    }
-                };
-                var validateTel = (rule, value, callback) => {
-                    var telreg = /^1[3|4|5|7|8][0-9]{9}$/;
-                    if (value === '') {
-                        this.tel_error = true;
-                        callback(new Error('请输入手机号码'));
-                    } else {
-                        if (!telreg.test(value)) {
+                    };
+                    var validateTel = (rule, value, callback) => {
+                        var telreg = /^1[3|4|5|7|8][0-9]{9}$/;
+                        if (value === '') {
                             this.tel_error = true;
-                            callback(new Error('请输入正确格式的手机号码'));
+                            callback(new Error('请输入手机号码'));
                         } else {
-                            this.tel_error = false;
-                            callback();
+                            if (!telreg.test(value)) {
+                                this.tel_error = true;
+                                callback(new Error('请输入正确格式的手机号码'));
+                            } else {
+                                this.tel_error = false;
+                                callback();
+                            }
                         }
-                    }
-                };
-                var validateCode = (rule, value, callback) => {
-                    if (value === '') {
-                        this.code_error = true;
-                        callback(new Error('请输入验证码'));
-                    } else if (!Number.isInteger(value)) {
-                        this.code_error = true;
-                        callback(new Error('请输入数值型验证码!'));
-                    } else {
-                        if (value.toString().length !== 6) {
+                    };
+                    var validateCode = (rule, value, callback) => {
+                        if (value === '') {
                             this.code_error = true;
-                            callback(new Error('请输入6位验证'));
+                            callback(new Error('请输入验证码'));
+                        } else if (!Number.isInteger(value)) {
+                            this.code_error = true;
+                            callback(new Error('请输入数值型验证码!'));
                         } else {
-                            callback();
+                            if (value.toString().length !== 6) {
+                                this.code_error = true;
+                                callback(new Error('请输入6位验证'));
+                            } else {
+                                callback();
+                            }
                         }
-                    }
-                };
-                var validateBank = (rule, value, callback) => {
-                    if (value === '') {
-                        this.bank_code_error = true;
-                        callback(new Error('请输入银行卡号'));
-                    } else {
-                        if (!(/[0-9]{16,19}/g).test(value)) {
+                    };
+                    var validateBank = (rule, value, callback) => {
+                        if (value === '') {
                             this.bank_code_error = true;
-                            callback(new Error('请输入正确格式的银行卡号'));
+                            callback(new Error('请输入银行卡号'));
                         } else {
-                            if (this.ruleForm3.confirm_card !== '') {
-                                this.$refs.ruleForm3.validateField('confirm_card');
+                            if (!(/[0-9]{16,19}/g).test(value)) {
+                                this.bank_code_error = true;
+                                callback(new Error('请输入正确格式的银行卡号'));
+                            } else {
+                                if (this.ruleForm3.confirm_card !== '') {
+                                    this.$refs.ruleForm3.validateField('confirm_card');
+                                }
+                                this.bank_code_error = false;
+                                callback();
                             }
-                            this.bank_code_error = false;
+                        }
+                    };
+                    var validateCheckBank = (rule, value, callback) => {
+                        if (value === '') {
+                            this.bank_confirm_error = true;
+                            callback(new Error('请再次确认银行卡号'));
+                        } else if (value !== this.ruleForm3.bank_card) {
+                            this.bank_confirm_error = true;
+                            callback(new Error('两次输入银行卡号不一致!'));
+                        } else {
+                            this.bank_confirm_error = false;
                             callback();
                         }
-                    }
-                };
-                var validateCheckBank = (rule, value, callback) => {
-                    if (value === '') {
-                        this.bank_confirm_error = true;
-                        callback(new Error('请再次确认银行卡号'));
-                    } else if (value !== this.ruleForm3.bank_card) {
-                        this.bank_confirm_error = true;
-                        callback(new Error('两次输入银行卡号不一致!'));
-                    } else {
-                        this.bank_confirm_error = false;
-                        callback();
-                    }
-                };
-                var validateBankAccount = (rule, value, callback) => {
-                    if (value === '') {
-                        this.bank_error = true;
-                        callback(new Error('请选择开户银行'));
-                    } else {
-                        this.bank_error = false;
-                        callback();
-                    }
-                };
-                var validateBankBranch = (rule, value, callback) => {
-                    if (value === '') {
-                        this.address_error = true;
-                        callback(new Error('请输入开户支行'));
-                    } else {
-                        this.address_error = false;
-                        callback();
-                    }
-                };
-                return {
-                    userId: sessionStorage.getItem('userId'),
-                    role: sessionStorage.getItem('role'),
-                    account: sessionStorage.getItem('account'),
-                    sessionId: sessionStorage.getItem('sessionId'),
-                    btnText: '发送验证码',
-                    count: 60,
-                    timer: null,
-                    modifyTel: false,
-                    btnActive: true,
-                    dialogPersionVisible: false,
-                    dialogAccountVisible: false,
-                    dialogPasswordVisible: false,
-                    account_error: true,
-                    ID_error: true,
-                    tel_error: true,
-                    code_error: true,
-                    bank_code_error: true,
-                    bank_confirm_error: true,
-                    bank_error: true,
-                    address_error: true,
-                    old_pass_error: true,
-                    new_pass_error: true,
-                    check_pass_error: true,
-                    ruleForm1: {
-                        old_pass: '',
-                        new_pass: '',
-                        check_pass: ''
-                    },
-                    ruleForm2: {
-                        account: '',
-                        ID: '',
-                        tel: '',
-                        code: ''
-                    },
-                    ruleForm3: {
-                        bank_card: '',
-                        confirm_card: '',
-                        bank_account: '',
-                        bank_branch: ''
-                    },
-                    rules1: {
-                        old_pass: [
-                            { validator: validateOldPass, trigger: 'blur' }
-                        ],
-                        new_pass: [
-                            { validator: validateNewPass1, trigger: 'blur' }
-                        ],
-                        check_pass: [
-                            { validator: validateNewPass2, trigger: 'blur' }
-                        ]
-                    },
-                    rules2: {
-                        account: [
-                            { validator: validateAccount, trigger: 'blur' }
-                        ],
-                        ID: [
-                            { validator: validateID, trigger: 'blur' }
-                        ],
-                        tel: [
-                            { validator: validateTel, trigger: 'blur' }
-                        ],
-                        code: [
-                            { validator: validateCode, trigger: 'blur' }
-                        ]
-                    },
-                    rules3: {
-                        bank_card: [
-                            { validator: validateBank, trigger: 'blur' }
-                        ],
-                        confirm_card: [
-                            { validator: validateCheckBank, trigger: 'blur' }
-                        ],
-                        bank_account: [
-                            { validator: validateBankAccount, trigger: 'change' }
-                        ],
-                        bank_branch: [
-                            { validator: validateBankBranch, trigger: 'blur' }
-                        ]
-                    }
-                };
-            },
-            computed: {
-                isActive: function () {
-                    return /^1[3|4|5|7|8][0-9]{9}$/.test(this.ruleForm2.tel);
-                }
-            },
-            methods: {
-                handleCommand(command) {
-                    if (command === 'persional') {
-                        this.dialogPersionVisible = true;
-                    } else if (command === 'account') {
-                        this.dialogAccountVisible = true;
-                    } else {
-                        this.dialogPasswordVisible = true;
-                    }
-                },
-                submitForm(formName) {
-                    this.$refs[formName].validate((valid) => {
-                        if (valid) {
-                            if (formName === 'ruleForm2') {
-                                this.dialogPersionVisible = false;
-                            } else if (formName === 'ruleForm1') {
-                                this.dialogPasswordVisible = false;
-                            } else {
-                                this.dialogAccountVisible = false;
-                            }
+                    };
+                    var validateBankAccount = (rule, value, callback) => {
+                        if (value === '') {
+                            this.bank_error = true;
+                            callback(new Error('请选择开户银行'));
                         } else {
-                            console.log('error submit!!');
-                            return false;
+                            this.bank_error = false;
+                            callback();
                         }
-                    });
-                }
-            },
-            watch: {
-                isActive: function (newVal, oldVal) {
-                    this.btnActive = oldVal;
+                    };
+                    var validateBankBranch = (rule, value, callback) => {
+                        if (value === '') {
+                            this.address_error = true;
+                            callback(new Error('请输入开户支行'));
+                        } else {
+                            this.address_error = false;
+                            callback();
+                        }
+                    };
+                    return {
+                        userId: sessionStorage.getItem('userId'),
+                        password: sessionStorage.getItem('password'),
+                        role: sessionStorage.getItem('role'),
+                        account: sessionStorage.getItem('account'),
+                        sessionId: sessionStorage.getItem('sessionId'),
+                        btnText: '发送验证码',
+                        count: 60,
+                        timer: null,
+                        modifyTel: false,
+                        btnActive: true,
+                        dialogPersionVisible: false,
+                        dialogAccountVisible: false,
+                        dialogPasswordVisible: false,
+                        dialogTips: false,
+                        account_error: true,
+                        ID_error: true,
+                        tel_error: true,
+                        code_error: true,
+                        bank_code_error: true,
+                        bank_confirm_error: true,
+                        bank_error: true,
+                        address_error: true,
+                        old_pass_error: true,
+                        new_pass_error: true,
+                        check_pass_error: true,
+                        ruleForm1: {
+                            old_pass: '',
+                            new_pass: '',
+                            check_pass: ''
+                        },
+                        ruleForm2: {
+                            account: '',
+                            ID: '',
+                            tel: '',
+                            code: ''
+                        },
+                        ruleForm3: {
+                            bank_card: '',
+                            confirm_card: '',
+                            bank_account: '',
+                            bank_branch: ''
+                        },
+                        rules1: {
+                            old_pass: [{
+                                validator: validateOldPass,
+                                trigger: 'blur'
+                            }],
+                            new_pass: [{
+                                validator: validateNewPass1,
+                                trigger: 'blur'
+                            }],
+                            check_pass: [{
+                                validator: validateNewPass2,
+                                trigger: 'blur'
+                            }]
+                        },
+                        rules2: {
+                            account: [{
+                                validator: validateAccount,
+                                trigger: 'blur'
+                            }],
+                            ID: [{
+                                validator: validateID,
+                                trigger: 'blur'
+                            }],
+                            tel: [{
+                                validator: validateTel,
+                                trigger: 'blur'
+                            }],
+                            code: [{
+                                validator: validateCode,
+                                trigger: 'blur'
+                            }]
+                        },
+                        rules3: {
+                            bank_card: [{
+                                validator: validateBank,
+                                trigger: 'blur'
+                            }],
+                            confirm_card: [{
+                                validator: validateCheckBank,
+                                trigger: 'blur'
+                            }],
+                            bank_account: [{
+                                validator: validateBankAccount,
+                                trigger: 'change'
+                            }],
+                            bank_branch: [{
+                                validator: validateBankBranch,
+                                trigger: 'blur'
+                            }]
+                        }
+                    };
                 },
-                modifyTel: function (newActive, oldActive) {
-                    if (this.modifyTel) {
-                        this.btnActive = true;
-                        this.btnText = `${this.count}后重发`;
-                        var that = this;
-                        this.timer = setInterval(function () {
-                            if (that.count === 1) {
-                                clearInterval(that.timer);
-                                that.btnText = '发送验证码';
-                                that.count = 60;
-                                that.modifyTel = false;
-                                that.btnActive = false;
-                            } else {
-                                that.count--;
-                                that.btnText = `${that.count}后重发`;
-                            }
-                        }, 1000)
+                computed: {
+                    isActive: function () {
+                        return /^1[3|4|5|7|8][0-9]{9}$/.test(this.ruleForm2.tel);
                     }
+                },
+                methods: {
+                    handleCommand(command) {
+                        if (command === 'persional') {
+                            this.dialogPersionVisible = true;
+                        } else if (command === 'account') {
+                            this.dialogAccountVisible = true;
+                        } else {
+                            this.dialogPasswordVisible = true;
+                        }
+                    },
+                    submitForm(formName) {
+                        this.$refs[formName].validate((valid) => {
+                            if (valid) {
+                                if (formName === 'ruleForm2') {
+                                    this.dialogPersionVisible = false;
+                                } else if (formName === 'ruleForm1') {
+                                    this.dialogPasswordVisible = false;
+                                } else {
+                                    this.dialogAccountVisible = false;
+                                }
+                            } else {
+                                console.log('error submit!!');
+                                return false;
+                            }
+                        });
+                    },
+                    confirmBtn () {
+                        this.dialogTips = false;
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                userId: that.userId,
+                                password: that.password
+                            },
+                            url: 'http://192.168.1.111:8080/zjdeel/user/logout.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    var tipmes = that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'success',
+                                        onClose: function (event) {
+                                            window.location.href = `../../index.html`;
+                                        }
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    }
+                },
+                watch: {
+                    isActive: function (newVal, oldVal) {
+                        this.btnActive = oldVal;
+                    },
+                    modifyTel: function (newActive, oldActive) {
+                        if (this.modifyTel) {
+                            this.btnActive = true;
+                            this.btnText = `${this.count}后重发`;
+                            var that = this;
+                            this.timer = setInterval(function () {
+                                if (that.count === 1) {
+                                    clearInterval(that.timer);
+                                    that.btnText = '发送验证码';
+                                    that.count = 60;
+                                    that.modifyTel = false;
+                                    that.btnActive = false;
+                                } else {
+                                    that.count--;
+                                    that.btnText = `${that.count}后重发`;
+                                }
+                            }, 1000)
+                        }
+                    }
+                },
+                mounted() {
+                    sessionStorage.removeItem('userId');
+                    sessionStorage.removeItem('role');
+                    sessionStorage.removeItem('account');
+                    sessionStorage.removeItem('sessionId');
+                    sessionStorage.removeItem('password');
                 }
-            }
+            });
         });
-    });
-</script>
+    </script>
 </body>
+
 </html>

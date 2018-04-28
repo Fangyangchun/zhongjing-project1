@@ -121,10 +121,6 @@
                         modifyTel: false,
                         btnActive: true,
                         has_login: true,
-                        // ID_error: true,
-                        // tel_error: true,
-                        // code_error: true,
-                        // pass_error: true,
                         xhr: null,
                         ruleForm: {
                             ID: '',
@@ -255,6 +251,7 @@
                                 }
                             },
                             success: function(data) {
+                                console.log(data);
                                 if (data.res === 'success') {
                                     that.modifyTel = true;
                                 } else {
@@ -297,6 +294,8 @@
                                         },
                                         success: function(data) {
                                             if (data.res === 'success') {
+                                                console.log(data);
+                                                sessionStorage.setItem('password', data.data.passwordmd);
                                                 window.location.href = `src/html/backend.html`
                                                     + `?role=${data.data.roldid}&&account=${data.data.username}&&resource=market&&sessionId=${data.sessionId}&&userId=${data.data.id}`;
                                             } else {
@@ -333,7 +332,6 @@
                                             }
                                         },
                                         success: function(data) {
-                                            console.log(data);
                                             if (data.res === 'success') {
                                                 window.location.href = `src/html/setting.html`;
                                             } else {
