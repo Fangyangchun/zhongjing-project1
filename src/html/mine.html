@@ -8,23 +8,23 @@
 </head>
 <body>
 <div id="mine">
-    <div class="info">
-        <div class="info_detail">
+    <div class="info" v-if="ownerStockData.length>0">
+        <div v-for="stockData in ownerStockData" class="info_detail">
             <div class="company">
-                <p class="tip">梦古堂</p>
+                <p class="tip">{{ stockData.stockname }}</p>
                 <p class="tip_detail">股票名称</p>
             </div>
             <div class="num">
-                <p class="tip">100202</p>
+                <p class="tip">{{ stockData.owncount }}</p>
                 <p class="tip_detail">股数</p>
             </div>
             <div class="prices">
-                <p class="tip">11.67</p>
+                <p class="tip">{{ stockData.price }}</p>
                 <p class="tip_detail">参考单价(元)</p>
             </div>
             <div class="handle">
-                <button class="buy">买入</button>
-                <button class="sell" @click="publishSell('梦古堂')">卖出</button>
+                <button class="buy" @click="publishBuy(stockData.stockname)">买入</button>
+                <button class="sell" @click="publishSell(stockData.stockname)">卖出</button>
             </div>
         </div>
     </div>
@@ -87,7 +87,15 @@
                         <el-table :data="transaction">
                             <el-table-column prop="name" label="交易股票">
                             </el-table-column>
+                            <el-table-column prop="announcer" label="发布者">
+                                    <template slot-scope="scope">
+                                        {{ scope.row.announcer }}&nbsp;{{ scope.row.sellerSex === 1? '先生' : '女士' }}
+                                    </template>
+                            </el-table-column>
                             <el-table-column prop="buyers" label="购买者">
+                                    <template slot-scope="scope">
+                                        {{ scope.row.buyers }}&nbsp;{{ scope.row.buyerSex === 1? '先生' : '女士' }}
+                                    </template>
                             </el-table-column>
                             <el-table-column prop=price label="交易单价(元)">
                             </el-table-column>
@@ -106,12 +114,12 @@
                                         <span v-else>{{ scope.row.note }}</span>
                                     </template>
                             </el-table-column>
-                            <el-table-column label="操作" header-align="center"
+                            <!-- <el-table-column label="操作" header-align="center"
                                                 align="center">
                                 <template slot-scope="scope">
                                     <el-button type="text" size="small" @click="confirmBox('delete')">删除记录</el-button>
                                 </template>
-                            </el-table-column>
+                            </el-table-column> -->
                         </el-table>
                         <div class="pagination_box">
                             <el-pagination v-if="activeName==='transaction'" background layout="prev, pager, next, jumper"
@@ -148,6 +156,9 @@
                                 </el-table-column>
                                 <el-table-column prop="status" header-align="center"
                                 align="center" label="订单状态">
+                                    <template slot-scope="scope">
+                                        {{ scope.row.status === 1 ? '待审核' : '已审核' }}
+                                    </template>
                                 </el-table-column>
                             </el-table>
                             <div class="pagination_box">
@@ -338,23 +349,9 @@
                         dialogTips: false,
                         dialogTipText: '',
                         published: [],
-                        transaction: [{
-                            name: '中经汇金',
-                            buyers: '周雅琼 女士',
-                            price: 10.77,
-                            trading_num: 1000,
-                            finished_date: '2017-02-12 16:27:56',
-                            note: '-----'
-                        }],
-                        orders: [{
-                            ordersNum: '35435345634634563',
-                            type: '买入',
-                            price: 10.99,
-                            trading_num: 10000,
-                            trading_time: '2017-08-19 15:19:56',
-                            note: '-----',
-                            status: '完成'
-                        }],
+                        ownerStockData: [],
+                        transaction: [],
+                        orders: [],
                         ruleForm: {
                             name: this.dialogTitle,
                             total_num: '',
@@ -389,6 +386,7 @@
                         this.currentPage = 1;
                         this.startDate = "";
                         this.endDate = "";
+                        this.getTables();
                     },
                     dateChangeHandle (val) {
                         if (val) {
@@ -402,10 +400,16 @@
                     handleCurrentChange (val) {
                         this.currentPage = val;
                     },
-                    publishSell (nameStr) {
-                        this.dialogTitle = nameStr;
-                        this.ruleForm.name = nameStr;
+                    publishSell (stockname) {
+                        this.dialogTitle = stockname;
+                        this.ruleForm.name = stockname;
                         this.dialogVisible = true;
+                    },
+                    publishBuy (stockname) {
+                        var urlStr = location.href;
+                        urlStr = urlStr.replace(/resource=mine/, "resource=market");
+                        urlStr = `${urlStr}&&stock=${stockname}`;
+                        window.location.href = urlStr;
                     },
                     modifyPublish (data) {
                         console.log(data);
@@ -467,6 +471,7 @@
                                 }
                             },
                             success: function (data) {
+                                that.published = [];
                                 if (data.total > 0) {
                                     that.publish_total = data.total;
                                     that.published = [];
@@ -484,11 +489,7 @@
                                         that.published.push(objData);
                                     });
                                 } else {
-                                    that.$message({
-                                        showClose: true,
-                                        message: '数据获取失败，请稍后重试',
-                                        type: 'warning'
-                                    });
+                                    that.publish_total = 0;
                                 }
                             }
                         });
@@ -496,17 +497,18 @@
                     getTransactionTables() {
                         var that = this;
                         $.ajax({
-                            type: 'GET',
+                            type: 'POST',
                             dataType: 'JSON',
                             async: false,
                             data: {
+                                userId: that.userId,
                                 stockName: that.checkedStocks,
                                 startDate: that.startDate,
                                 endDate: that.endDate,
                                 pageNo: that.currentPage,
                                 pageSize: that.pagesize
                             },
-                            url: 'http://192.168.1.100:8080/zjdeel/order/selectAll.do',
+                            url: 'http://192.168.1.100:8080/zjdeel/order/selectHisDealByUser.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -523,40 +525,89 @@
                                 }
                             },
                             success: function (data) {
-                                console.log(data);
+                                that.transaction = [];
                                 if (data.total > 0) {
                                     that.transaction_total = data.total;
-                                    that.transaction = [];
                                     data.list.forEach((val, index, arr) => {
                                         var objData = {
-                                            name: val.stockname,
-                                            sellerSex: val.sellerSex,
-                                            announcer: val.seller,
-                                            buyers: val.buyerName,
-                                            buyerSex: val.buyerSex,
-                                            trading_num: val.dealcount,
-                                            price: val.dealprice,
-                                            publish_date: val.createtimeStr,
-                                        };
+                                                name: val.stockname,
+                                                announcer: val.sellerName,
+                                                sellerSex: val.sellerSex,
+                                                buyers: val.buyerName,
+                                                buyerSex: val.buyerSex,
+                                                price: val.dealprice,
+                                                trading_num: val.dealcount,
+                                                finished_date: val.dealtimeStr,
+                                                note: val.remark
+                                            };
                                         that.transaction.push(objData);
+                                    });
+                                } else {
+                                    that.transaction_total = 0;
+                                }
+                            }
+                        });
+                    },
+                    getOrdersTables() {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                userId: that.userId,
+                                stockName: that.checkedStocks,
+                                startDate: that.startDate,
+                                endDate: that.endDate,
+                                pageNo: that.currentPage,
+                                pageSize: that.pagesize
+                            },
+                            url: 'http://192.168.1.100:8080/zjdeel/order/selectHisOrderByUser.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
                                     });
                                 } else {
                                     that.$message({
                                         showClose: true,
-                                        message: '数据获取失败，请稍后重试',
+                                        message: '数据获取失败，请稍后重试!',
                                         type: 'warning'
                                     });
+                                }
+                            },
+                            success: function (data) {
+                                that.orders = [];
+                                if (data.total > 0) {
+                                    that.orders_total = data.total;
+                                    data.list.forEach((val, index, arr) => {
+                                        var objData = {
+                                            ordersNum: val.orderno,
+                                            type: '买入',
+                                            price: val.dealprice,
+                                            trading_num: val.dealcount,
+                                            trading_time: val.dealtimeStr,
+                                            note: val.remark,
+                                            status: val.status
+                                        };
+                                        that.orders.push(objData);
+                                    });
+                                } else {
+                                    that.orders_total = 0;
                                 }
                             }
                         });
                     },
                     getTables() {
-                        this.getPublishedTables();
-                        // if (this.activeName2 === 'published') {
-                        //     this.getPublishedTables();
-                        // } else {
-                        //     this.getTransactionTables();
-                        // }
+                        if (this.activeName === 'published') {
+                            this.getPublishedTables();
+                        } else if (this.activeName === 'transaction') {
+                            this.getTransactionTables();
+                        } else {
+                            this.getOrdersTables();
+                        }
                     },
                     getOwnerStocks() {
                         var that = this;
@@ -584,30 +635,10 @@
                                 }
                             },
                             success: function (data) {
-                                console.log(data);
-                                // if (data.total > 0) {
-                                //     that.transaction_total = data.total;
-                                //     that.transaction = [];
-                                //     data.list.forEach((val, index, arr) => {
-                                //         var objData = {
-                                //             name: val.stockname,
-                                //             sellerSex: val.sellerSex,
-                                //             announcer: val.seller,
-                                //             buyers: val.buyerName,
-                                //             buyerSex: val.buyerSex,
-                                //             trading_num: val.dealcount,
-                                //             price: val.dealprice,
-                                //             publish_date: val.createtimeStr,
-                                //         };
-                                //         that.transaction.push(objData);
-                                //     });
-                                // } else {
-                                //     that.$message({
-                                //         showClose: true,
-                                //         message: '数据获取失败，请稍后重试',
-                                //         type: 'warning'
-                                //     });
-                                // }
+                                if (Object.prototype.toString.call(data) ===
+                                    '[object Array]' && data.length > 0) {
+                                    that.ownerStockData = data;
+                                }
                             }
                         });
                     }

@@ -96,8 +96,14 @@
                                 <el-table-column prop="name" label="交易股票">
                                 </el-table-column>
                                 <el-table-column prop="announcer" label="发布者">
+                                        <template slot-scope="scope">
+                                            {{ scope.row.announcer }}&nbsp;{{ scope.row.sellerSex === 1? '先生' : '女士' }}
+                                        </template>
                                 </el-table-column>
                                 <el-table-column prop="buyers" label="购买者">
+                                        <template slot-scope="scope">
+                                            {{ scope.row.buyers }}&nbsp;{{ scope.row.buyerSex === 1? '先生' : '女士' }}
+                                        </template>
                                 </el-table-column>
                                 <el-table-column prop=trading_num label="交易数量(股)">
                                 </el-table-column>
@@ -177,6 +183,14 @@
                     transaction: []
                 },
                 methods: {
+                    urlResolve() {
+                        var pathStr = location.href;
+                        if (pathStr.indexOf('&&stock') !== -1) {
+                            var dataStr = pathStr.split('&&stock=')[1];
+                            this.checkedStocks.push(decodeURIComponent(dataStr));
+                            console.log(this.checkedStocks);
+                        }
+                    },
                     splitData(rawData) {
                         var categoryData = [];
                         var values = [];
@@ -432,9 +446,9 @@
                                 }
                             },
                             success: function (data) {
+                                that.published = [];
                                 if (data.total > 0) {
                                     that.publish_total = data.total;
-                                    that.published = [];
                                     data.list.forEach((val, index, arr) => {
                                         var objData = {
                                             name: val.stockname,
@@ -450,6 +464,7 @@
                                         that.published.push(objData);
                                     });
                                 } else {
+                                    that.publish_total = 0;
                                     that.$message({
                                         showClose: true,
                                         message: '数据获取失败，请稍后重试',
@@ -462,7 +477,7 @@
                     getTransactionTables() {
                         var that = this;
                         $.ajax({
-                            type: 'GET',
+                            type: 'POST',
                             dataType: 'JSON',
                             async: false,
                             data: {
@@ -489,15 +504,14 @@
                                 }
                             },
                             success: function (data) {
-                                console.log(data);
+                                that.transaction = [];
                                 if (data.total > 0) {
                                     that.transaction_total = data.total;
-                                    that.transaction = [];
                                     data.list.forEach((val, index, arr) => {
                                         var objData = {
                                             name: val.stockname,
                                             sellerSex: val.sellerSex,
-                                            announcer: val.seller,
+                                            announcer: val.sellerName,
                                             buyers: val.buyerName,
                                             buyerSex: val.buyerSex,
                                             trading_num: val.dealcount,
@@ -507,6 +521,7 @@
                                         that.transaction.push(objData);
                                     });
                                 } else {
+                                    that.transaction_total = 0;
                                     that.$message({
                                         showClose: true,
                                         message: '数据获取失败，请稍后重试',
@@ -517,15 +532,15 @@
                         });
                     },
                     getTables() {
-                        this.getTransactionTables();
-                        // if (this.activeName2 === 'published') {
-                        //     this.getPublishedTables();
-                        // } else {
-                        //     this.getTransactionTables();
-                        // }
-                    },
+                        if (this.activeName2 === 'published') {
+                            this.getPublishedTables();
+                        } else {
+                            this.getTransactionTables();
+                        }
+                    }
                 },
                 mounted() {
+                    this.urlResolve();
                     this.getAllStock();
                     this.getOneStock();
                     this.getTables();

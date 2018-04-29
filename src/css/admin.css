@@ -1,0 +1,40 @@
+#admin {
+    width: 100%;
+    background: white;
+}
+.entryBtn {
+    padding: 25px 0 25px 45px;
+}
+.entryBtn .el-button.is-round {
+    padding: 5px 17px;
+    background: #4993E5;
+}
+.entyrTable {
+    width: 100%;
+    margin-left: 20px;
+}
+.el-dialog__wrapper.confirm_dialog .el-dialog__header {
+    line-height: 44px!important;
+    background: transparent!important;
+    border-bottom: 1px solid #DAE4EA;
+}
+.el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__title {
+    line-height: 44px!important;
+    font-size: 16px!important;
+    font-family: AppleSystemUIFont;
+    color: #1F2D3D!important;
+}
+.el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn {
+    height: 44px!important;
+}
+.el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn i {
+    color: #1F2D3D!important;
+}
+.el-dialog__wrapper.confirm_dialog .el-dialog__body {
+    text-align: center;
+}
+.el-dialog__wrapper.confirm_dialog .el-dialog__body p {
+    font-family: PingFangSC-Regular;
+    font-size: 15px;
+    color: #666666;
+}

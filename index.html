@@ -294,10 +294,17 @@
                                         },
                                         success: function(data) {
                                             if (data.res === 'success') {
-                                                console.log(data);
+                                                var resourceStr;
+                                                if (data.data.roldid === 1) {
+                                                    resourceStr = 'params';
+                                                } else if (data.data.roldid === 2) {
+                                                    resourceStr = 'orders';
+                                                } else {
+                                                    resourceStr = 'market';
+                                                }
                                                 sessionStorage.setItem('password', data.data.passwordmd);
                                                 window.location.href = `src/html/backend.html`
-                                                    + `?role=${data.data.roldid}&&account=${data.data.username}&&resource=market&&sessionId=${data.sessionId}&&userId=${data.data.id}`;
+                                                    + `?role=${data.data.roldid}&&account=${data.data.username}&&resource=${resourceStr}&&sessionId=${data.sessionId}&&userId=${data.data.id}`;
                                             } else {
                                                 that.$message({
                                                     showClose: true,

@@ -3,54 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>管理员</title>
-    <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="../css/home.css">
-    <script src="../../lib/jquery.min.js"></script>
-    <script src="../../lib/vue.js"></script>
-    <script src="../../lib/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="../css/admin.css">
 </head>
-<style>
-    #admin {
-        width: 100%;
-        background: white;
-    }
-    .entryBtn {
-        padding: 25px 0 25px 45px;
-    }
-    .entryBtn .el-button.is-round {
-        padding: 5px 17px;
-        background: #4993E5;
-    }
-    .entyrTable {
-        width: 100%;
-        margin-left: 20px;
-    }
-    .el-dialog__wrapper.confirm_dialog .el-dialog__header {
-        line-height: 44px!important;
-        background: transparent!important;
-        border-bottom: 1px solid #DAE4EA;
-    }
-    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__title {
-        line-height: 44px!important;
-        font-size: 16px!important;
-        font-family: AppleSystemUIFont;
-        color: #1F2D3D!important;
-    }
-    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn {
-        height: 44px!important;
-    }
-    .el-dialog__wrapper.confirm_dialog .el-dialog__header .el-dialog__headerbtn i {
-        color: #1F2D3D!important;
-    }
-    .el-dialog__wrapper.confirm_dialog .el-dialog__body {
-        text-align: center;
-    }
-    .el-dialog__wrapper.confirm_dialog .el-dialog__body p {
-        font-family: PingFangSC-Regular;
-        font-size: 15px;
-        color: #666666;
-    }
-</style>
 <body>
     <div id="admin">
         <div class="entryBtn">
@@ -75,15 +30,15 @@
                     <el-table-column label="操作" header-align="center"
                                                 align="center">
                         <template slot-scope="scope">
-                            <el-button type="text" size="small" @click="modifyParams(scope.row)">修改</el-button>
-                            <span style="font-size: 14px; color: #2678D2;">|</span>
-                            <el-button type="text" size="small" @click="deleteAccount(scope.row);">删除</el-button>
+                            <el-button type="text" size="small" @click="modifyOneGet(scope.row.id)">修改</el-button>
+                            <!-- <span style="font-size: 14px; color: #2678D2;">|</span>
+                            <el-button type="text" size="small" @click="deleteAccount(scope.row);">删除</el-button> -->
                         </template>
                     </el-table-column>
                 </el-table>
                 <div class="pagination_box">
                     <el-pagination background layout="prev, pager, next, jumper"
-                                    :page-size=pagesize :total=entry_num
+                                    :page-size=pagesize :total=entry_num :current-page=currentPage
                                     @current-change="currentPageChange">
                     </el-pagination>
                 </div>
@@ -195,7 +150,8 @@
                     };
                     return {
                         pagesize: 8,
-                        entry_num: 12,
+                        entry_num: 0,
+                        currentPage: 1,
                         dialogTitle: '录入',
                         entryDialogVisible: false,
                         dialogTips: false,
@@ -204,24 +160,13 @@
                         ID_error: true,
                         tel_error: true,
                         stock_num_error: true,
-                        adminData: [{
-                            account: '中经汇金',
-                            ID: '330782199309255424',
-                            tel: '15116925248',
-                            bank_num: '988988944433443',
-                            stock_num: 100000
-                        }, {
-                            account: '中经汇金',
-                            ID: '330782199309255424',
-                            tel: '15116925248',
-                            bank_num: '',
-                            stock_num: 100000
-                        }],
+                        adminData: [],
                         ruleForm: {
                             account: '',
                             ID: '',
                             tel: '',
-                            stock_num: ''
+                            stock_num: '',
+                            userId: ''
                         },
                         rules: {
                             account: [
@@ -241,22 +186,73 @@
                 },
                 methods: {
                     entryType () {
+                        this.ruleForm = {
+                            account: '',
+                            ID: '',
+                            tel: '',
+                            stock_num: '',
+                            userId: ''
+                        }
                         this.dialogTitle = '录入';
                         this.entryDialogVisible = true;
                     },
-                    modifyParams (data) {
-                        this.dialogTitle = '修改';
-                        this.entryDialogVisible = true;
-                        console.log(data);
+                    modifyOneGet (id) {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                userId: id
+                            },
+                            url: 'http://192.168.1.100:8080/zjdeel/user/selectById.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    that.ruleForm = {
+                                        account: data.data.username,
+                                        ID: data.data.identifycard,
+                                        tel: data.data.mobile,
+                                        stock_num: 10000,
+                                        userId: data.data.id
+                                    };
+                                    that.dialogTitle = '修改';
+                                    that.entryDialogVisible = true;
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
                     },
                     currentPageChange (num) {
-                        console.log(num);
+                        this.currentPage = val;
                     },
                     submitForm (formName) {
                         this.$refs[formName].validate((valid) => {
                             if (valid) {
-                                console.log('修改成功');
-                                this.entryDialogVisible = false;
+                                if (this.dialogTitle === '录入') {
+                                    this.insertUser();
+                                } else {
+                                    this.postModify();
+                                }
                             } else {
                                 console.log('error submit!!');
                                 return false;
@@ -270,7 +266,155 @@
                     confirmBtn () {
                         console.log('确认删除该用户信息');
                         this.dialogTips = false;
+                    },
+                    getAllUsers() {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                pageNo: that.currentPage,
+                                pageSize: that.pagesize
+                            },
+                            url: 'http://192.168.1.100:8080/zjdeel/user/selectAll.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                that.adminData = [];
+                                if (data.total > 0) {
+                                    that.entry_num = data.total;
+                                    data.list.forEach((val, index, arr) => {
+                                        var objData = {
+                                            account: val.username,
+                                            ID: val.identifycard,
+                                            tel: val.mobile,
+                                            bank_num: val.creditcard,
+                                            stock_num: 10000,
+                                            id: val.id
+                                        };
+                                        that.adminData.push(objData);
+                                    });
+                                } else {
+                                    that.entry_num = 0;
+                                    that.$message({
+                                        showClose: true,
+                                        message: '当前无数据',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    insertUser() {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                username: this.ruleForm.account,
+                                identifycard: this.ruleForm.ID,
+                                mobile: this.ruleForm.tel
+                            },
+                            url: 'http://192.168.1.100:8080/zjdeel/user/insertUser.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'success'
+                                    });
+                                    that.entryDialogVisible = false;
+                                    that.getAllUsers();
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    postModify() {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                userId: this.ruleForm.userId,
+                                username: this.ruleForm.account,
+                                identifycard: this.ruleForm.ID,
+                                mobile: this.ruleForm.tel
+                            },
+                            url: 'http://192.168.1.100:8080/zjdeel/user/updateUser.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'success'
+                                    });
+                                    that.entryDialogVisible = false;
+                                    that.getAllUsers();
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
                     }
+                },
+                mounted() {
+                    this.getAllUsers();
                 }
             })
         })
