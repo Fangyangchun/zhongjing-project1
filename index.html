@@ -190,7 +190,7 @@
                                     data: {
                                         identify: value
                                     },
-                                    url : 'http://192.168.1.111:8080/zjdeel/user/checkLoginStatus.do',
+                                    url : 'http://192.168.1.100:8080/zjdeel/user/checkLoginStatus.do',
                                     error: function (XMLHttpRequest, textStatus, errorThrown) {
                                         that.ruleForm.ID = '';
                                         that.ruleForm.tel = '';
@@ -234,7 +234,7 @@
                                 identify: this.ruleForm.ID,
                                 phoneNumber: this.ruleForm.tel
                             },
-                            url : 'http://192.168.1.111:8080/zjdeel/sms/sendMsg.do',
+                            url : 'http://192.168.1.100:8080/zjdeel/sms/sendMsg.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -276,7 +276,7 @@
                                             identifyCard: this.ruleForm.ID,
                                             password: $.md5(this.ruleForm.login_pass)
                                         },
-                                        url : 'http://192.168.1.111:8080/zjdeel/user/login.do',
+                                        url : 'http://192.168.1.100:8080/zjdeel/user/login.do',
                                         error: function (XMLHttpRequest, textStatus, errorThrown) {
                                             if (errorThrown) {
                                                 that.$message({
@@ -315,7 +315,7 @@
                                             phoneNumber: this.ruleForm.tel,
                                             phoneCode: this.ruleForm.code
                                         },
-                                        url : 'http://192.168.1.111:8080/zjdeel/sms/validate.do',
+                                        url : 'http://192.168.1.100:8080/zjdeel/sms/validate.do',
                                         error: function (XMLHttpRequest, textStatus, errorThrown) {
                                             if (errorThrown) {
                                                 that.$message({

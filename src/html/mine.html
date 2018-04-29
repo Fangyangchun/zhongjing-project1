@@ -27,38 +27,14 @@
                 <button class="sell" @click="publishSell('梦古堂')">卖出</button>
             </div>
         </div>
-        <div class="info_detail">
-            <div class="company">
-                <p class="tip">中经汇金</p>
-                <p class="tip_detail">股票名称</p>
-            </div>
-            <div class="num">
-                <p class="tip">698336</p>
-                <p class="tip_detail">股数</p>
-            </div>
-            <div class="prices">
-                <p class="tip">30.67</p>
-                <p class="tip_detail">参考单价(元)</p>
-            </div>
-            <div class="handle">
-                <button class="buy">买入</button>
-                <button class="sell" @click="publishSell('中经汇金')">卖出</button>
-            </div>
-        </div>
     </div>
     <div class="table_wrapper">
         <div class="table_content">
             <div class="block">
-                <el-date-picker v-model="value" type="daterange"
-                                align="right"
-                                unlink-panels
-                                range-separator="-"
-                                start-placeholder="开始日期"
-                                end-placeholder="结束日期"
-                                :picker-options="pickerOptions"
-                                :default-value="new Date(`${nowYear}-${nowMonth}-1`)"
-                                @change="dateChangeHandle"
-                                value-format="yyyy-MM-dd">
+                <el-date-picker v-model="value" type="daterange" align="right" unlink-panels
+                                range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"
+                                :picker-options="pickerOptions" :default-value="new Date(`${nowYear}-${nowMonth}-1`)"
+                                @change="dateChangeHandle" value-format="yyyy-MM-dd">
                 </el-date-picker>
             </div>
             <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -80,12 +56,12 @@
                             </el-table-column>
                             <el-table-column prop="note" min-width="150px" label="备注信息">
                                     <template slot-scope="scope">
-                                        <el-popover v-if="scope.row.note.length > 8" width="120" placement="top" popper-class='note'
-                                                trigger="click" :content=scope.row.note>
+                                        <span v-if="!scope.row.note">-----</span>
+                                        <el-popover v-else-if="scope.row.note.length > 8" width="120" placement="top" popper-class='note' trigger="click" :content=scope.row.note>
                                             <span slot="reference">
-                                                    {{scope.row.note.slice(0, 5)}}…</span>
+                                                {{scope.row.note.slice(0, 5)}}…</span>
                                         </el-popover>
-                                        <span v-if="scope.row.note.length < 8">{{ scope.row.note }}</span>
+                                        <span v-else>{{ scope.row.note }}</span>
                                     </template>
                             </el-table-column>
                             <el-table-column label="操作" header-align="center"
@@ -99,9 +75,9 @@
                             </el-table-column>
                         </el-table>
                         <div class="pagination_box">
-                            <el-pagination background layout="prev, pager, next, jumper"
-                                            :page-size=pagesize :total=publish_total
-                                            @current-change="handleCurrentChange1">
+                            <el-pagination v-if="activeName==='published'" background layout="prev, pager, next, jumper"
+                                            :page-size=pagesize :total=publish_total :current-page=currentPage
+                                            @current-change="handleCurrentChange">
                             </el-pagination>
                         </div>
                     </div>
@@ -122,12 +98,12 @@
                             </el-table-column>
                             <el-table-column prop="note" min-width="150px" label="备注信息">
                                     <template slot-scope="scope">
-                                        <el-popover v-if="scope.row.note.length > 8" width="120" placement="top" popper-class='note'
-                                                trigger="click" :content=scope.row.note>
+                                        <span v-if="!scope.row.note">-----</span>
+                                        <el-popover v-else-if="scope.row.note.length > 8" width="120" placement="top" popper-class='note' trigger="click" :content=scope.row.note>
                                             <span slot="reference">
-                                                    {{scope.row.note.slice(0, 5)}}…</span>
+                                                {{scope.row.note.slice(0, 5)}}…</span>
                                         </el-popover>
-                                        <span v-if="scope.row.note.length < 8">{{ scope.row.note }}</span>
+                                        <span v-else>{{ scope.row.note }}</span>
                                     </template>
                             </el-table-column>
                             <el-table-column label="操作" header-align="center"
@@ -138,9 +114,9 @@
                             </el-table-column>
                         </el-table>
                         <div class="pagination_box">
-                            <el-pagination background layout="prev, pager, next, jumper"
-                                            :page-size=pagesize :total=transaction_total
-                                            @current-change="handleCurrentChange2">
+                            <el-pagination v-if="activeName==='transaction'" background layout="prev, pager, next, jumper"
+                                            :page-size=pagesize :total=transaction_total :current-page=currentPage
+                                            @current-change="handleCurrentChange">
                             </el-pagination>
                         </div>
                     </div>
@@ -162,12 +138,12 @@
                                 </el-table-column>
                                 <el-table-column prop="note" label="备注信息">
                                         <template slot-scope="scope">
-                                            <el-popover v-if="scope.row.note.length > 8" width="120" placement="top" popper-class='note'
-                                                    trigger="click" :content=scope.row.note>
+                                            <span v-if="!scope.row.note">-----</span>
+                                            <el-popover v-else-if="scope.row.note.length > 8" width="120" placement="top" popper-class='note' trigger="click" :content=scope.row.note>
                                                 <span slot="reference">
-                                                        {{scope.row.note.slice(0, 5)}}…</span>
+                                                    {{scope.row.note.slice(0, 5)}}…</span>
                                             </el-popover>
-                                            <span v-if="scope.row.note.length < 8">{{ scope.row.note }}</span>
+                                            <span v-else>{{ scope.row.note }}</span>
                                         </template>
                                 </el-table-column>
                                 <el-table-column prop="status" header-align="center"
@@ -175,9 +151,9 @@
                                 </el-table-column>
                             </el-table>
                             <div class="pagination_box">
-                                <el-pagination background layout="prev, pager, next, jumper"
-                                                :page-size=pagesize :total=transaction_total
-                                                @current-change="handleCurrentChange2">
+                                <el-pagination v-if="activeName==='orders'" background layout="prev, pager, next, jumper"
+                                                :page-size=pagesize :total=orders_total :current-page=currentPage
+                                                @current-change="handleCurrentChange">
                                 </el-pagination>
                             </div>
                         </div>
@@ -301,13 +277,18 @@
                         }
                     };
                     return {
+                        userId: sessionStorage.getItem('userId'),
                         nowYear: new Date().getFullYear(),
                         nowMonth: new Date().getMonth(),
                         activeName: 'published',
                         pagesize: 8,
-                        publish_total: 12,
-                        transaction_total: 12,
+                        currentPage: 1,
+                        publish_total: 0,
+                        transaction_total: 0,
+                        orders_total: 0,
                         value: '',
+                        startDate: "",
+                        endDate: "",
                         total_num_error: true,
                         lock_num_error: true,
                         price_error: true,
@@ -356,25 +337,7 @@
                         volatility: 0.05,
                         dialogTips: false,
                         dialogTipText: '',
-                        published: [{
-                            name: '梦古堂',
-                            total_num: 10000,
-                            locking_num: 5000,
-                            tradable_num: 5000,
-                            price: 10.77,
-                            publish_date: '2017-02-12 16:27:56',
-                            note: '线下交易只接受杭州同城交易',
-                            tel: '15116925248'
-                        }, {
-                            name: '梦古堂',
-                            total_num: 10000,
-                            locking_num: 5000,
-                            tradable_num: 5000,
-                            price: 10.77,
-                            publish_date: '2017-02-12 16:27:56',
-                            note: '杭州同城交易',
-                            tel: '15116925248'
-                        }],
+                        published: [],
                         transaction: [{
                             name: '中经汇金',
                             buyers: '周雅琼 女士',
@@ -382,13 +345,6 @@
                             trading_num: 1000,
                             finished_date: '2017-02-12 16:27:56',
                             note: '-----'
-                        }, {
-                            name: '中经汇金',
-                            buyers: '周雅琼 女士',
-                            price: 10.77,
-                            trading_num: 1000,
-                            finished_date: '2017-02-12 16:27:56',
-                            note: '线下交易只接受杭州内同城交易，确定交易先联系股票持有者'
                         }],
                         orders: [{
                             ordersNum: '35435345634634563',
@@ -424,25 +380,27 @@
                 },
                 methods: {
                     handleClick (tab, event) {
-                        // console.log(tab.name);
                         if (this.activeName === 'published') {
                             $('.el-tabs__nav .el-tabs__active-bar').css('left', '0px');
                         } else {
                             $('.el-tabs__nav .el-tabs__active-bar').css('left', '-20px');
                         }
+                        this.value = '';
+                        this.currentPage = 1;
+                        this.startDate = "";
+                        this.endDate = "";
                     },
                     dateChangeHandle (val) {
                         if (val) {
-                            console.log(val);
+                            this.startDate = val[0];
+                            this.endDate = val[1];
                         } else {
-                            console.log('读取无日期筛选的数据');
+                            this.startDate = "";
+                            this.endDate = "";
                         }
                     },
-                    handleCurrentChange1 (val) {
-                        console.log(val);
-                    },
-                    handleCurrentChange2 (val) {
-                        console.log(val);
+                    handleCurrentChange (val) {
+                        this.currentPage = val;
                     },
                     publishSell (nameStr) {
                         this.dialogTitle = nameStr;
@@ -478,7 +436,185 @@
                     },
                     computedNum (num) {
                         this.ruleForm.total_num = this.total_num * num;
+                    },
+                    getPublishedTables() {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                userId: that.userId,
+                                startDate: that.startDate,
+                                endDate: that.endDate,
+                                pageNo: that.currentPage,
+                                pageSize: that.pagesize
+                            },
+                            url: 'http://192.168.1.100:8080/zjdeel/deal/selectDealByUser.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.total > 0) {
+                                    that.publish_total = data.total;
+                                    that.published = [];
+                                    data.list.forEach((val, index, arr) => {
+                                        var objData = {
+                                            name: val.stockname,
+                                            total_num: val.dealcount,
+                                            locking_num: val.lockcount,
+                                            tradable_num: val.dealcount - val.lockcount,
+                                            price: val.unitprice,
+                                            publish_date: val.createtimeStr,
+                                            note: val.remark,
+                                            tel: val.mobile
+                                        }
+                                        that.published.push(objData);
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    getTransactionTables() {
+                        var that = this;
+                        $.ajax({
+                            type: 'GET',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                stockName: that.checkedStocks,
+                                startDate: that.startDate,
+                                endDate: that.endDate,
+                                pageNo: that.currentPage,
+                                pageSize: that.pagesize
+                            },
+                            url: 'http://192.168.1.100:8080/zjdeel/order/selectAll.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                console.log(data);
+                                if (data.total > 0) {
+                                    that.transaction_total = data.total;
+                                    that.transaction = [];
+                                    data.list.forEach((val, index, arr) => {
+                                        var objData = {
+                                            name: val.stockname,
+                                            sellerSex: val.sellerSex,
+                                            announcer: val.seller,
+                                            buyers: val.buyerName,
+                                            buyerSex: val.buyerSex,
+                                            trading_num: val.dealcount,
+                                            price: val.dealprice,
+                                            publish_date: val.createtimeStr,
+                                        };
+                                        that.transaction.push(objData);
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    getTables() {
+                        this.getPublishedTables();
+                        // if (this.activeName2 === 'published') {
+                        //     this.getPublishedTables();
+                        // } else {
+                        //     this.getTransactionTables();
+                        // }
+                    },
+                    getOwnerStocks() {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                id: that.userId,
+                            },
+                            url: 'http://192.168.1.100:8080/zjdeel/owner/selectAllById.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                console.log(data);
+                                // if (data.total > 0) {
+                                //     that.transaction_total = data.total;
+                                //     that.transaction = [];
+                                //     data.list.forEach((val, index, arr) => {
+                                //         var objData = {
+                                //             name: val.stockname,
+                                //             sellerSex: val.sellerSex,
+                                //             announcer: val.seller,
+                                //             buyers: val.buyerName,
+                                //             buyerSex: val.buyerSex,
+                                //             trading_num: val.dealcount,
+                                //             price: val.dealprice,
+                                //             publish_date: val.createtimeStr,
+                                //         };
+                                //         that.transaction.push(objData);
+                                //     });
+                                // } else {
+                                //     that.$message({
+                                //         showClose: true,
+                                //         message: '数据获取失败，请稍后重试',
+                                //         type: 'warning'
+                                //     });
+                                // }
+                            }
+                        });
                     }
+                },
+                mounted() {
+                    this.getOwnerStocks();
+                    this.getTables();
                 }
             });
         });

@@ -73,9 +73,9 @@
             console.log('接口请求判定该用户的登陆信息是否已过期，若过期，重新登陆');
             $('.wrapper').html(`<div class="toolbar"></div><div class="content">
             <div class="aside"></div><div class="main"></div></div>`);
-            $(".toolbar").load("header.html");
             $(".aside").load("aside.html");
             $(".main").load(`${str}.html`);
+            $(".toolbar").load("header.html");
         }
     })
 </script>

@@ -3,11 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>参数配置</title>
-    <link rel="stylesheet" href="../../lib/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="../css/home.css">
-    <script src="../../lib/jquery.min.js"></script>
-    <script src="../../lib/vue.js"></script>
-    <script src="../../lib/element-ui/lib/index.js"></script>
 </head>
 <style>
     #params {
@@ -51,13 +47,13 @@
                     <el-table-column label="操作" header-align="center"
                                                 align="center">
                         <template slot-scope="scope">
-                            <el-button type="text" size="small" @click="modifyParams(scope.row)">修改</el-button>
+                            <el-button type="text" size="small" @click="getModifyParams(scope.row.id)">修改</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
                 <div class="pagination_box">
                     <el-pagination background layout="prev, pager, next, jumper"
-                                    :page-size=pagesize :total=entry_num
+                                    :page-size=pagesize :total=entry_num :current-page=currentPage
                                     @current-change="currentPageChange">
                     </el-pagination>
                 </div>
@@ -120,12 +116,10 @@
                         }
                     };
                     var validateStock = (rule, value, callback) => {
+                        // var testReg = /(^[0]\.(0[1-9]|[1-9][0-9]?)$)|(^[1-9][0-9]?\.([0-9]{1,2})$)|(^[1-9][0-9]?$)/;
                         if (value === '') {
                             this.stock_num_error = true;
                             callback(new Error('请输入买卖数量的百分比'));
-                        } else if (!Number.isInteger(value)) {
-                            this.stock_num_error = true;
-                            callback(new Error('请输入数值型!'));
                         } else if (value <= 0 || value >= 100) {
                             this.stock_num_error = true;
                             return callback(new Error('请输入大于0且小于100的数值!'));
@@ -138,9 +132,6 @@
                         if (value === '') {
                             this.sell_price_error = true;
                             callback(new Error('请输入买卖单价百分比'));
-                        } else if (!Number.isInteger(value)) {
-                            this.sell_price_error = true;
-                            callback(new Error('请输入数值型!'));
                         } else if (value <= 0 || value >= 100) {
                             this.sell_price_error = true;
                             return callback(new Error('请输入大于0且小于100的数值!'));
@@ -153,9 +144,6 @@
                         if (value === '') {
                             this.price_error = true;
                             callback(new Error('请输入参考单价'));
-                        } else if (!Number.isInteger(value)) {
-                            this.price_error = true;
-                            callback(new Error('请输入数值型!'));
                         } else {
                             this.price_error = false;
                             callback();
@@ -163,24 +151,21 @@
                     };
                     return {
                         pagesize: 8,
-                        entry_num: 12,
+                        entry_num: 0,
+                        currentPage: 1,
                         dialogTitle: '录入',
                         entryDialogVisible: false,
                         name_error: true,
                         stock_num_error: true,
                         sell_price_error: true,
                         price_error: true,
-                        paramsData: [{
-                            name: '中经汇金',
-                            sell_percent: 0.05,
-                            price_percent: 0.1,
-                            price: 10
-                        }],
+                        paramsData: [],
                         ruleForm: {
-                            name: '中经汇金',
+                            name: '',
                             sell_percent: '',
                             price_percent: '',
-                            price: ''
+                            price: '',
+                            id: ''
                         },
                         rules: {
                             name: [
@@ -200,28 +185,226 @@
                 },
                 methods: {
                     entryType () {
+                        this.ruleForm = {
+                            name: '',
+                            sell_percent: '',
+                            price_percent: '',
+                            price: '',
+                            id: ''
+                        };
                         this.dialogTitle = '录入';
                         this.entryDialogVisible = true;
                     },
-                    modifyParams (data) {
-                        this.dialogTitle = '修改';
-                        this.entryDialogVisible = true;
-                        console.log(data);
+                    getModifyParams (id) {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                id: id
+                            },
+                            url: 'http://192.168.1.100:8080/zjdeel/systemprop/selectPropById.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    that.ruleForm = {
+                                        name: data.data.stockname,
+                                        sell_percent: data.data.sellpercent * 100,
+                                        price_percent: data.data.pricepercent * 100,
+                                        price: data.data.refprice,
+                                        id: data.data.id
+                                    };
+                                    that.dialogTitle = '修改';
+                                    that.entryDialogVisible = true;
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
                     },
                     currentPageChange (num) {
-                        console.log(num);
+                        this.currentPage = val;
                     },
                     submitForm (formName) {
                         this.$refs[formName].validate((valid) => {
                             if (valid) {
-                                console.log('修改成功');
-                                this.entryDialogVisible = false;
+                                if (this.dialogTitle === '录入') {
+                                    this.insertParam();
+                                } else {
+                                    this.postModify();
+                                }
                             } else {
                                 console.log('error submit!!');
                                 return false;
                             }
                         });
+                    },
+                    getParams() {
+                        var that = this;
+                        $.ajax({
+                            type: 'GET',
+                            dataType: 'JSON',
+                            async: false,
+                            url: 'http://192.168.1.100:8080/zjdeel/systemprop/selectAll.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                that.paramsData = [];
+                                that.entry_num = data.total;
+                                if (data.res === 'success') {
+                                    if (Object.prototype.toString.call(data.data) ===
+                                    '[object Array]' && data.data.length >= 0) {
+                                        data.data.forEach((val, index, arr) => {
+                                            var objData = {
+                                                name: val.stockname,
+                                                sell_percent: val.sellpercent,
+                                                price_percent: val.pricepercent,
+                                                price: val.refprice,
+                                                id: val.id
+                                            };
+                                            that.paramsData.push(objData);
+                                        });
+                                    }
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    insertParam() {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                stockname: that.ruleForm.name,
+                                sellpercent: that.ruleForm.sell_percent / 100,
+                                pricepercent: that.ruleForm.price_percent / 100,
+                                refprice: that.ruleForm.price
+                            },
+                            url: 'http://192.168.1.100:8080/zjdeel/systemprop/insertProp.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res = 'success') {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'success'
+                                    });
+                                    that.entryDialogVisible = false;
+                                    that.getParams();
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    postModify() {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                id: that.ruleForm.id,
+                                stockname: that.ruleForm.name,
+                                sellpercent: that.ruleForm.sell_percent / 100,
+                                pricepercent: that.ruleForm.price_percent / 100,
+                                refprice: that.ruleForm.price
+                            },
+                            url: 'http://192.168.1.100:8080/zjdeel/systemprop/updateProp.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res = 'success') {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'success'
+                                    });
+                                    that.entryDialogVisible = false;
+                                    that.getParams();
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
                     }
+                },
+                mounted() {
+                    this.getParams();
                 }
             })
         })
