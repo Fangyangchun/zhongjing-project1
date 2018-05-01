@@ -204,7 +204,7 @@
                             data: {
                                 id: id
                             },
-                            url: 'http://192.168.1.100:8080/zjdeel/systemprop/selectPropById.do',
+                            url: 'http://192.168.1.110:8080/zjdeel/systemprop/selectPropById.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -261,10 +261,14 @@
                     getParams() {
                         var that = this;
                         $.ajax({
-                            type: 'GET',
+                            type: 'POST',
                             dataType: 'JSON',
                             async: false,
-                            url: 'http://192.168.1.100:8080/zjdeel/systemprop/selectAll.do',
+                            data: {
+                                pageNo: that.currentPage,
+                                pageSize: that.pagesize
+                            },
+                            url: 'http://192.168.1.110:8080/zjdeel/systemprop/selectAll.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -282,27 +286,20 @@
                             },
                             success: function (data) {
                                 that.paramsData = [];
-                                that.entry_num = data.total;
-                                if (data.res === 'success') {
-                                    if (Object.prototype.toString.call(data.data) ===
-                                    '[object Array]' && data.data.length >= 0) {
-                                        data.data.forEach((val, index, arr) => {
-                                            var objData = {
-                                                name: val.stockname,
-                                                sell_percent: val.sellpercent,
-                                                price_percent: val.pricepercent,
-                                                price: val.refprice,
-                                                id: val.id
-                                            };
-                                            that.paramsData.push(objData);
-                                        });
-                                    }
-                                } else {
-                                    that.$message({
-                                        showClose: true,
-                                        message: '数据获取失败，请稍后重试',
-                                        type: 'warning'
+                                if (data.total > 0) {
+                                    that.entry_num = data.total;
+                                    data.list.forEach((val, index, arr) => {
+                                        var objData = {
+                                            name: val.stockname,
+                                            sell_percent: val.sellpercent,
+                                            price_percent: val.pricepercent,
+                                            price: val.refprice,
+                                            id: val.id
+                                        };
+                                        that.paramsData.push(objData);
                                     });
+                                } else {
+                                    that.entry_num = data.total;
                                 }
                             }
                         });
@@ -319,7 +316,7 @@
                                 pricepercent: that.ruleForm.price_percent / 100,
                                 refprice: that.ruleForm.price
                             },
-                            url: 'http://192.168.1.100:8080/zjdeel/systemprop/insertProp.do',
+                            url: 'http://192.168.1.110:8080/zjdeel/systemprop/insertProp.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -367,7 +364,7 @@
                                 pricepercent: that.ruleForm.price_percent / 100,
                                 refprice: that.ruleForm.price
                             },
-                            url: 'http://192.168.1.100:8080/zjdeel/systemprop/updateProp.do',
+                            url: 'http://192.168.1.110:8080/zjdeel/systemprop/updateProp.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({

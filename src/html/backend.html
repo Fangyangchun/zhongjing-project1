@@ -55,6 +55,14 @@
                         contentShow(resStr);
                     }
                     break;
+                case '4':
+                    if (!(resStr === 'enterer')) {
+                        $(".wrapper").load("error.html");
+                    } else {
+                        saveSession(role, account, sessionId, userId);
+                        contentShow(resStr);
+                    }
+                    break;
                 default:
                     $(".wrapper").load("error.html");
             }

@@ -24,7 +24,7 @@
             </div>
             <div class="handle">
                 <button class="buy" @click="publishBuy(stockData.stockname)">买入</button>
-                <button class="sell" @click="publishSell(stockData.stockname)">卖出</button>
+                <button class="sell" @click="publishSell(stockData.stockname, stockData.owncount, stockData.price, stockData.id)">卖出</button>
             </div>
         </div>
     </div>
@@ -188,11 +188,11 @@
                         <img v-if="!total_num_error" src="../images/stock_num_after.png" alt="">
                     </div>
                 <el-input class="total-num" v-model.number="ruleForm.total_num"
-                          auto-complete="off" placeholder="请输入总股数"></el-input>
+                          auto-complete="off" placeholder='请输入发布股数'></el-input>
                           <div class="paramsBtn">
-                            <el-button round @click="computedNum(0.1)">10%</el-button>
-                            <el-button round @click="computedNum(0.3)">30%</el-button>
-                            <el-button round @click="computedNum(0.5)">50%</el-button>
+                            <el-button round @click="computedNum(0.1)" :disabled="sell_volatility<0.1">10%</el-button>
+                            <el-button round @click="computedNum(0.3)" :disabled="sell_volatility<0.3">30%</el-button>
+                            <el-button round @click="computedNum(0.5)" :disabled="sell_volatility<0.5">50%</el-button>
                           </div>
             </el-form-item>
             <el-form-item prop="locking_num">
@@ -241,9 +241,9 @@
                         if (value === '') {
                             this.total_num_error = true;
                             callback(new Error('请输入总股数'));
-                        } else if (value > this.total_num) {
+                        } else if (value > this.total_num * this.sell_volatility) {
                             this.total_num_error = true;
-                            callback(new Error('发布总股数必须小于持有股数'));
+                            callback(new Error(`发布总股数必须小于等于持有股数${this.sell_volatility*100}%内`));
                         } else {
                             if (this.ruleForm.locking_num !== '') {
                                 this.$refs.ruleForm.validateField('locking_num');
@@ -343,9 +343,10 @@
                         },
                         dialogVisible: false,
                         dialogTitle: '',
-                        total_num: 10000,
-                        reference_price: 10,
-                        volatility: 0.05,
+                        total_num: 0,
+                        reference_price: 0,
+                        volatility: 0,
+                        sell_volatility: 0,
                         dialogTips: false,
                         dialogTipText: '',
                         published: [],
@@ -357,7 +358,8 @@
                             total_num: '',
                             locking_num: '',
                             price: '',
-                            note: ''
+                            note: '',
+                            stockId: ''
                         },
                         rules: {
                             total_num: [
@@ -400,10 +402,56 @@
                     handleCurrentChange (val) {
                         this.currentPage = val;
                     },
-                    publishSell (stockname) {
-                        this.dialogTitle = stockname;
-                        this.ruleForm.name = stockname;
-                        this.dialogVisible = true;
+                    publishSell (stockname, stockNum, price, stockId) {
+                        this.total_num = stockNum;
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                id: stockId
+                            },
+                            url: 'http://192.168.1.110:8080/zjdeel/systemprop/selectPropById.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    that.dialogTitle = data.data.stockname;
+                                    that.ruleForm = {
+                                        name: that.dialogTitle,
+                                        total_num: '',
+                                        locking_num: '',
+                                        price: '',
+                                        note: '',
+                                        stockId: data.data.stockid
+                                    }
+                                    that.reference_price = data.data.refprice;
+                                    that.volatility = data.data.pricepercent;
+                                    that.sell_volatility = data.data.sellpercent;
+                                    that.dialogVisible = true;
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '参数读取失败，请稍后再试',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
                     },
                     publishBuy (stockname) {
                         var urlStr = location.href;
@@ -419,7 +467,57 @@
                     submitForm (formName) {
                         this.$refs[formName].validate((valid) => {
                             if (valid) {
-                                this.dialogVisible = false;
+                                var that = this;
+                                $.ajax({
+                                    type: 'POST',
+                                    dataType: 'JSON',
+                                    async: false,
+                                    data: {
+                                        id: that.ruleForm.stockId,
+                                        stockName:  that.ruleForm.name,
+                                        sellCount: that.ruleForm.total_num,
+                                        lockCount: that.ruleForm.locking_num,
+                                        price: that.ruleForm.price,
+                                        remark: that.ruleForm.note,
+                                        userId: that.userId
+                                    },
+                                    url: 'http://192.168.1.110:8080/zjdeel/deal/insertDeal.do',
+                                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                        if (errorThrown) {
+                                            that.$message({
+                                                showClose: true,
+                                                message: errorThrown,
+                                                type: 'warning'
+                                            });
+                                        } else {
+                                            that.$message({
+                                                showClose: true,
+                                                message: '数据获取失败，请稍后重试!',
+                                                type: 'warning'
+                                            });
+                                        }
+                                    },
+                                    success: function (data) {
+                                        if (data.res === 'success') {
+                                            that.$message({
+                                                showClose: true,
+                                                message: data.msg,
+                                                type: 'success'
+                                            });
+                                            that.dialogVisible = false;
+                                            this.getOwnerStocks();
+                                            if (this.activeName === 'published') {
+                                                this.getPublishedTables();
+                                            }
+                                        } else {
+                                            that.$message({
+                                                showClose: true,
+                                                message: data.msg,
+                                                type: 'warning'
+                                            });
+                                        }
+                                    }
+                                });
                             } else {
                                 console.log('error submit!!');
                                 return false;
@@ -454,7 +552,7 @@
                                 pageNo: that.currentPage,
                                 pageSize: that.pagesize
                             },
-                            url: 'http://192.168.1.100:8080/zjdeel/deal/selectDealByUser.do',
+                            url: 'http://192.168.1.110:8080/zjdeel/deal/selectDealByUser.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -508,7 +606,7 @@
                                 pageNo: that.currentPage,
                                 pageSize: that.pagesize
                             },
-                            url: 'http://192.168.1.100:8080/zjdeel/order/selectHisDealByUser.do',
+                            url: 'http://192.168.1.110:8080/zjdeel/order/selectHisDealByUser.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -562,7 +660,7 @@
                                 pageNo: that.currentPage,
                                 pageSize: that.pagesize
                             },
-                            url: 'http://192.168.1.100:8080/zjdeel/order/selectHisOrderByUser.do',
+                            url: 'http://192.168.1.110:8080/zjdeel/order/selectHisOrderByUser.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -618,7 +716,7 @@
                             data: {
                                 id: that.userId,
                             },
-                            url: 'http://192.168.1.100:8080/zjdeel/owner/selectAllById.do',
+                            url: 'http://192.168.1.110:8080/zjdeel/owner/selectAllById.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../css/header.css">
     <link rel="stylesheet" href="../css/mine.css">
     <script src="../../lib/jquery.min.js"></script>
+    <script src="../../lib/jQuery.md5.js"></script>
     <script src="../../lib/vue.js"></script>
     <script src="../../lib/element-ui/lib/index.js"></script>
 </head>
@@ -411,15 +412,66 @@
                         this.$refs[formName].validate((valid) => {
                             if (valid) {
                                 if (formName === 'ruleForm2') {
-                                    this.dialogPersionVisible = false;
+                                    this.persionDetail();
                                 } else if (formName === 'ruleForm1') {
-                                    this.dialogPasswordVisible = false;
+                                    this.passwordDetail();
                                 } else {
-                                    this.dialogAccountVisible = false;
+                                    this.accountDetail();
                                 }
                             } else {
                                 console.log('error submit!!');
                                 return false;
+                            }
+                        });
+                    },
+                    persionDetail () {
+                        this.dialogPersionVisible = false;
+                    },
+                    accountDetail () {
+                        this.dialogAccountVisible = false;
+                    },
+                    passwordDetail () {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                userId: that.userId,
+                                passwordOld: $.md5(that.ruleForm1.old_pass),
+                                passwordNew: $.md5(that.ruleForm1.new_pass)
+                            },
+                            url: 'http://192.168.1.110:8080/zjdeel/user/resetPwd.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'success'
+                                    });
+                                    that.dialogPasswordVisible = false;
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                }
                             }
                         });
                     },
@@ -434,7 +486,7 @@
                                 userId: that.userId,
                                 password: that.password
                             },
-                            url: 'http://192.168.1.100:8080/zjdeel/user/logout.do',
+                            url: 'http://192.168.1.110:8080/zjdeel/user/logout.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
