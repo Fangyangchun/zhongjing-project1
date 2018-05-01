@@ -68,9 +68,9 @@
                                                 align="center">
                                 <template slot-scope="scope">
                                     <el-button type="text" size="small" 
-                                        @click="modifyPublish(scope.row)">修改</el-button>
+                                        @click="modifyPublish(scope.row.publish_id)">修改</el-button>
                                     <span style="font-size: 14px; color: #2678D2;">|</span>
-                                    <el-button type="text" size="small" @click="confirmBox('undo')">撤销</el-button>
+                                    <el-button type="text" size="small" @click="confirmBox(scope.row.publish_id)">撤销</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -188,8 +188,8 @@
                         <img v-if="!total_num_error" src="../images/stock_num_after.png" alt="">
                     </div>
                 <el-input class="total-num" v-model.number="ruleForm.total_num"
-                          auto-complete="off" placeholder='请输入发布股数'></el-input>
-                          <div class="paramsBtn">
+                          auto-complete="off" placeholder='请输入发布股数' :disabled="undoInput"></el-input>
+                          <div class="paramsBtn" v-if="!undoInput">
                             <el-button round @click="computedNum(0.1)" :disabled="sell_volatility<0.1">10%</el-button>
                             <el-button round @click="computedNum(0.3)" :disabled="sell_volatility<0.3">30%</el-button>
                             <el-button round @click="computedNum(0.5)" :disabled="sell_volatility<0.5">50%</el-button>
@@ -220,7 +220,7 @@
                           auto-complete="off" placeholder="请输入备注信息(少于20个字符)"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button @click="dialogVisible = false">取消</el-button>
+                <el-button @click="resetForm('ruleForm')">取消</el-button>
                 <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
             </el-form-item>
         </el-form>
@@ -272,7 +272,7 @@
                             if (value < this.reference_price * (1 - this.volatility) 
                             || value > this.reference_price * (1 + this.volatility)) {
                                 this.price_error = true;
-                                callback(new Error('发布单价必须在参考单价±5%之间!'));
+                                callback(new Error(`发布单价的波动必须在参考单价±${this.volatility*100}%之间!`));
                             }
                             this.price_error = false;
                             callback();
@@ -292,6 +292,7 @@
                         nowYear: new Date().getFullYear(),
                         nowMonth: new Date().getMonth(),
                         activeName: 'published',
+                        publish_id: '',
                         pagesize: 8,
                         currentPage: 1,
                         publish_total: 0,
@@ -354,12 +355,13 @@
                         transaction: [],
                         orders: [],
                         ruleForm: {
-                            name: this.dialogTitle,
+                            name: '',
                             total_num: '',
                             locking_num: '',
                             price: '',
                             note: '',
-                            stockId: ''
+                            stockId: '',
+                            publish_id: ''
                         },
                         rules: {
                             total_num: [
@@ -375,6 +377,11 @@
                                 { validator: validateNote, trigger: 'blur' }
                             ]
                         }
+                    }
+                },
+                computed: {
+                    undoInput: function () {
+                        return this.dialogTitle === '发布' ? false : true;
                     }
                 },
                 methods: {
@@ -404,6 +411,7 @@
                     },
                     publishSell (stockname, stockNum, price, stockId) {
                         this.total_num = stockNum;
+                        this.dialogTitle = '发布';
                         var that = this;
                         $.ajax({
                             type: 'POST',
@@ -430,14 +438,14 @@
                             },
                             success: function (data) {
                                 if (data.res === 'success') {
-                                    that.dialogTitle = data.data.stockname;
                                     that.ruleForm = {
-                                        name: that.dialogTitle,
+                                        name: data.data.stockname,
                                         total_num: '',
                                         locking_num: '',
                                         price: '',
                                         note: '',
-                                        stockId: data.data.stockid
+                                        stockId: data.data.stockid,
+                                        publish_id: ''
                                     }
                                     that.reference_price = data.data.refprice;
                                     that.volatility = data.data.pricepercent;
@@ -460,81 +468,221 @@
                         window.location.href = urlStr;
                     },
                     modifyPublish (data) {
-                        console.log(data);
-                        this.dialogTitle = data.name;
-                        this.dialogVisible = true;
+                        this.dialogTitle = '修改';
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                id: data
+                            },
+                            url: 'http://192.168.1.110:8080/zjdeel/deal/selectById.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    that.ruleForm = {
+                                        name: data.data.stockname,
+                                        total_num: data.data.dealcount,
+                                        locking_num: data.data.lockcount,
+                                        price: data.data.unitprice,
+                                        note: data.data.remark,
+                                        stockId: '',
+                                        publish_id: data.data.id,
+                                    }
+                                    that.reference_price = data.data.unitprice;
+                                    that.volatility = 0.05;
+                                    that.total_num = data.data.dealcount;
+                                    that.sell_volatility = 1;
+                                    that.dialogVisible = true;
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '参数读取失败，请稍后再试',
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
                     },
                     submitForm (formName) {
                         this.$refs[formName].validate((valid) => {
                             if (valid) {
-                                var that = this;
-                                $.ajax({
-                                    type: 'POST',
-                                    dataType: 'JSON',
-                                    async: false,
-                                    data: {
-                                        id: that.ruleForm.stockId,
-                                        stockName:  that.ruleForm.name,
-                                        sellCount: that.ruleForm.total_num,
-                                        lockCount: that.ruleForm.locking_num,
-                                        price: that.ruleForm.price,
-                                        remark: that.ruleForm.note,
-                                        userId: that.userId
-                                    },
-                                    url: 'http://192.168.1.110:8080/zjdeel/deal/insertDeal.do',
-                                    error: function (XMLHttpRequest, textStatus, errorThrown) {
-                                        if (errorThrown) {
-                                            that.$message({
-                                                showClose: true,
-                                                message: errorThrown,
-                                                type: 'warning'
-                                            });
-                                        } else {
-                                            that.$message({
-                                                showClose: true,
-                                                message: '数据获取失败，请稍后重试!',
-                                                type: 'warning'
-                                            });
-                                        }
-                                    },
-                                    success: function (data) {
-                                        if (data.res === 'success') {
-                                            that.$message({
-                                                showClose: true,
-                                                message: data.msg,
-                                                type: 'success'
-                                            });
-                                            that.dialogVisible = false;
-                                            this.getOwnerStocks();
-                                            if (this.activeName === 'published') {
-                                                this.getPublishedTables();
-                                            }
-                                        } else {
-                                            that.$message({
-                                                showClose: true,
-                                                message: data.msg,
-                                                type: 'warning'
-                                            });
-                                        }
-                                    }
-                                });
+                                if (this.dialogTitle === '发布') {
+                                    this.insertPublish(formName);
+                                } else {
+                                    this.postModifyPublish(formName);
+                                }
                             } else {
                                 console.log('error submit!!');
                                 return false;
                             }
                         });
                     },
-                    confirmBox (str) {
-                        if (str === 'undo') {
-                            this.dialogTipText = '确定撤销该笔交易？';
-                        } else {
-                            this.dialogTipText = '确定删除该笔交易记录？';
-                        }
+                    postModifyPublish (formName) {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                id: that.ruleForm.publish_id,
+                                lockCount: that.ruleForm.locking_num,
+                                price: that.ruleForm.price,
+                                remark: that.ruleForm.note,
+                            },
+                            url: 'http://192.168.1.110:8080/zjdeel/deal/updateDeal.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'success'
+                                    });
+                                    that.resetForm(formName);
+                                    that.getOwnerStocks();
+                                    that.getPublishedTables();
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    insertPublish (formName) {
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                id: that.ruleForm.stockId,
+                                stockName:  that.ruleForm.name,
+                                sellCount: that.ruleForm.total_num,
+                                lockCount: that.ruleForm.locking_num,
+                                price: that.ruleForm.price,
+                                remark: that.ruleForm.note,
+                                userId: that.userId
+                            },
+                            url: 'http://192.168.1.110:8080/zjdeel/deal/insertDeal.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'success'
+                                    });
+                                    that.resetForm(formName);
+                                    that.getOwnerStocks();
+                                    if (that.activeName === 'published') {
+                                        that.getPublishedTables();
+                                    }
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    confirmBox (id) {
+                        this.dialogTipText = '确定撤销该笔交易？';
+                        this.publish_id = id;
                         this.dialogTips = true;
                     },
                     confirmBtn () {
-                        console.log('确定撤销');
-                        this.dialogTips = false;
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                id: that.publish_id
+                            },
+                            url: 'http://192.168.1.110:8080/zjdeel/deal/deleteDeal.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'success'
+                                    });
+                                    that.dialogTips = false;
+                                    that.getOwnerStocks();
+                                    that.getPublishedTables();
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                }
+                            }
+                        });
                     },
                     computedNum (num) {
                         this.ruleForm.total_num = this.total_num * num;
@@ -582,7 +730,8 @@
                                             price: val.unitprice,
                                             publish_date: val.createtimeStr,
                                             note: val.remark,
-                                            tel: val.mobile
+                                            tel: val.mobile,
+                                            publish_id: val.id
                                         }
                                         that.published.push(objData);
                                     });
@@ -739,6 +888,10 @@
                                 }
                             }
                         });
+                    },
+                    resetForm(formName) {
+                        this.$refs[formName].resetFields();
+                        this.dialogVisible = false;
                     }
                 },
                 mounted() {

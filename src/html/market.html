@@ -212,6 +212,7 @@
                     },
                     drawStock(id, stockData) {
                         if (this.chart) {
+                            this.chart.dispose();
                             this.chart = null;
                         }
                         this.chart = echarts.init(document.getElementById(id));
@@ -465,11 +466,6 @@
                                     });
                                 } else {
                                     that.publish_total = 0;
-                                    that.$message({
-                                        showClose: true,
-                                        message: '数据获取失败，请稍后重试',
-                                        type: 'warning'
-                                    });
                                 }
                             }
                         });
@@ -522,11 +518,6 @@
                                     });
                                 } else {
                                     that.transaction_total = 0;
-                                    that.$message({
-                                        showClose: true,
-                                        message: '数据获取失败，请稍后重试',
-                                        type: 'warning'
-                                    });
                                 }
                             }
                         });
@@ -544,6 +535,10 @@
                     this.getAllStock();
                     this.getOneStock();
                     this.getTables();
+                    var _this = this;
+                    window.onresize = function resetStock() {
+                        _this.getOneStock();
+                    };
                 }
             });
         })
