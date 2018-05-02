@@ -278,7 +278,8 @@
                         });
                     },
                     currentPageChange (num) {
-                        this.currentPage = val;
+                        this.currentPage = num;
+                        this.getAllOrders();
                     },
                     submitForm (formName) {
                         this.$refs[formName].validate((valid) => {

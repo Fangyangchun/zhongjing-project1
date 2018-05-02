@@ -406,9 +406,11 @@
                             this.startDate = "";
                             this.endDate = "";
                         }
+                        this.getTables();
                     },
                     handleCurrentChange (val) {
                         this.currentPage = val;
+                        this.getTables();
                     },
                     publishSell (stockname, stockNum, price, stockId) {
                         this.total_num = stockNum;

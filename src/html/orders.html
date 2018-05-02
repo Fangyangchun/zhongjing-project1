@@ -107,6 +107,7 @@
             methods: {
                 currentPageChange (num) {
                     this.currentPage = num;
+                    this.getAllOrders();
                 },
                 reviewOrders (bool, data) {
                     if (bool) {

@@ -244,6 +244,7 @@
                     },
                     currentPageChange (num) {
                         this.currentPage = val;
+                        this.getParams();
                     },
                     submitForm (formName) {
                         this.$refs[formName].validate((valid) => {

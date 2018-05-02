@@ -245,6 +245,7 @@
                     },
                     currentPageChange (num) {
                         this.currentPage = num;
+                        this.getAllUsers();
                     },
                     submitForm (formName) {
                         this.$refs[formName].validate((valid) => {
@@ -255,7 +256,6 @@
                                     this.postModify(formName);
                                 }
                             } else {
-                                console.log('error submit!!');
                                 return false;
                             }
                         });
