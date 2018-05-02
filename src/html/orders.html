@@ -101,7 +101,9 @@
                     currentPage: 1,
                     dialogTipText: '',
                     dialogTips: false,
-                    ordersData: []
+                    ordersData: [],
+                    orderId: '',
+                    passFlg: ''
                 }
             },
             methods: {
@@ -110,16 +112,60 @@
                     this.getAllOrders();
                 },
                 reviewOrders (bool, data) {
+                    this.orderId = data.id;
                     if (bool) {
                         this.dialogTipText = '确认通过该订单?';
+                        this.passFlg = 1;
                     } else {
                         this.dialogTipText = '确认不通过该订单?';
+                        this.passFlg = 0;
                     }
                     this.dialogTips = true;
                 },
                 confirmBtn () {
-                    console.log('确认');
-                    this.dialogTips = false;
+                    var that = this;
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'JSON',
+                        async: false,
+                        data: {
+                            id: that.orderId,
+                            passFlg: that.passFlg
+                        },
+                        url: 'http://192.168.1.113:8080/zjdeel/order/audit.do',
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            if (errorThrown) {
+                                that.$message({
+                                    showClose: true,
+                                    message: errorThrown,
+                                    type: 'warning'
+                                });
+                            } else {
+                                that.$message({
+                                    showClose: true,
+                                    message: '数据获取失败，请稍后重试!',
+                                    type: 'warning'
+                                });
+                            }
+                        },
+                        success: function (data) {
+                            if (data.res === 'success') {
+                                that.$message({
+                                    showClose: true,
+                                    message: data.msg,
+                                    type: 'success'
+                                });
+                                that.dialogTips = false;
+                                that.getAllOrders();
+                            } else {
+                                that.$message({
+                                    showClose: true,
+                                    message: data.msg,
+                                    type: 'warning'
+                                });
+                            }
+                        }
+                    });
                 },
                 getAllOrders () {
                     var that = this;
@@ -160,7 +206,8 @@
                                         seller: val.sellerName,
                                         sellerSex: val.sellerSex,
                                         sell_num: val.dealcount,
-                                        price: val.dealprice
+                                        price: val.dealprice,
+                                        id: val.id
                                     };
                                     that.ordersData.push(objData);
                                 });

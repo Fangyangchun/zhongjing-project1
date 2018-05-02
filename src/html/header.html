@@ -25,7 +25,7 @@
                     <img style="cursor: pointer;" src="../images/setting.png" alt="">
                     <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item command="persional">个人信息</el-dropdown-item>
-                        <el-dropdown-item command="account" divided>账户信息</el-dropdown-item>
+                        <!-- <el-dropdown-item command="account" divided>账户信息</el-dropdown-item> -->
                         <el-dropdown-item command="password" divided>登录密码</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
@@ -97,7 +97,7 @@
                 </el-form>
             </el-dialog>
         </el-dialog>
-        <el-dialog width="382px" title="账户信息" :visible.sync="dialogAccountVisible"
+        <!-- <el-dialog width="382px" title="账户信息" :visible.sync="dialogAccountVisible"
          :close-on-click-modal=false :before-close="handleClose">
             <el-form :model="ruleForm3" status-icon :rules="rules3" ref="ruleForm3">
                 <el-form-item prop="bank_card">
@@ -122,16 +122,6 @@
                     <el-select v-model="ruleForm3.bank_account" placeholder="开户银行">
                         <el-option label="中国工商银行" value="中国工商银行"></el-option>
                         <el-option label="中国农业银行" value="中国农业银行"></el-option>
-                        <el-option label="中国建设银行" value="中国建设银行"></el-option>
-                        <el-option label="中国邮政银行" value="中国邮政银行"></el-option>
-                        <el-option label="广发银行" value="广发银行"></el-option>
-                        <el-option label="中信银行" value="中信银行"></el-option>
-                        <el-option label="兴业银行" value="兴业银行"></el-option>
-                        <el-option label="浦发银行" value="浦发银行"></el-option>
-                        <el-option label="浙商银行" value="浙商银行"></el-option>
-                        <el-option label="恒丰银行" value="恒丰银行"></el-option>
-                        <el-option label="光大银行" value="光大银行"></el-option>
-                        <el-option label="招商银行" value="招商银行"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item prop="bank_branch">
@@ -146,7 +136,7 @@
                     <el-button type="primary" @click="submitForm('ruleForm3')">确定</el-button>
                 </el-form-item>
             </el-form>
-        </el-dialog>
+        </el-dialog> -->
         <el-dialog width="382px" title="登录密码" :visible.sync="dialogPasswordVisible"
          :close-on-click-modal=false :before-close="handleClose">
             <el-form :model="ruleForm1" status-icon :rules="rules1" ref="ruleForm1">
