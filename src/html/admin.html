@@ -16,6 +16,11 @@
                 <el-table :data="adminData">
                     <el-table-column min-width="120px" prop="account" label="用户名">
                         </el-table-column>
+                        <el-table-column prop="sex" label="性别">
+                                <template slot-scope="scope">
+                                        <span>{{ scope.row.sex === 1 ? '男' : '女' }}</span>
+                                    </template>
+                            </el-table-column>
                     <el-table-column min-width="120px" prop="ID" label="身份证">
                     </el-table-column>
                     <el-table-column prop="tel" label="绑定手机号">
@@ -54,6 +59,15 @@
                         </div>
                     <el-input v-model="ruleForm.account"
                             auto-complete="off" placeholder="请输入用户名"></el-input>
+                </el-form-item>
+                <el-form-item prop="sex">
+                    <div class="icon_img">
+                        <img src="../images/sex_after.png" alt="">
+                    </div>
+                    <el-select v-model.number="ruleForm.sex" placeholder="性别">
+                        <el-option label="男" :value=1></el-option>
+                        <el-option label="女" :value=0></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item prop="ID">
                         <div class="icon_img">
@@ -164,6 +178,7 @@
                         formData: 'ruleForm',
                         ruleForm: {
                             account: '',
+                            sex: 1,
                             ID: '',
                             tel: '',
                             stock_num: '',
@@ -189,6 +204,7 @@
                     entryType () {
                         this.ruleForm = {
                             account: '',
+                            sex: 1,
                             ID: '',
                             tel: '',
                             stock_num: '',
@@ -226,6 +242,7 @@
                                 if (data.res === 'success') {
                                     that.ruleForm = {
                                         account: data.data.username,
+                                        sex: data.data.sex,
                                         ID: data.data.identifycard,
                                         tel: data.data.mobile,
                                         stock_num: 10000,
@@ -305,7 +322,8 @@
                                             tel: val.mobile,
                                             bank_num: val.creditcard,
                                             stock_num: 10000,
-                                            id: val.id
+                                            id: val.id,
+                                            sex: val.sex
                                         };
                                         that.adminData.push(objData);
                                     });
@@ -323,6 +341,7 @@
                             async: false,
                             data: {
                                 username: this.ruleForm.account,
+                                sex: this.ruleForm.sex,
                                 identifycard: this.ruleForm.ID,
                                 mobile: this.ruleForm.tel
                             },
@@ -370,6 +389,7 @@
                             data: {
                                 userId: this.ruleForm.userId,
                                 username: this.ruleForm.account,
+                                sex: this.ruleForm.sex,
                                 identifycard: this.ruleForm.ID,
                                 mobile: this.ruleForm.tel
                             },

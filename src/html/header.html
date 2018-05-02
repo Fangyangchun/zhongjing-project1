@@ -53,9 +53,12 @@
                 </el-form-item>
                 <el-form-item prop="sex">
                     <div class="icon_img">
-                        <img src="../images/account_after.png" alt="">
+                        <img src="../images/sex_after.png" alt="">
                     </div>
-                    <el-input v-model="ruleForm.sex"></el-input>
+                    <el-select v-model.number="ruleForm.sex" placeholder="性别">
+                        <el-option label="男" :value=1></el-option>
+                        <el-option label="女" :value=0></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item prop="tel">
                     <div class="icon_img">
@@ -529,7 +532,50 @@
                         });
                     },
                     persionDetail () {
-                        this.dialogPersionVisible = false;
+                        var that = this;
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'JSON',
+                            async: false,
+                            data: {
+                                userId: that.userId,
+                                username: that.ruleForm.account,
+                                sex: that.ruleForm.sex
+                            },
+                            url: 'http://192.168.1.113:8080/zjdeel/user/updateUser.do',
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                if (errorThrown) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: errorThrown,
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '数据获取失败，请稍后重试!',
+                                        type: 'warning'
+                                    });
+                                }
+                            },
+                            success: function (data) {
+                                if (data.res === 'success') {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'success'
+                                    });
+                                    that.account = that.ruleForm.account;
+                                    that.resetForm('ruleForm');
+                                } else {
+                                    that.$message({
+                                        showClose: true,
+                                        message: data.msg,
+                                        type: 'warning'
+                                    });
+                                }
+                            } 
+                        });
                     },
                     telDetail () {
                         var that = this;
@@ -568,10 +614,8 @@
                                         type: 'warning'
                                     });
                                 }
-                            }
-                            
+                            } 
                         });
-                        
                     },
                     accountDetail () {
                         this.dialogAccountVisible = false;
@@ -610,7 +654,7 @@
                                         message: data.msg,
                                         type: 'success'
                                     });
-                                    that.dialogPasswordVisible = false;
+                                    that.resetForm('ruleForm1');
                                 } else {
                                     that.$message({
                                         showClose: true,
