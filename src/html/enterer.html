@@ -30,18 +30,15 @@
         <div class="entyrTable">
             <div style="width: calc(100% - 40px); padding-bottom: 20px;">
                 <el-table :data="enterData">
-                    <el-table-column min-width="120px" prop="name" label="买入方">
+                    <el-table-column min-width="120px" prop="buyIdentify" label="买入方">
                         </el-table-column>
-                    <el-table-column min-width="120px" prop=sell_percent label="卖出方">
+                    <el-table-column min-width="120px" prop="sellIdentify" label="卖出方">
                     </el-table-column>
-                    <el-table-column prop=price_percent label="股票名">
-                        <template slot-scope="scope">
-                            <span>{{ scope.row.price_percent * 100 }}%</span>
-                        </template>
+                    <el-table-column prop=stockname label="股票名">
                     </el-table-column>
                     <el-table-column prop=price label="交易单价">
                     </el-table-column>
-                    <el-table-column prop=price label="交易数量">
+                    <el-table-column prop=count label="交易数量">
                     </el-table-column>
                     <el-table-column label="操作" header-align="center"
                                                 align="center">
@@ -59,30 +56,30 @@
             </div>
         </div>
         <el-dialog width="382px" :title="dialogTitle" :visible.sync="entryDialogVisible"
-               :close-on-click-modal=false>
+               :close-on-click-modal=false :before-close="handleClose">
             <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
-                <el-form-item prop="buyer">
+                <el-form-item prop="buyIdentify">
                         <div class="icon_img">
                             <img v-if="buyer_error" src="../images/account_pre.png" alt="">
                             <img v-if="!buyer_error" src="../images/account_after.png" alt="">
                         </div>
-                    <el-input v-model="ruleForm.buyer"
+                    <el-input v-model="ruleForm.buyIdentify"
                             auto-complete="off" placeholder="买入方"></el-input>
                 </el-form-item>
-                <el-form-item prop="seller">
+                <el-form-item prop="sellIdentify">
                         <div class="icon_img">
                             <img v-if="seller_error" src="../images/stock_num_pre.png" alt="">
                             <img v-if="!seller_error" src="../images/stock_num_after.png" alt="">
                         </div>
-                    <el-input v-model.number="ruleForm.seller"
+                    <el-input v-model="ruleForm.sellIdentify"
                             auto-complete="off" placeholder="卖出方"></el-input>
                 </el-form-item>
-                <el-form-item prop="stock_name">
+                <el-form-item prop="stockname">
                         <div class="icon_img">
                             <img v-if="name_error" src="../images/price_pre.png" alt="">
                             <img v-if="!name_error" src="../images/price_after.png" alt="">
                         </div>
-                    <el-input v-model="ruleForm.stock_name"
+                    <el-input v-model="ruleForm.stockname"
                             auto-complete="off" placeholder='股票名'></el-input>
                 </el-form-item>
                 <el-form-item prop="price">
@@ -123,8 +120,8 @@
                                 this.buyer_error = true;
                                 callback(new Error('请输入正确格式的身份证号'));
                             } else {
-                                if (this.ruleForm.seller !== '') {
-                                    this.$refs.ruleForm.validateField('seller');
+                                if (this.ruleForm.sellIdentify !== '') {
+                                    this.$refs.ruleForm.validateField('sellIdentify');
                                 }
                                 this.buyer_error = false;
                                 callback();
@@ -141,7 +138,7 @@
                                 this.seller_error = true;
                                 callback(new Error('请输入正确格式的身份证号'));
                             } else {
-                                if (value === this.ruleForm.buyer) {
+                                if (value === this.ruleForm.buyIdentify) {
                                     this.seller_error = true;
                                     callback(new Error('卖出方与买入方不能为同一个人!'));
                                 }
@@ -191,22 +188,24 @@
                         seller_error: true,
                         price_error: true,
                         count_error: true,
+                        formData: 'ruleForm',
                         enterData: [],
                         ruleForm: {
-                            buyer: '',
-                            seller: '',
-                            stock_name: '',
+                            buyIdentify: '',
+                            sellIdentify: '',
+                            stockname: '',
                             price: '',
-                            count: ''
+                            count: '',
+                            id: ''
                         },
                         rules: {
-                            buyer: [
+                            buyIdentify: [
                              { validator: validateID1, trigger: 'blur' }
                             ],
-                            seller: [
+                            sellIdentify: [
                              { validator: validateID2, trigger: 'blur' }
                             ],
-                            stock_name: [
+                            stockname: [
                                 { validator: validateName, trigger: 'blur' }
                             ],
                             price: [
@@ -221,11 +220,12 @@
                 methods: {
                     entryType () {
                         this.ruleForm = {
-                            buyer: '',
-                            seller: '',
-                            stock_name: '',
+                            buyIdentify: '',
+                            sellIdentify: '',
+                            stockname: '',
                             price: '',
-                            count: ''
+                            count: '',
+                            id: ''
                         };
                         this.dialogTitle = '录入';
                         this.entryDialogVisible = true;
@@ -239,7 +239,7 @@
                             data: {
                                 id: id
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/systemprop/selectPropById.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/order/selectOrderById.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -258,11 +258,12 @@
                             success: function (data) {
                                 if (data.res === 'success') {
                                     that.ruleForm = {
-                                        name: data.data.stockname,
-                                        sell_percent: data.data.sellpercent * 100,
-                                        price_percent: data.data.pricepercent * 100,
-                                        price: data.data.refprice,
-                                        id: data.data.id
+                                        id: data.data.id,
+                                        buyIdentify: data.data.buyIdentify,
+                                        sellIdentify: data.data.sellIdentify,
+                                        stockname: data.data.stockname,
+                                        price: data.data.dealprice,
+                                        count: data.data.dealcount
                                     };
                                     that.dialogTitle = '修改';
                                     that.entryDialogVisible = true;
@@ -303,7 +304,7 @@
                                 pageNo: that.currentPage,
                                 pageSize: that.pagesize
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/systemprop/selectAll.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/order/selectForInputer.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -325,10 +326,11 @@
                                     that.entry_num = data.total;
                                     data.list.forEach((val, index, arr) => {
                                         var objData = {
-                                            name: val.stockname,
-                                            sell_percent: val.sellpercent,
-                                            price_percent: val.pricepercent,
-                                            price: val.refprice,
+                                            buyIdentify: val.buyIdentify,
+                                            sellIdentify: val.sellIdentify,
+                                            stockname: val.stockname,
+                                            price: val.dealprice,
+                                            count: val.dealcount,
                                             id: val.id
                                         };
                                         that.enterData.push(objData);
@@ -346,12 +348,13 @@
                             dataType: 'JSON',
                             async: false,
                             data: {
-                                stockname: that.ruleForm.name,
-                                sellpercent: that.ruleForm.sell_percent / 100,
-                                pricepercent: that.ruleForm.price_percent / 100,
-                                refprice: that.ruleForm.price
+                                seller: that.ruleForm.sellIdentify,
+                                buyer: that.ruleForm.buyIdentify,
+                                stockName: that.ruleForm.stockname,
+                                dealcount: that.ruleForm.count,
+                                dealprice: that.ruleForm.price
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/systemprop/insertProp.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/order/insertOrder.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -394,12 +397,12 @@
                             async: false,
                             data: {
                                 id: that.ruleForm.id,
-                                stockname: that.ruleForm.name,
-                                sellpercent: that.ruleForm.sell_percent / 100,
-                                pricepercent: that.ruleForm.price_percent / 100,
-                                refprice: that.ruleForm.price
+                                seller: that.ruleForm.sellIdentify,
+                                buyer: that.ruleForm.buyIdentify,
+                                dealcount: that.ruleForm.count,
+                                dealprice: that.ruleForm.price
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/systemprop/updateProp.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/order/updateOrder.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -436,7 +439,21 @@
                     },
                     resetForm(formName) {
                         this.$refs[formName].resetFields();
+                        this.name_error = true,
+                        this.buyer_error = true,
+                        this.seller_error = true,
+                        this.price_error = true,
+                        this.count_error = true,
                         this.entryDialogVisible = false;
+                    },
+                    handleClose(done) {
+                        this.$refs[this.formData].resetFields();
+                        this.name_error = true;
+                        this.buyer_error = true;
+                        this.seller_error = true;
+                        this.price_error = true;
+                        this.count_error = true;
+                        done();
                     }
                 },
                 mounted() {

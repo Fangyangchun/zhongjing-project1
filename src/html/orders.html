@@ -53,8 +53,14 @@
                 <el-table-column min-width="120px" prop="order_number" label="订单号">
                     </el-table-column>
                 <el-table-column min-width="120px" prop="buyer" label="买入方">
+                        <template slot-scope="scope">
+                                {{ scope.row.buyer }}&nbsp;{{ scope.row.buyerSex === 1? '先生' : '女士' }}
+                            </template>
                     </el-table-column>
                 <el-table-column min-width="120px" prop="seller" label="卖出方">
+                        <template slot-scope="scope">
+                                {{ scope.row.seller }}&nbsp;{{ scope.row.sellerSex === 1? '先生' : '女士' }}
+                            </template>
                 </el-table-column>
                 <el-table-column prop=sell_num label="交易数量(股)">
                 </el-table-column>
@@ -71,7 +77,7 @@
             </el-table>
             <div class="pagination_box">
                 <el-pagination background layout="prev, pager, next, jumper"
-                                :page-size=pagesize :total=entry_num
+                                :page-size=pagesize :total=entry_num :current-page=currentPage
                                 @current-change="currentPageChange">
                 </el-pagination>
             </div>
@@ -91,27 +97,16 @@
             data () {
                 return {
                     pagesize: 8,
-                    entry_num: 12,
+                    entry_num: 0,
+                    currentPage: 1,
                     dialogTipText: '',
                     dialogTips: false,
-                    ordersData: [{
-                        order_number: '12378789398459038545',
-                        buyer: '方阳春',
-                        seller: '周雅琼',
-                        sell_num: 100000,
-                        price: 10.97
-                    }, {
-                        order_number: '12378789398459038545',
-                        buyer: '方阳春',
-                        seller: '周雅琼',
-                        sell_num: 100000,
-                        price: 10.97
-                    }]
+                    ordersData: []
                 }
             },
             methods: {
                 currentPageChange (num) {
-                    console.log(num);
+                    this.currentPage = num;
                 },
                 reviewOrders (bool, data) {
                     if (bool) {
@@ -124,7 +119,59 @@
                 confirmBtn () {
                     console.log('确认');
                     this.dialogTips = false;
+                },
+                getAllOrders () {
+                    var that = this;
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'JSON',
+                        async: false,
+                        data: {
+                            pageSize: that.pagesize,
+                            pageNo: that.currentPage
+                        },
+                        url: 'http://192.168.1.113:8080/zjdeel/order/selectUnaudited.do',
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            if (errorThrown) {
+                                that.$message({
+                                    showClose: true,
+                                    message: errorThrown,
+                                    type: 'warning'
+                                });
+                            } else {
+                                that.$message({
+                                    showClose: true,
+                                    message: '数据获取失败，请稍后重试!',
+                                    type: 'warning'
+                                });
+                            }
+                        },
+                        success: function (data) {
+                            that.entry_num = 0;
+                            that.ordersData = [];
+                            if (data.total > 0) {
+                                that.entry_num = data.total;
+                                data.list.forEach((val, index, arr) => {
+                                    var objData = {
+                                        order_number: val.orderno,
+                                        buyer: val.buyerName,
+                                        buyerSex: val.buyerSex,
+                                        seller: val.sellerName,
+                                        sellerSex: val.sellerSex,
+                                        sell_num: val.dealcount,
+                                        price: val.dealprice
+                                    };
+                                    that.ordersData.push(objData);
+                                });
+                            } else {
+                                this.entry_num = 0;
+                            }
+                        }
+                    });
                 }
+            },
+            mounted() {
+                this.getAllOrders();
             }
         })
     })

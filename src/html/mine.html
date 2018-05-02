@@ -173,7 +173,7 @@
         </div>
     </div>
     <el-dialog width="382px" :title="dialogTitle" :visible.sync="dialogVisible"
-               :close-on-click-modal=false>
+               :close-on-click-modal=false :before-close="handleClose">
         <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm">
             <el-form-item prop="name">
                     <div class="icon_img">
@@ -354,6 +354,7 @@
                         ownerStockData: [],
                         transaction: [],
                         orders: [],
+                        formData: 'ruleForm',
                         ruleForm: {
                             name: '',
                             total_num: '',
@@ -420,7 +421,7 @@
                             data: {
                                 id: stockId
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/systemprop/selectPropById.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/systemprop/selectPropById.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -477,7 +478,7 @@
                             data: {
                                 id: data
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/deal/selectById.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/deal/selectById.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -545,7 +546,7 @@
                                 price: that.ruleForm.price,
                                 remark: that.ruleForm.note,
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/deal/updateDeal.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/deal/updateDeal.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -596,7 +597,7 @@
                                 remark: that.ruleForm.note,
                                 userId: that.userId
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/deal/insertDeal.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/deal/insertDeal.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -648,7 +649,7 @@
                             data: {
                                 id: that.publish_id
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/deal/deleteDeal.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/deal/deleteDeal.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -700,7 +701,7 @@
                                 pageNo: that.currentPage,
                                 pageSize: that.pagesize
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/deal/selectDealByUser.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/deal/selectDealByUser.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -755,7 +756,7 @@
                                 pageNo: that.currentPage,
                                 pageSize: that.pagesize
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/order/selectHisDealByUser.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/order/selectHisDealByUser.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -809,7 +810,7 @@
                                 pageNo: that.currentPage,
                                 pageSize: that.pagesize
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/order/selectHisOrderByUser.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/order/selectHisOrderByUser.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -865,7 +866,7 @@
                             data: {
                                 id: that.userId,
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/owner/selectAllById.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/owner/selectAllById.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -891,7 +892,19 @@
                     },
                     resetForm(formName) {
                         this.$refs[formName].resetFields();
+                        this.total_num_error = true;
+                        this.lock_num_error = true;
+                        this.price_error = true;
+                        this.note_error = true;
                         this.dialogVisible = false;
+                    },
+                    handleClose(done) {
+                        this.$refs[this.formData].resetFields();
+                        this.total_num_error = true;
+                        this.lock_num_error = true;
+                        this.price_error = true;
+                        this.note_error = true;
+                        done();
                     }
                 },
                 mounted() {

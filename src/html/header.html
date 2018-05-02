@@ -444,7 +444,7 @@
                                 passwordOld: $.md5(that.ruleForm1.old_pass),
                                 passwordNew: $.md5(that.ruleForm1.new_pass)
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/user/resetPwd.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/user/resetPwd.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
@@ -489,7 +489,7 @@
                                 userId: that.userId,
                                 password: that.password
                             },
-                            url: 'http://192.168.1.110:8080/zjdeel/user/logout.do',
+                            url: 'http://192.168.1.113:8080/zjdeel/user/logout.do',
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 if (errorThrown) {
                                     that.$message({
